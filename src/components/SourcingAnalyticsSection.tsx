@@ -1,0 +1,899 @@
+import React, { useState } from 'react';
+import { 
+  Package, 
+  RotateCcw, 
+  CheckCircle, 
+  Info, 
+  MoreVertical, 
+  Calendar, 
+  Check, 
+  ExternalLink,
+  ChevronDown,
+  Copy,
+  RefreshCw,
+  HelpCircle,
+  ShieldCheck,
+  DollarSign,
+  Truck
+} from 'lucide-react';
+import { Tooltip } from './Tooltip';
+import { OrderItem } from '../types';
+
+interface SourcingAnalyticsSectionProps {
+  orders: OrderItem[];
+  totalSourcedRMB: number;
+  totalSourcedUSD: number;
+  onShowToast?: (msg: string) => void;
+  onOpenOrderDetail?: (order: OrderItem) => void;
+}
+
+type TimeInterval = 'Monthly' | 'Weekly' | 'Daily';
+type ChartType = 'line' | 'bar';
+
+interface MonthlyDataPoint {
+  month: string;
+  fulfilled: number;
+  fulfilledValUSD: number;
+  fulfilledValRMB: number;
+  cancel: number;
+  cancelValUSD: number;
+  volumeBarHeight: number; // percentage
+}
+
+const MONTHLY_DATA: MonthlyDataPoint[] = [
+  { month: 'Jan', fulfilled: 210, fulfilledValUSD: 6800, fulfilledValRMB: 49232, cancel: 45, cancelValUSD: 3400, volumeBarHeight: 35 },
+  { month: 'Feb', fulfilled: 245, fulfilledValUSD: 7400, fulfilledValRMB: 53576, cancel: 50, cancelValUSD: 3900, volumeBarHeight: 45 },
+  { month: 'Mar', fulfilled: 290, fulfilledValUSD: 8200, fulfilledValRMB: 59368, cancel: 42, cancelValUSD: 3800, volumeBarHeight: 52 },
+  { month: 'Apr', fulfilled: 260, fulfilledValUSD: 6400, fulfilledValRMB: 46336, cancel: 60, cancelValUSD: 4100, volumeBarHeight: 40 },
+  { month: 'May', fulfilled: 320, fulfilledValUSD: 7800, fulfilledValRMB: 56472, cancel: 55, cancelValUSD: 4300, volumeBarHeight: 58 },
+  { month: 'Jun', fulfilled: 356, fulfilledValUSD: 8900, fulfilledValRMB: 64436, cancel: 75, cancelValUSD: 5133, volumeBarHeight: 70 },
+  { month: 'Jul', fulfilled: 380, fulfilledValUSD: 9400, fulfilledValRMB: 68056, cancel: 68, cancelValUSD: 4600, volumeBarHeight: 82 },
+  { month: 'Aug', fulfilled: 410, fulfilledValUSD: 8600, fulfilledValRMB: 62264, cancel: 70, cancelValUSD: 4800, volumeBarHeight: 78 },
+];
+
+export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> = ({
+  orders,
+  totalSourcedRMB,
+  totalSourcedUSD,
+  onShowToast,
+  onOpenOrderDetail
+}) => {
+  const [timeInterval, setTimeInterval] = useState<TimeInterval>('Monthly');
+  const [chartType, setChartType] = useState<ChartType>('line');
+  const [hoveredIndex, setHoveredIndex] = useState<number>(5); // default to June
+  const [isIntervalDropdownOpen, setIsIntervalDropdownOpen] = useState(false);
+  const [mapMode, setMapMode] = useState<'map' | 'satellite'>('map');
+  const [showShipmentMenu, setShowShipmentMenu] = useState(false);
+  const [activeShipmentIndex, setActiveShipmentIndex] = useState(0);
+
+  // Active tracked shipments matching the Proc360 logistics OS
+  const activeShipments = [
+    {
+      id: '#170845-25-800NYK',
+      internalId: 'P360-84920',
+      title: 'CNC Aluminum Mechanical Keyboards (Batch #2)',
+      carrier: 'SF International Air Express',
+      origin: 'Guangdong Consolidation Hub, Dongguan',
+      destination: 'Los Angeles, CA, USA',
+      status: 'In transit',
+      statusColor: 'text-[#E35D3B]',
+      eta: '28 Aug 2026',
+      timeline: [
+        { label: 'Delivered', subtext: 'Estimated 28 Aug 2026', time: '10:20 AM', completed: false, isEstimate: true },
+        { label: 'In Transit', subtext: '27 Aug 2026', time: '09:15 AM', completed: true },
+        { label: 'In Sorting Centre', subtext: '26 Aug 2026', time: '06:21 AM', completed: true },
+        { label: 'Order Confirmed', subtext: '25 Aug 2026', time: '06:21 AM', completed: true },
+      ]
+    },
+    {
+      id: '#194820-99-410LAX',
+      internalId: 'P360-84917',
+      title: 'Ergonomic Desk Accessories & Cable Rigs',
+      carrier: 'Matson Sea Expedited (CLX)',
+      origin: 'Shenzhen Yantian Terminal',
+      destination: 'Long Beach Port -> Inland Hub',
+      status: 'In transit',
+      statusColor: 'text-[#E35D3B]',
+      eta: '04 Sep 2026',
+      timeline: [
+        { label: 'Delivered', subtext: 'Estimated 04 Sep 2026', time: '02:00 PM', completed: false, isEstimate: true },
+        { label: 'Vessel In Pacific Transit', subtext: '30 Aug 2026', time: '11:40 AM', completed: true },
+        { label: 'Customs Cleared at Yantian', subtext: '26 Aug 2026', time: '04:15 PM', completed: true },
+        { label: 'Container Sealed & Loaded', subtext: '24 Aug 2026', time: '08:30 AM', completed: true },
+      ]
+    }
+  ];
+
+  const currentShipment = activeShipments[activeShipmentIndex];
+  const activeMonth = MONTHLY_DATA[hoveredIndex];
+
+  // SVG Chart coordinate configuration (High-res 1000x240 viewBox)
+  const chartWidth = 1000;
+  const chartHeight = 240;
+  const paddingLeft = 55;
+  const paddingRight = 45;
+  const paddingTop = 25;
+  const paddingBottom = 35;
+
+  const plotWidth = chartWidth - paddingLeft - paddingRight;
+  const plotHeight = chartHeight - paddingTop - paddingBottom;
+  const chartBaselineY = chartHeight - paddingBottom;
+
+  // Max value in USD is 10,000
+  const maxVal = 10000;
+  const minVal = 0;
+
+  const pointsFulfilled = MONTHLY_DATA.map((d, i) => {
+    const x = paddingLeft + (i * plotWidth) / (MONTHLY_DATA.length - 1);
+    const y = chartBaselineY - ((d.fulfilledValUSD - minVal) / (maxVal - minVal)) * plotHeight;
+    return { x, y, ...d };
+  });
+
+  const pointsCancel = MONTHLY_DATA.map((d, i) => {
+    const x = paddingLeft + (i * plotWidth) / (MONTHLY_DATA.length - 1);
+    const y = chartBaselineY - ((d.cancelValUSD - minVal) / (maxVal - minVal)) * plotHeight;
+    return { x, y, ...d };
+  });
+
+  // High quality Catmull-Rom to Cubic Bezier spline generator
+  const getSplinePath = (pts: { x: number; y: number }[]) => {
+    if (pts.length === 0) return '';
+    if (pts.length === 1) return `M ${pts[0].x},${pts[0].y}`;
+    let d = `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = i > 0 ? pts[i - 1] : pts[i];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = i < pts.length - 2 ? pts[i + 2] : p2;
+
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+
+      d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
+    }
+    return d;
+  };
+
+  const pathFulfilled = getSplinePath(pointsFulfilled);
+  const pathCancel = getSplinePath(pointsCancel);
+  const areaFulfilled = `${pathFulfilled} L ${pointsFulfilled[pointsFulfilled.length - 1].x},${chartBaselineY} L ${pointsFulfilled[0].x},${chartBaselineY} Z`;
+
+  return (
+    <div className="w-full flex flex-col xl:flex-row items-stretch gap-4 sm:gap-5 overflow-hidden">
+      {/* LEFT SECTION: 3 STAT CARDS + ORDER ANALYSIS CHART */}
+      <div className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-5">
+        {/* TOP ROW: 3 STAT CARDS */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+          
+          {/* Card 1: Total Orders */}
+          <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
+            {/* Header with Box Icon & Info */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-xl border border-slate-200 flex items-center justify-center text-slate-700 bg-slate-50/50">
+                  <Package className="w-3.5 h-3.5 text-slate-700" />
+                </div>
+                <span className="text-xs font-bold text-slate-900 tracking-tight">Total Orders</span>
+              </div>
+              <Tooltip 
+                title="Total Orders"
+                content="Cumulative count of all Purchase Orders routed through 1688, Taobao, and OEM factories."
+                position="bottom"
+              >
+                <div 
+                  className="text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
+                  aria-label="Total orders explanation"
+                >
+                  <Info className="w-3.5 h-3.5" />
+                </div>
+              </Tooltip>
+            </div>
+
+            {/* Metric & Mini Sparkline */}
+            <div className="flex items-center justify-between mt-3">
+              <div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-slate-950 font-mono tracking-tight leading-none">
+                  3,484
+                </div>
+                <div className="flex items-center gap-1 mt-2 text-xs font-bold text-emerald-600 font-mono">
+                  <span>+1.1%</span>
+                  <span className="text-slate-400 font-normal font-sans text-[11px]">vs last week</span>
+                </div>
+              </div>
+
+              {/* Sparkline Visualizer with +$12,180 badge */}
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] font-mono font-bold text-slate-700 mb-0.5">
+                  +¥12,180
+                </span>
+                <svg className="w-20 sm:w-24 h-8 overflow-visible" viewBox="0 0 100 30">
+                  <path
+                    d="M 0,20 Q 20,22 35,12 T 65,18 T 100,5"
+                    fill="none"
+                    stroke="#E35D3B"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                  <circle cx="100" cy="5" r="2.5" fill="#E35D3B" />
+                </svg>
+              </div>
+            </div>
+
+            {/* Helper Bar */}
+            <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+              <span>All 1688 & factory POs</span>
+              <span className="text-slate-400 text-[10px]">Active</span>
+            </div>
+          </div>
+
+          {/* Card 2: Returns / QC Issues Orders */}
+          <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
+            {/* Header with Rotate Icon & Info */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-xl border border-rose-200/70 flex items-center justify-center text-rose-600 bg-rose-50/50">
+                  <RotateCcw className="w-3.5 h-3.5 text-rose-600" />
+                </div>
+                <span className="text-xs font-bold text-slate-900 tracking-tight">Returns Orders</span>
+              </div>
+              <Tooltip 
+                title="Returns & Refunds"
+                content="Items that failed 5-point QC at China hubs and were returned to 1688/factories for full RMB refunds before international dispatch."
+                position="bottom"
+              >
+                <div 
+                  className="text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
+                  aria-label="Returns order explanation"
+                >
+                  <Info className="w-3.5 h-3.5 text-[#E35D3B]" />
+                </div>
+              </Tooltip>
+            </div>
+
+            {/* Metric & Mini Columns */}
+            <div className="flex items-center justify-between mt-3">
+              <div>
+                <div className="text-2xl sm:text-3xl font-extrabold text-slate-950 font-mono tracking-tight leading-none">
+                  978
+                </div>
+                <div className="flex items-center gap-1 mt-2 text-xs font-bold text-[#E35D3B] font-mono">
+                  <span>-3.3%</span>
+                  <span className="text-slate-400 font-normal font-sans text-[11px]">vs last week</span>
+                </div>
+              </div>
+
+              {/* Mini Column Array */}
+              <div className="flex items-end gap-1.5 h-8 pr-1">
+                <div className="w-2.5 h-6 rounded-xs bg-slate-100" />
+                <div className="w-2.5 h-7 rounded-xs bg-slate-100" />
+                <div className="w-2.5 h-8 rounded-xs bg-[#E35D3B]" />
+                <div className="w-2.5 h-7 rounded-xs bg-slate-100" />
+                <div className="w-2.5 h-6 rounded-xs bg-slate-100" />
+              </div>
+            </div>
+
+            {/* Helper Bar */}
+            <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+              <span className="truncate pr-1">
+                China QC rejects & seller refunds
+              </span>
+              <span className="text-emerald-600 font-semibold text-[10px]">100% Escrow</span>
+            </div>
+          </div>
+
+          {/* Card 3: Fulfilled Orders & QC Satisfaction */}
+          <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
+            {/* Header with Checkmark Icon & Info */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-xl border border-emerald-200/70 flex items-center justify-center text-emerald-600 bg-emerald-50/50">
+                  <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
+                </div>
+                <span className="text-xs font-bold text-slate-900 tracking-tight">Fulfilled Orders</span>
+              </div>
+              <Tooltip 
+                title="Fulfilled Orders"
+                content="302 orders verified via 5-point QC inspection and packed for export; 184 in active inspection."
+                position="bottom"
+              >
+                <div 
+                  className="text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
+                  aria-label="Fulfilled orders explanation"
+                >
+                  <Info className="w-3.5 h-3.5" />
+                </div>
+              </Tooltip>
+            </div>
+
+            {/* Split Progress Columns */}
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              {/* Satisfied */}
+              <div>
+                <div className="text-xl sm:text-2xl font-extrabold text-slate-950 font-mono leading-none">
+                  302
+                </div>
+                <p className="text-[10px] text-emerald-600 font-semibold mt-1">Satisfied</p>
+                <div className="w-full h-1.5 rounded-full bg-emerald-500 mt-1.5" />
+              </div>
+
+              {/* Not Satisfied / Pending */}
+              <div>
+                <div className="text-xl sm:text-2xl font-extrabold text-slate-950 font-mono leading-none">
+                  184
+                </div>
+                <p className="text-[10px] text-amber-600 font-semibold mt-1">In Inspection</p>
+                <div className="w-full h-1.5 rounded-full bg-amber-400 mt-1.5" />
+              </div>
+            </div>
+
+            {/* Helper Bar */}
+            <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+              <span>Passed 5-pt QC & boxed</span>
+              <span className="text-slate-400 text-[10px]">5/5 QC</span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* BOTTOM ROW: ORDER ANALYSIS CHART */}
+        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-2xs relative overflow-hidden">
+          {/* Header Controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3">
+            {/* Title & Legend Pill */}
+            <div className="flex items-center gap-3.5 flex-wrap">
+              <h2 className="text-base font-bold text-slate-950 tracking-tight">
+                Order Analysis
+              </h2>
+              <Tooltip
+                title="Reimbursed Escrow"
+                content="Funds reclaimed from Chinese sellers via discounts, rebates, and defective batch returns."
+                position="top"
+              >
+                <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200/60 cursor-pointer">
+                  <span className="w-2.5 h-2.5 rounded-xs bg-slate-900" />
+                  <span className="font-semibold text-slate-800">Reimbursed $5,133</span>
+                  <span className="text-[11px] text-slate-400 font-mono hidden md:inline">(¥37,200 RMB)</span>
+                </div>
+              </Tooltip>
+            </div>
+
+            {/* Right Interactive Selectors: Time Interval + Line/Bar Switcher */}
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              {/* Time Interval Dropdown */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsIntervalDropdownOpen(!isIntervalDropdownOpen)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 transition-colors cursor-pointer"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                  <span>{timeInterval}</span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+
+                {isIntervalDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-1.5 w-32 bg-white border border-slate-200 rounded-xl shadow-lg p-1 z-30 animate-in fade-in duration-100 text-xs">
+                    {(['Monthly', 'Weekly', 'Daily'] as TimeInterval[]).map((interval) => (
+                      <button
+                        key={interval}
+                        type="button"
+                        onClick={() => {
+                          setTimeInterval(interval);
+                          setIsIntervalDropdownOpen(false);
+                          if (onShowToast) onShowToast(`Switched view to ${interval} Sourcing Velocity`);
+                        }}
+                        className={`w-full text-left px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                          timeInterval === interval ? 'bg-slate-100 font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50'
+                        }`}
+                      >
+                        {interval}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Line vs Bar Switcher */}
+              <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200/60">
+                <button
+                  type="button"
+                  onClick={() => setChartType('line')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    chartType === 'line'
+                      ? 'bg-white text-slate-950 shadow-2xs'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  Line
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChartType('bar')}
+                  className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    chartType === 'bar'
+                      ? 'bg-white text-slate-950 shadow-2xs'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  Bar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Chart Content Area */}
+          <div className="pt-2">
+            {/* Chart Legend Indicators */}
+            <div className="flex items-center justify-between gap-4 text-xs font-medium text-slate-600 mb-3 flex-wrap">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+                  <span className="font-medium text-slate-800">Fulfilled Orders (USD / RMB)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+                  <span className="font-medium text-rose-600">Cancel / QC Returned</span>
+                </div>
+              </div>
+              <div className="text-[11px] font-mono text-slate-400 hidden sm:block">
+                1 USD ≈ 7.24 RMB
+              </div>
+            </div>
+
+            {/* Custom SVG Visualization Container */}
+            <div className="relative w-full bg-slate-50/40 rounded-2xl p-2 sm:p-3 border border-slate-100/80">
+              {/* Main Chart Graphic Canvas */}
+              <div className="relative w-full h-[210px] sm:h-[230px]">
+                {chartType === 'line' ? (
+                  <svg 
+                    className="w-full h-full" 
+                    viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
+                    preserveAspectRatio="none"
+                  >
+                    <defs>
+                      <linearGradient id="fulfilledGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10B981" stopOpacity="0.25" />
+                        <stop offset="60%" stopColor="#10B981" stopOpacity="0.08" />
+                        <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+                      </linearGradient>
+                      <filter id="shadowGlow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#10B981" floodOpacity="0.3" />
+                      </filter>
+                    </defs>
+
+                    {/* Horizontal Grid Lines & Y-Axis Reference Guides */}
+                    {[
+                      { val: '$10k', rmb: '¥72.4k', y: paddingTop },
+                      { val: '$7.5k', rmb: '¥54.3k', y: paddingTop + plotHeight * 0.25 },
+                      { val: '$5.0k', rmb: '¥36.2k', y: paddingTop + plotHeight * 0.5 },
+                      { val: '$2.5k', rmb: '¥18.1k', y: paddingTop + plotHeight * 0.75 },
+                      { val: '$0k', rmb: '¥0', y: chartBaselineY },
+                    ].map((grid, idx) => (
+                      <g key={grid.val}>
+                        <line
+                          x1={paddingLeft}
+                          y1={grid.y}
+                          x2={chartWidth - paddingRight}
+                          y2={grid.y}
+                          stroke={idx === 4 ? '#cbd5e1' : '#f1f5f9'}
+                          strokeWidth={idx === 4 ? '1.5' : '1'}
+                          strokeDasharray={idx === 4 ? 'none' : '4 4'}
+                        />
+                        <text
+                          x={paddingLeft - 8}
+                          y={grid.y + 3.5}
+                          textAnchor="end"
+                          className="text-[11px] font-mono fill-slate-400 font-medium"
+                        >
+                          {grid.val}
+                        </text>
+                        <text
+                          x={chartWidth - paddingRight + 8}
+                          y={grid.y + 3.5}
+                          textAnchor="start"
+                          className="text-[10px] font-mono fill-slate-300 hidden md:block"
+                        >
+                          {grid.rmb}
+                        </text>
+                      </g>
+                    ))}
+
+                    {/* Gradient Fill under Fulfilled Line */}
+                    <path
+                      d={areaFulfilled}
+                      fill="url(#fulfilledGrad)"
+                    />
+
+                    {/* Cancelled Curve (Red / Bad - Dashed) */}
+                    <path
+                      d={pathCancel}
+                      fill="none"
+                      stroke="#EF4444"
+                      strokeWidth="2.2"
+                      strokeDasharray="5 5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+
+                    {/* Fulfilled Curve (Emerald Green / Good - High-Precision Spline) */}
+                    <path
+                      d={pathFulfilled}
+                      fill="none"
+                      stroke="#10B981"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      filter="url(#shadowGlow)"
+                    />
+
+                    {/* Vertical Active Cursor Guide Line */}
+                    {hoveredIndex !== null && (
+                      <g>
+                        <line
+                          x1={pointsFulfilled[hoveredIndex].x}
+                          y1={paddingTop}
+                          x2={pointsFulfilled[hoveredIndex].x}
+                          y2={chartBaselineY}
+                          stroke="#10B981"
+                          strokeWidth="1.5"
+                          strokeDasharray="3 3"
+                          opacity="0.7"
+                        />
+                      </g>
+                    )}
+
+                    {/* Cancelled Data Points (Subtle Red Dots) */}
+                    {pointsCancel.map((pt, i) => (
+                      <g key={`cancel-${pt.month}`}>
+                        <circle
+                          cx={pt.x}
+                          cy={pt.y}
+                          r="3.5"
+                          fill="#ffffff"
+                          stroke="#EF4444"
+                          strokeWidth="1.8"
+                        />
+                      </g>
+                    ))}
+
+                    {/* Fulfilled Data Points (Emerald Dual-Ring Circular Points) */}
+                    {pointsFulfilled.map((pt, i) => {
+                      const isHovered = hoveredIndex === i;
+                      return (
+                        <g 
+                          key={`pt-${pt.month}`}
+                          className="cursor-pointer"
+                          onMouseEnter={() => setHoveredIndex(i)}
+                          onClick={() => {
+                            setHoveredIndex(i);
+                            if (onShowToast) onShowToast(`${pt.month} Velocity: ${pt.fulfilled} orders ($${pt.fulfilledValUSD.toLocaleString()} / ¥${pt.fulfilledValRMB.toLocaleString()} RMB)`);
+                          }}
+                        >
+                          {/* Invisible larger hover hit area */}
+                          <rect
+                            x={pt.x - 25}
+                            y={paddingTop}
+                            width="50"
+                            height={plotHeight}
+                            fill="transparent"
+                          />
+
+                          {/* Outer Pulsing Aura Ring on Active/Hovered Point */}
+                          {isHovered && (
+                            <circle
+                              cx={pt.x}
+                              cy={pt.y}
+                              r="11"
+                              fill="#10B981"
+                              fillOpacity="0.25"
+                              className="animate-pulse"
+                            />
+                          )}
+
+                          {/* White Outer Halo Ring */}
+                          <circle
+                            cx={pt.x}
+                            cy={pt.y}
+                            r={isHovered ? 6 : 4.5}
+                            fill="#ffffff"
+                            stroke="#10B981"
+                            strokeWidth={isHovered ? 3 : 2}
+                          />
+
+                          {/* Center Solid Core Dot */}
+                          <circle
+                            cx={pt.x}
+                            cy={pt.y}
+                            r={isHovered ? 2.5 : 2}
+                            fill="#10B981"
+                          />
+                        </g>
+                      );
+                    })}
+                  </svg>
+                ) : (
+                  /* Volume Bar Chart View */
+                  <div className="w-full h-full flex items-end justify-between px-8 sm:px-12 pb-2">
+                    {MONTHLY_DATA.map((d, i) => {
+                      const isHovered = hoveredIndex === i;
+                      const fulfilledHeightPercent = (d.fulfilledValUSD / maxVal) * 100;
+                      const cancelHeightPercent = (d.cancelValUSD / maxVal) * 100;
+                      return (
+                        <div
+                          key={`bar-${d.month}`}
+                          onMouseEnter={() => setHoveredIndex(i)}
+                          className="flex flex-col items-center gap-1.5 h-full justify-end group cursor-pointer"
+                        >
+                          <div className="flex items-end gap-1 h-[170px]">
+                            {/* Fulfilled Bar (Green) */}
+                            <div
+                              style={{ height: `${fulfilledHeightPercent}%` }}
+                              className={`w-3.5 sm:w-5 rounded-t-md transition-all ${
+                                isHovered ? 'bg-emerald-500 shadow-md scale-y-[1.02]' : 'bg-emerald-500/80 group-hover:bg-emerald-500'
+                              }`}
+                            />
+                            {/* Cancel / QC Bar (Red) */}
+                            <div
+                              style={{ height: `${cancelHeightPercent}%` }}
+                              className={`w-2.5 sm:w-3.5 rounded-t-md transition-all ${
+                                isHovered ? 'bg-rose-500 shadow-xs' : 'bg-rose-400/70 group-hover:bg-rose-500'
+                              }`}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Floating Tooltip Card */}
+                {hoveredIndex !== null && (
+                  <div 
+                    style={{
+                      left: `${((hoveredIndex) / (MONTHLY_DATA.length - 1)) * 74 + 13}%`,
+                      top: '12%',
+                    }}
+                    className="absolute z-20 bg-slate-950/95 text-white border border-white/15 rounded-2xl p-3 shadow-2xl pointer-events-none -translate-x-1/2 animate-in fade-in duration-150 min-w-[170px] backdrop-blur-md"
+                  >
+                    <div className="text-xs font-bold text-white mb-2 border-b border-white/10 pb-1.5 flex items-center justify-between">
+                      <span>{activeMonth.month} 2026</span>
+                      <span className="text-[10px] font-mono text-emerald-400 font-bold">● Active</span>
+                    </div>
+                    <div className="space-y-1.5 text-xs font-mono">
+                      <div className="flex items-center justify-between gap-3 text-slate-200">
+                        <span className="flex items-center gap-1.5 font-sans text-[11px] text-slate-300">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                          <span>Fulfilled</span>
+                        </span>
+                        <span className="font-extrabold text-emerald-400">
+                          ${activeMonth.fulfilledValUSD.toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="text-[10px] text-right text-slate-400 leading-tight">
+                        ¥{activeMonth.fulfilledValRMB.toLocaleString()} RMB ({activeMonth.fulfilled} POs)
+                      </div>
+                      <div className="flex items-center justify-between gap-3 text-slate-300 pt-1 border-t border-white/10">
+                        <span className="flex items-center gap-1.5 font-sans text-[11px] text-slate-400">
+                          <span className="w-2 h-2 rounded-full bg-rose-500" />
+                          <span>Cancel / QC</span>
+                        </span>
+                        <span className="font-bold text-rose-400">
+                          ${activeMonth.cancelValUSD.toLocaleString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Dedicated X-Axis Month Markers (Cleanly separated from line graph) */}
+              <div className="flex items-center justify-between text-xs font-medium text-slate-500 pt-2.5 px-6 sm:px-10 border-t border-slate-200/60 mt-1">
+                {MONTHLY_DATA.map((d, i) => {
+                  const isSelected = hoveredIndex === i;
+                  return (
+                    <button
+                      key={d.month}
+                      type="button"
+                      onMouseEnter={() => setHoveredIndex(i)}
+                      onClick={() => {
+                        setHoveredIndex(i);
+                        if (onShowToast) onShowToast(`${d.month} Sourcing: ${d.fulfilled} orders fulfilled ($${d.fulfilledValUSD.toLocaleString()} / ¥${d.fulfilledValRMB.toLocaleString()} RMB)`);
+                      }}
+                      className={`px-2.5 py-1 rounded-xl transition-all cursor-pointer font-medium ${
+                        isSelected 
+                          ? 'text-slate-950 font-bold bg-white shadow-xs border border-slate-200 scale-105' 
+                          : 'hover:text-slate-900 hover:bg-slate-100/80 text-slate-500'
+                      }`}
+                    >
+                      {d.month}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* RIGHT SECTION: TRACK NEW SHIPMENT CARD */}
+      <div className="w-full xl:w-[360px] shrink-0 bg-white rounded-3xl p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between overflow-hidden">
+        
+        {/* Card Header */}
+        <div className="flex items-center justify-between relative pb-2 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm font-bold text-slate-950 tracking-tight">
+              Track New Shipment
+            </h3>
+            <Tooltip 
+              title="Shipment Tracking"
+              content="Live GPS telemetry for domestic SF Express pickups and international Air Express/Ocean freight."
+              position="bottom"
+            >
+              <div 
+                className="text-slate-400 hover:text-slate-600 p-0.5 rounded cursor-pointer"
+                aria-label="Live GPS telemetry"
+              >
+                <Info className="w-3.5 h-3.5" />
+              </div>
+            </Tooltip>
+          </div>
+
+          {/* Three-dots menu */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowShipmentMenu(!showShipmentMenu)}
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+              aria-label="Shipment options"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+
+            {showShipmentMenu && (
+              <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 z-40 animate-in fade-in duration-100 text-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveShipmentIndex((activeShipmentIndex + 1) % activeShipments.length);
+                    setShowShipmentMenu(false);
+                    if (onShowToast) onShowToast('Switched to active freight waybill');
+                  }}
+                  className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-50 flex items-center gap-2 text-slate-700 cursor-pointer"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 text-slate-400" /> Switch Active Parcel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowShipmentMenu(false);
+                    navigator.clipboard.writeText(currentShipment.id);
+                    if (onShowToast) onShowToast(`Copied tracking number: ${currentShipment.id}`);
+                  }}
+                  className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-50 flex items-center gap-2 text-slate-700 cursor-pointer"
+                >
+                  <Copy className="w-3.5 h-3.5 text-slate-400" /> Copy Waybill ID
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Interactive Map Visualizer Container */}
+        <div className="relative my-3 rounded-2xl overflow-hidden border border-slate-200/90 bg-slate-900 h-44 shadow-inner">
+          <svg className="w-full h-full absolute inset-0 opacity-40" xmlns="http://www.w3.org/2000/svg">
+            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
+            </pattern>
+            <rect width="100%" height="100%" fill="url(#grid)" />
+          </svg>
+
+          {/* Map Route Graphics */}
+          <svg className="w-full h-full absolute inset-0 overflow-visible" viewBox="0 0 320 180">
+            <path
+              d="M 40,120 Q 140,30 270,75"
+              fill="none"
+              stroke="#475569"
+              strokeWidth="2"
+              strokeDasharray="4 4"
+            />
+            <path
+              d="M 40,120 Q 110,65 170,55"
+              fill="none"
+              stroke="#E35D3B"
+              strokeWidth="3"
+            />
+
+            <g transform="translate(40, 120)">
+              <circle r="5" fill="#10b981" />
+              <circle r="9" fill="none" stroke="#10b981" strokeWidth="1.5" className="animate-ping opacity-60" />
+            </g>
+
+            <g transform="translate(170, 55)">
+              <circle r="6" fill="#E35D3B" />
+              <circle r="11" fill="none" stroke="#E35D3B" strokeWidth="2" className="animate-ping" />
+            </g>
+
+            <g transform="translate(270, 75)">
+              <circle r="5" fill="#ffffff" />
+            </g>
+          </svg>
+
+          <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-950/80 backdrop-blur-xs border border-white/10 text-[11px] font-mono text-white">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#E35D3B] animate-pulse" />
+            <span>SF-EXPRESS AIR</span>
+          </div>
+
+          <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono text-slate-300 bg-slate-950/85 backdrop-blur-xs px-3 py-1.5 rounded-xl border border-white/10">
+            <span>{currentShipment.origin.split(',')[0]}</span>
+            <span className="text-[#E35D3B] font-bold">● IN TRANSIT</span>
+            <span>{currentShipment.destination.split(',')[0]}</span>
+          </div>
+        </div>
+
+        {/* Tracking ID & Summary Bar */}
+        <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between mb-3">
+          <div>
+            <p className="text-[10px] text-slate-400 font-semibold leading-tight">Current Consignment</p>
+            <p className="text-xs font-mono font-bold text-slate-950 leading-snug mt-0.5">
+              {currentShipment.id}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              navigator.clipboard.writeText(currentShipment.id);
+              if (onShowToast) onShowToast(`Copied tracking number: ${currentShipment.id}`);
+            }}
+            className="p-1.5 text-slate-400 hover:text-slate-800 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all cursor-pointer"
+            title="Copy Tracking ID"
+          >
+            <Copy className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Stepper Timeline with Checkboxes matching screenshot */}
+        <div className="space-y-2.5 pt-1 relative">
+          <div className="absolute left-[7px] top-3 bottom-3 w-0.5 bg-slate-200 -z-0" />
+
+          {currentShipment.timeline.map((step) => (
+            <div 
+              key={step.label}
+              className="flex items-start justify-between gap-2 relative z-10 text-xs"
+            >
+              {/* Checkbox indicator */}
+              <div className="flex items-start gap-2.5 min-w-0">
+                <div 
+                  className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 mt-0.5 ${
+                    step.completed
+                      ? 'bg-[#E35D3B] text-white shadow-2xs'
+                      : 'bg-white border-2 border-slate-300'
+                  }`}
+                >
+                  {step.completed && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                </div>
+
+                <div className="min-w-0">
+                  <p className={`font-semibold leading-tight ${step.completed ? 'text-slate-900' : 'text-slate-500'}`}>
+                    {step.label}
+                  </p>
+                  <p className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5 truncate">
+                    {step.subtext}
+                  </p>
+                </div>
+              </div>
+
+              {/* Timestamp on right */}
+              <span className="text-[10px] font-mono text-slate-400 shrink-0 font-medium">
+                {step.time}
+              </span>
+            </div>
+          ))}
+        </div>
+
+      </div>
+    </div>
+  );
+};
