@@ -524,6 +524,13 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                           src={order.thumbnail}
                           alt=""
                           referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            // Fallback to a reliable SVG placeholder or high-reliability image
+                            const target = e.currentTarget;
+                            if (!target.src.includes('photo-1577937927133-66ef06acdf18')) {
+                              target.src = 'https://images.unsplash.com/photo-1577937927133-66ef06acdf18?w=160&auto=format&fit=crop&q=80';
+                            }
+                          }}
                           className="w-9 h-9 rounded-xl object-cover border border-slate-200/80 bg-slate-100"
                         />
                         {order.qcPhotos && order.qcPhotos.length > 0 && (

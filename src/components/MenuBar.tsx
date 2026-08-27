@@ -160,9 +160,35 @@ export const MenuBar: React.FC<MenuBarProps> = ({
           </div>
         </form>
 
-        {/* Right Section: Account and Help */}
-        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+        {/* Right Section: Focus View Mode + Account and Help */}
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           
+          {/* Focus View Mode Toggle */}
+          {onToggleFocusMode && (
+            <button
+              type="button"
+              onClick={onToggleFocusMode}
+              title={isFocusMode ? "Exit Focus View (Show analytics charts)" : "Enter Focus View (Hide analytics charts to maximize order space)"}
+              className={`flex items-center gap-1.5 h-9 sm:h-10 px-2.5 sm:px-3 rounded-md text-xs sm:text-sm font-semibold transition-all cursor-pointer border select-none ${
+                isFocusMode
+                  ? 'bg-slate-900 text-white border-slate-950 shadow-xs ring-2 ring-slate-900/20'
+                  : 'bg-white text-slate-700 hover:text-slate-950 hover:bg-slate-50 border-slate-200 shadow-2xs'
+              }`}
+            >
+              {isFocusMode ? (
+                <Minimize2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              ) : (
+                <Maximize2 className="w-4 h-4 text-slate-500 shrink-0" />
+              )}
+              <span className="hidden sm:inline">Focus View</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold leading-none ${
+                isFocusMode ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-slate-100 text-slate-500'
+              }`}>
+                {isFocusMode ? 'ON' : 'OFF'}
+              </span>
+            </button>
+          )}
+
           {/* Account Dropdown */}
           <div className="relative" ref={accountRef}>
             <button

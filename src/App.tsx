@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { mockOrders, initialWalletState } from './data/mockOrders';
 import { OrderItem, WalletState } from './types';
 import { MenuBar } from './components/MenuBar';
@@ -13,12 +14,13 @@ import { WalletModal } from './components/WalletModal';
 import { ActionModal } from './components/ActionModal';
 import { ConsolidationDrawer } from './components/ConsolidationDrawer';
 import { PhotoModal } from './components/PhotoModal';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Maximize2, Sparkles } from 'lucide-react';
 
 export function App() {
   // Main State
   const [orders, setOrders] = useState<OrderItem[]>(mockOrders);
   const [wallet, setWallet] = useState<WalletState>(initialWalletState);
+  const [isFocusMode, setIsFocusMode] = useState(false);
 
   // Real-time Updated Order IDs Tracker for Animation Highlight
   const [recentlyUpdatedOrderIds, setRecentlyUpdatedOrderIds] = useState<Record<string, number>>({});
@@ -352,6 +354,12 @@ export function App() {
         totalOrdersCount={counts.all}
         walletBalanceCNY={wallet.balanceCNY}
         wallet={wallet}
+        isFocusMode={isFocusMode}
+        onToggleFocusMode={() => {
+          const next = !isFocusMode;
+          setIsFocusMode(next);
+          showToast(next ? 'Focus View Active: Secondary analytics charts hidden' : 'Focus View Deactivated: Sourcing charts restored');
+        }}
         onOpenFundWallet={() => setIsFundWalletOpen(true)}
         onOpenPlaceOrder={() => setIsNewOrderOpen(true)}
         onExport={handleExportData}
@@ -371,14 +379,48 @@ export function App() {
           onShowToast={showToast}
         />
 
-        {/* Sourcing Analytics & Live Freight Tracking Section */}
-        <SourcingAnalyticsSection
-          orders={orders}
-          totalSourcedRMB={totalSourcedRMB}
-          totalSourcedUSD={totalSourcedUSD}
-          onShowToast={showToast}
-          onOpenOrderDetail={(order) => setSelectedOrderDetail(order)}
-        />
+        {/* Sourcing Analytics & Live Freight Tracking Section (Collapsible in Focus View) */}
+        <AnimatePresence initial={false}>
+          {!isFocusMode && (
+            <motion.div
+              key="sourcing-analytics"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden"
+            >
+              <SourcingAnalyticsSection
+                orders={orders}
+                totalSourcedRMB={totalSourcedRMB}
+                totalSourcedUSD={totalSourcedUSD}
+                onShowToast={showToast}
+                onOpenOrderDetail={(order) => setSelectedOrderDetail(order)}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Focus Mode Workspace Notice Banner */}
+        {isFocusMode && (
+          <div className="w-full bg-slate-900 text-white rounded-xl px-4 py-2.5 flex items-center justify-between gap-3 shadow-sm border border-slate-800 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span className="font-semibold">Focus View Active</span>
+              <span className="text-slate-400 hidden sm:inline">• Secondary analytics charts hidden to maximize order space</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setIsFocusMode(false);
+                showToast('Focus View Deactivated: Sourcing charts restored');
+              }}
+              className="text-xs font-bold text-emerald-400 hover:text-emerald-300 underline cursor-pointer"
+            >
+              Show Analytics Charts
+            </button>
+          </div>
+        )}
 
         {/* Orders Table with 10-order View More limit */}
         <OrdersTable

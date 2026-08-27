@@ -109,6 +109,12 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
               src={order.thumbnail}
               alt=""
               referrerPolicy="no-referrer"
+              onError={(e) => {
+                const target = e.currentTarget;
+                if (!target.src.includes('photo-1577937927133-66ef06acdf18')) {
+                  target.src = 'https://images.unsplash.com/photo-1577937927133-66ef06acdf18?w=160&auto=format&fit=crop&q=80';
+                }
+              }}
               className="w-20 h-20 rounded-xl object-cover border border-slate-200 bg-white shrink-0"
             />
             <div className="flex-1 min-w-0 space-y-1">

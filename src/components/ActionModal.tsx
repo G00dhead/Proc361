@@ -146,6 +146,12 @@ export const ActionModal: React.FC<ActionModalProps> = ({
                 src={order.thumbnail}
                 alt=""
                 referrerPolicy="no-referrer"
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.includes('photo-1577937927133-66ef06acdf18')) {
+                    target.src = 'https://images.unsplash.com/photo-1577937927133-66ef06acdf18?w=160&auto=format&fit=crop&q=80';
+                  }
+                }}
                 className="w-11 h-11 rounded-xl object-cover border border-slate-200 bg-white"
               />
               <div>

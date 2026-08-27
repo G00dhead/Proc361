@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   Package, 
   RotateCcw, 
@@ -60,7 +61,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
 }) => {
   const [timeInterval, setTimeInterval] = useState<TimeInterval>('Monthly');
   const [chartType, setChartType] = useState<ChartType>('line');
-  const [hoveredIndex, setHoveredIndex] = useState<number>(5); // default to June
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [isIntervalDropdownOpen, setIsIntervalDropdownOpen] = useState(false);
   const [mapMode, setMapMode] = useState<'map' | 'satellite'>('map');
   const [showShipmentMenu, setShowShipmentMenu] = useState(false);
@@ -105,7 +106,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
   ];
 
   const currentShipment = activeShipments[activeShipmentIndex];
-  const activeMonth = MONTHLY_DATA[hoveredIndex];
+  const activeMonth = hoveredIndex !== null ? MONTHLY_DATA[hoveredIndex] : null;
 
   // SVG Chart coordinate configuration (High-res 1000x240 viewBox)
   const chartWidth = 1000;
@@ -307,31 +308,41 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               </Tooltip>
             </div>
 
-            {/* Split Progress Columns */}
+            {/* Split Progress Columns with Clear Contextual Labels */}
             <div className="grid grid-cols-2 gap-3 mt-3">
-              {/* Satisfied */}
-              <div>
-                <div className="text-xl sm:text-2xl font-extrabold text-slate-950 font-mono leading-none">
-                  302
+              {/* Passed QC / Satisfied (Green) */}
+              <div className="bg-emerald-50/50 p-2.5 rounded-2xl border border-emerald-100/80">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-emerald-800 font-bold">Passed QC</span>
+                  <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded-md">62%</span>
                 </div>
-                <p className="text-[10px] text-emerald-600 font-semibold mt-1">Satisfied</p>
-                <div className="w-full h-1.5 rounded-full bg-emerald-500 mt-1.5" />
+                <div className="text-xl sm:text-2xl font-extrabold text-emerald-950 font-mono leading-none mt-1.5">
+                  302 <span className="text-[11px] font-sans font-normal text-emerald-700">POs</span>
+                </div>
+                <div className="w-full h-1.5 rounded-full bg-emerald-200 mt-2 overflow-hidden">
+                  <div className="h-full bg-emerald-500 rounded-full w-[62%]" />
+                </div>
               </div>
 
-              {/* Not Satisfied / Pending */}
-              <div>
-                <div className="text-xl sm:text-2xl font-extrabold text-slate-950 font-mono leading-none">
-                  184
+              {/* In Inspection / Pending (Amber/Yellow) */}
+              <div className="bg-amber-50/50 p-2.5 rounded-2xl border border-amber-100/80">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] text-amber-800 font-bold">In QC Queue</span>
+                  <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-100/70 px-1.5 py-0.5 rounded-md">38%</span>
                 </div>
-                <p className="text-[10px] text-amber-600 font-semibold mt-1">In Inspection</p>
-                <div className="w-full h-1.5 rounded-full bg-amber-400 mt-1.5" />
+                <div className="text-xl sm:text-2xl font-extrabold text-amber-950 font-mono leading-none mt-1.5">
+                  184 <span className="text-[11px] font-sans font-normal text-amber-700">POs</span>
+                </div>
+                <div className="w-full h-1.5 rounded-full bg-amber-200 mt-2 overflow-hidden">
+                  <div className="h-full bg-amber-500 rounded-full w-[38%]" />
+                </div>
               </div>
             </div>
 
             {/* Helper Bar */}
             <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-              <span>Passed 5-pt QC & boxed</span>
-              <span className="text-slate-400 text-[10px]">5/5 QC</span>
+              <span className="text-slate-600">302 Passed QC • 184 In Hub Check</span>
+              <span className="text-emerald-700 font-semibold text-[10px] bg-emerald-50 px-1.5 py-0.5 rounded">486 Total Sourced</span>
             </div>
           </div>
 
@@ -443,7 +454,11 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
             </div>
 
             {/* Custom SVG Visualization Container */}
-            <div className="relative w-full bg-slate-50/40 rounded-2xl p-2 sm:p-3 border border-slate-100/80">
+            <div 
+              className="relative w-full bg-slate-50/40 rounded-2xl p-2 sm:p-3 border border-slate-100/80 select-none"
+              onMouseLeave={() => setHoveredIndex(null)}
+              onClick={() => setHoveredIndex(null)}
+            >
               {/* Main Chart Graphic Canvas */}
               <div className="relative w-full h-[210px] sm:h-[230px]">
                 {chartType === 'line' ? (
@@ -529,7 +544,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                     />
 
                     {/* Vertical Active Cursor Guide Line */}
-                    {hoveredIndex !== null && (
+                    {hoveredIndex !== null && pointsFulfilled[hoveredIndex] && (
                       <g>
                         <line
                           x1={pointsFulfilled[hoveredIndex].x}
@@ -545,7 +560,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                     )}
 
                     {/* Cancelled Data Points (Subtle Red Dots) */}
-                    {pointsCancel.map((pt, i) => (
+                    {pointsCancel.map((pt) => (
                       <g key={`cancel-${pt.month}`}>
                         <circle
                           cx={pt.x}
@@ -565,10 +580,16 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                         <g 
                           key={`pt-${pt.month}`}
                           className="cursor-pointer"
-                          onMouseEnter={() => setHoveredIndex(i)}
-                          onClick={() => {
+                          onMouseEnter={(e) => {
+                            e.stopPropagation();
                             setHoveredIndex(i);
-                            if (onShowToast) onShowToast(`${pt.month} Velocity: ${pt.fulfilled} orders ($${pt.fulfilledValUSD.toLocaleString()} / ¥${pt.fulfilledValRMB.toLocaleString()} RMB)`);
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setHoveredIndex((prev) => (prev === i ? null : i));
+                            if (onShowToast) {
+                              onShowToast(`${pt.month} Velocity: ${pt.fulfilled} orders ($${pt.fulfilledValUSD.toLocaleString()} / ¥${pt.fulfilledValRMB.toLocaleString()} RMB)`);
+                            }
                           }}
                         >
                           {/* Invisible larger hover hit area */}
@@ -623,7 +644,14 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                       return (
                         <div
                           key={`bar-${d.month}`}
-                          onMouseEnter={() => setHoveredIndex(i)}
+                          onMouseEnter={(e) => {
+                            e.stopPropagation();
+                            setHoveredIndex(i);
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setHoveredIndex((prev) => (prev === i ? null : i));
+                          }}
                           className="flex flex-col items-center gap-1.5 h-full justify-end group cursor-pointer"
                         >
                           <div className="flex items-end gap-1 h-[170px]">
@@ -648,44 +676,58 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   </div>
                 )}
 
-                {/* Floating Tooltip Card */}
-                {hoveredIndex !== null && (
-                  <div 
-                    style={{
-                      left: `${((hoveredIndex) / (MONTHLY_DATA.length - 1)) * 74 + 13}%`,
-                      top: '12%',
-                    }}
-                    className="absolute z-20 bg-slate-950/95 text-white border border-white/15 rounded-2xl p-3 shadow-2xl pointer-events-none -translate-x-1/2 animate-in fade-in duration-150 min-w-[170px] backdrop-blur-md"
-                  >
-                    <div className="text-xs font-bold text-white mb-2 border-b border-white/10 pb-1.5 flex items-center justify-between">
-                      <span>{activeMonth.month} 2026</span>
-                      <span className="text-[10px] font-mono text-emerald-400 font-bold">● Active</span>
-                    </div>
-                    <div className="space-y-1.5 text-xs font-mono">
-                      <div className="flex items-center justify-between gap-3 text-slate-200">
-                        <span className="flex items-center gap-1.5 font-sans text-[11px] text-slate-300">
-                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                          <span>Fulfilled</span>
-                        </span>
-                        <span className="font-extrabold text-emerald-400">
-                          ${activeMonth.fulfilledValUSD.toLocaleString()}
-                        </span>
+                {/* Floating Tooltip Card with Hover Entrance & Exit Animation */}
+                <AnimatePresence>
+                  {hoveredIndex !== null && activeMonth && (
+                    <motion.div 
+                      key={`tooltip-${hoveredIndex}`}
+                      initial={{ opacity: 0, scale: 0.94, y: 6 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.94, y: 4 }}
+                      transition={{ duration: 0.15, ease: 'easeOut' }}
+                      style={{
+                        left: `${((hoveredIndex) / (MONTHLY_DATA.length - 1)) * 74 + 13}%`,
+                        top: '10%',
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setHoveredIndex(null);
+                      }}
+                      className="absolute z-20 bg-slate-950/95 text-white border border-white/15 rounded-2xl p-3 shadow-2xl pointer-events-auto cursor-pointer -translate-x-1/2 min-w-[175px] backdrop-blur-md"
+                    >
+                      <div className="text-xs font-bold text-white mb-2 border-b border-white/10 pb-1.5 flex items-center justify-between">
+                        <span>{activeMonth.month} 2026</span>
+                        <span className="text-[10px] font-mono text-emerald-400 font-bold">● Active</span>
                       </div>
-                      <div className="text-[10px] text-right text-slate-400 leading-tight">
-                        ¥{activeMonth.fulfilledValRMB.toLocaleString()} RMB ({activeMonth.fulfilled} POs)
+                      <div className="space-y-1.5 text-xs font-mono">
+                        <div className="flex items-center justify-between gap-3 text-slate-200">
+                          <span className="flex items-center gap-1.5 font-sans text-[11px] text-slate-300">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                            <span>Fulfilled</span>
+                          </span>
+                          <span className="font-extrabold text-emerald-400">
+                            ${activeMonth.fulfilledValUSD.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-right text-slate-400 leading-tight">
+                          ¥{activeMonth.fulfilledValRMB.toLocaleString()} RMB ({activeMonth.fulfilled} POs)
+                        </div>
+                        <div className="flex items-center justify-between gap-3 text-slate-300 pt-1 border-t border-white/10">
+                          <span className="flex items-center gap-1.5 font-sans text-[11px] text-slate-400">
+                            <span className="w-2 h-2 rounded-full bg-rose-500" />
+                            <span>Cancel / QC</span>
+                          </span>
+                          <span className="font-bold text-rose-400">
+                            ${activeMonth.cancelValUSD.toLocaleString()}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center justify-between gap-3 text-slate-300 pt-1 border-t border-white/10">
-                        <span className="flex items-center gap-1.5 font-sans text-[11px] text-slate-400">
-                          <span className="w-2 h-2 rounded-full bg-rose-500" />
-                          <span>Cancel / QC</span>
-                        </span>
-                        <span className="font-bold text-rose-400">
-                          ${activeMonth.cancelValUSD.toLocaleString()}
-                        </span>
+                      <div className="mt-2 pt-1.5 border-t border-white/10 text-[9px] text-slate-400 text-center font-sans">
+                        Click or move away to dismiss
                       </div>
-                    </div>
-                  </div>
-                )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               {/* Dedicated X-Axis Month Markers (Cleanly separated from line graph) */}
@@ -696,9 +738,13 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                     <button
                       key={d.month}
                       type="button"
-                      onMouseEnter={() => setHoveredIndex(i)}
-                      onClick={() => {
+                      onMouseEnter={(e) => {
+                        e.stopPropagation();
                         setHoveredIndex(i);
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setHoveredIndex((prev) => (prev === i ? null : i));
                         if (onShowToast) onShowToast(`${d.month} Sourcing: ${d.fulfilled} orders fulfilled ($${d.fulfilledValUSD.toLocaleString()} / ¥${d.fulfilledValRMB.toLocaleString()} RMB)`);
                       }}
                       className={`px-2.5 py-1 rounded-xl transition-all cursor-pointer font-medium ${

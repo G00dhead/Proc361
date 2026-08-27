@@ -265,7 +265,7 @@ export const mockOrders: OrderItem[] = [
     supplierName: 'Chaozhou Jingde Ceramic Studio',
     supplierPlatform: 'Taobao',
     supplierUrl: 'https://item.taobao.com/item.htm?id=784910284',
-    thumbnail: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=160&auto=format&fit=crop&q=80',
+    thumbnail: 'https://images.unsplash.com/photo-1577937927133-66ef06acdf18?w=160&auto=format&fit=crop&q=80',
     quantity: 80,
     unit: 'sets',
     priceRMB: 3920.00,
