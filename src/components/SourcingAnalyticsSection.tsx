@@ -20,7 +20,11 @@ import {
   Box,
   Layers,
   Headphones,
-  FileText
+  FileText,
+  X,
+  ChevronRight,
+  ArrowRight,
+  Search
 } from 'lucide-react';
 import { Tooltip } from './Tooltip';
 import { OrderItem } from '../types';
@@ -73,6 +77,9 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
   const [mapMode, setMapMode] = useState<'map' | 'satellite'>('map');
   const [showShipmentMenu, setShowShipmentMenu] = useState(false);
   const [activeShipmentIndex, setActiveShipmentIndex] = useState(0);
+  const [showShipmentsDrawer, setShowShipmentsDrawer] = useState(false);
+  const [drawerFilter, setDrawerFilter] = useState<'all' | 'air' | 'sea'>('all');
+  const [drawerSearch, setDrawerSearch] = useState('');
 
   // Active tracked shipments matching the Proc360 logistics OS
   const activeShipments = [
@@ -81,6 +88,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
       internalId: 'P360-84920',
       title: language === 'zh' ? 'CNC 铝合金客制化机械键盘 (第2批次)' : 'CNC Aluminum Mechanical Keyboards (Batch #2)',
       carrier: language === 'zh' ? '顺丰国际空运特快专线' : 'SF International Air Express',
+      carrierShort: 'SF Express Air',
       origin: language === 'zh' ? '广东集拼中心 (东莞仓)' : 'Guangdong Consolidation Hub, Dongguan',
       destination: language === 'zh' ? '美国 洛杉矶仓库' : 'Los Angeles, CA, USA',
       status: language === 'zh' ? '干线在途' : 'In transit',
@@ -125,6 +133,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
       internalId: 'P360-84917',
       title: language === 'zh' ? '人体工学桌面配件与线槽' : 'Ergonomic Desk Accessories & Cable Rigs',
       carrier: language === 'zh' ? '美森快船加急海运 (CLX)' : 'Matson Sea Expedited (CLX)',
+      carrierShort: 'Matson Sea (CLX)',
       origin: language === 'zh' ? '深圳盐田码头出口仓' : 'Shenzhen Yantian Terminal',
       destination: language === 'zh' ? '长滩港 -> 内陆集运仓' : 'Long Beach Port -> Inland Hub',
       status: language === 'zh' ? '海运在途' : 'In transit',
@@ -160,6 +169,51 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
           label: language === 'zh' ? '集装箱已封柜装船' : 'Container Sealed & Loaded', 
           subtext: '24 Aug 2026', 
           time: '08:30 AM', 
+          completed: true 
+        },
+      ]
+    },
+    {
+      id: '#205118-14-620ORD',
+      internalId: 'P360-84915',
+      title: language === 'zh' ? '阳极氧化铝 CNC 外壳总成' : 'Anodized Aluminum CNC Enclosures',
+      carrier: language === 'zh' ? 'DHL 国际特快专递' : 'DHL Express Priority',
+      carrierShort: 'DHL Express',
+      origin: language === 'zh' ? '上海浦东转运中心' : 'Shanghai Pudong Hub',
+      destination: language === 'zh' ? '美国 芝加哥中转分拨点' : 'Chicago, IL, USA',
+      status: language === 'zh' ? '派送中' : 'Out for delivery',
+      statusColor: 'text-emerald-600',
+      eta: '28 Aug 2026',
+      weight: '28.4 kg',
+      volume: '0.15 CBM',
+      cartons: language === 'zh' ? '2箱 (共30套)' : '2 Master Cartons (30 units)',
+      hubBay: language === 'zh' ? '上海浦东仓 1C库区' : 'Shanghai Hub Bay 1C',
+      customsStatus: language === 'zh' ? '出口查验放行' : 'Customs Cleared',
+      packagingType: language === 'zh' ? '防静电珍珠棉封装' : 'Anti-Static Foam Casing',
+      timeline: [
+        { 
+          label: language === 'zh' ? '派送员上门派送中' : 'Out for Delivery', 
+          subtext: '28 Aug 2026', 
+          time: '08:45 AM', 
+          completed: true, 
+          isEstimate: false 
+        },
+        { 
+          label: language === 'zh' ? '抵达芝加哥分拨枢纽' : 'Arrived at Chicago Hub', 
+          subtext: '27 Aug 2026', 
+          time: '11:20 PM', 
+          completed: true 
+        },
+        { 
+          label: language === 'zh' ? '完成清关检查' : 'Customs Cleared', 
+          subtext: '26 Aug 2026', 
+          time: '03:10 PM', 
+          completed: true 
+        },
+        { 
+          label: language === 'zh' ? '浦东机场启运' : 'Departed Shanghai PVG', 
+          subtext: '25 Aug 2026', 
+          time: '09:00 AM', 
           completed: true 
         },
       ]
@@ -1025,104 +1079,346 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
           ))}
         </div>
 
-        {/* Consignment Specs & Warehouse Hub Bay Info */}
-        <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/80 space-y-2 text-xs">
-          <div className="flex items-center justify-between border-b border-slate-200/60 pb-1.5">
+        {/* OTHER TRACKED SHIPMENTS (Limited to 1 preview with sidebar expand trigger) */}
+        <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+          <div className="flex items-center justify-between">
             <span className="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
-              <Box className="w-3.5 h-3.5 text-slate-600" />
-              {language === 'zh' ? '集运货运与库位详情' : 'Cargo Specs & Warehouse Bay'}
+              <Truck className="w-3.5 h-3.5 text-slate-600" />
+              {language === 'zh' ? '其他在途跟踪运单' : 'Other Tracked Shipment'}
             </span>
-            <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded font-semibold flex items-center gap-1">
-              <ShieldCheck className="w-3 h-3 text-emerald-600" />
-              {currentShipment.customsStatus}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-[11px]">
-            <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs">
-              <span className="text-[10px] text-slate-400 block font-medium">
-                {language === 'zh' ? '中转库区与库位' : 'Consolidation Bay'}
-              </span>
-              <span className="font-semibold text-slate-800 truncate block mt-0.5">
-                {currentShipment.hubBay}
-              </span>
-            </div>
-
-            <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs">
-              <span className="text-[10px] text-slate-400 block font-medium">
-                {language === 'zh' ? '总毛重与体积' : 'Gross Weight & Vol'}
-              </span>
-              <span className="font-semibold text-slate-800 truncate block mt-0.5 font-mono">
-                {currentShipment.weight} • {currentShipment.volume}
-              </span>
-            </div>
-
-            <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs">
-              <span className="text-[10px] text-slate-400 block font-medium">
-                {language === 'zh' ? '外箱规格' : 'Master Cartons'}
-              </span>
-              <span className="font-semibold text-slate-800 truncate block mt-0.5">
-                {currentShipment.cartons}
-              </span>
-            </div>
-
-            <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs">
-              <span className="text-[10px] text-slate-400 block font-medium">
-                {language === 'zh' ? '强化加固工艺' : 'Packaging Grade'}
-              </span>
-              <span className="font-semibold text-slate-800 truncate block mt-0.5">
-                {currentShipment.packagingType}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Action Controls & Dispatch Drawer Trigger */}
-        <div className="space-y-2 pt-0.5">
-          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => {
-                const matchingOrder = orders.find(
-                  (o) => o.orderId === currentShipment.internalId || (o.trackingNumber && o.trackingNumber.includes(currentShipment.id))
-                ) || orders[0];
-                if (onOpenOrderDetail && matchingOrder) {
-                  onOpenOrderDetail(matchingOrder);
-                } else if (onShowToast) {
-                  onShowToast(language === 'zh' ? `正在调取 ${currentShipment.id} 实时品控与清关档案...` : `Opening QC Station & Customs dossier for ${currentShipment.id}...`);
-                }
-              }}
-              className="flex-1 py-2 px-3 bg-slate-950 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
+              onClick={() => setShowShipmentsDrawer(true)}
+              className="text-[11px] font-semibold text-[#E35D3B] hover:text-[#c4492a] flex items-center gap-0.5 cursor-pointer transition-colors"
             >
-              <FileText className="w-3.5 h-3.5" />
-              <span>{language === 'zh' ? '查看质检库位与运单档案' : 'Inspect QC Station & Dossier'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (onShowToast) {
-                  onShowToast(language === 'zh' ? `已连接驻华双语跟单客服 (顺丰/美森专属对接)` : `Connected with Dedicated China Forwarding Agent`);
-                }
-              }}
-              className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all cursor-pointer"
-              title={language === 'zh' ? '联系驻华跟单客服' : 'Contact Sourcing Agent'}
-            >
-              <Headphones className="w-4 h-4 text-slate-600" />
+              <span>{language === 'zh' ? `查看全部 (${activeShipments.length})` : `View all (${activeShipments.length})`}</span>
+              <ChevronRight className="w-3 h-3" />
             </button>
           </div>
 
-          {/* Escrow & Transpacific Protection Assurance */}
-          <div className="flex items-center justify-between text-[10px] text-slate-500 px-1 pt-1 border-t border-slate-100">
-            <span className="flex items-center gap-1 text-slate-500 font-medium">
-              <ShieldCheck className="w-3 h-3 text-emerald-600 shrink-0" />
-              {language === 'zh' ? '全额担保代管与货运一切险已生效' : '100% Escrow & Marine Cargo Insurance'}
-            </span>
-            <span className="font-mono text-slate-400 font-semibold">SLA: 99.4%</span>
-          </div>
+          {/* Single preview shipment */}
+          {(() => {
+            const previewIndex = (activeShipmentIndex + 1) % activeShipments.length;
+            const previewShipment = activeShipments[previewIndex];
+            return (
+              <div
+                onClick={() => {
+                  setActiveShipmentIndex(previewIndex);
+                  if (onShowToast) {
+                    onShowToast(language === 'zh' ? `已切换至跟踪运单: ${previewShipment.id}` : `Tracking shipment: ${previewShipment.id}`);
+                  }
+                }}
+                className="w-full text-left p-2.5 rounded-2xl border border-slate-200/80 bg-slate-50 hover:bg-slate-100/90 text-slate-700 transition-all cursor-pointer flex items-center justify-between gap-2 shadow-2xs hover:border-slate-300"
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">
+                      {previewShipment.carrierShort}
+                    </span>
+                    <span className="text-xs font-mono font-semibold text-slate-900 truncate">
+                      {previewShipment.id}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 truncate mt-0.5">
+                    {previewShipment.title}
+                  </p>
+                  <div className="flex items-center gap-1.5 text-[9px] font-mono text-slate-400 mt-1">
+                    <span>{previewShipment.origin.split(' ')[0]}</span>
+                    <span>→</span>
+                    <span className="truncate">{previewShipment.destination.split(',')[0]}</span>
+                  </div>
+                </div>
+
+                <div className="shrink-0 text-right flex flex-col items-end justify-between self-stretch">
+                  <span className="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">
+                    {previewShipment.status}
+                  </span>
+                  <span className="text-[9px] font-mono text-slate-400">
+                    ETA: {previewShipment.eta}
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
       </div>
+
+      {/* RIGHT SLIDE-OVER SIDEBAR DRAWER FOR ALL SHIPMENTS */}
+      <AnimatePresence>
+        {showShipmentsDrawer && (
+          <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowShipmentsDrawer(false)}
+              className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs transition-opacity"
+            />
+
+            {/* Sidebar Slide-over Panel */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+              className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col z-10 border-l border-slate-200"
+            >
+              {/* Drawer Header */}
+              <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-[#E35D3B]">
+                    <Truck className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h2 className="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
+                      {language === 'zh' ? '在途运单与国际物流监控' : 'All Active Consignments & Tracking'}
+                      <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                        {activeShipments.length} LIVE
+                      </span>
+                    </h2>
+                    <p className="text-[11px] text-slate-500">
+                      {language === 'zh' ? '顺丰空运、美森快船与特快专递实时轨迹回传' : 'Real-time GPS telemetry and freight checkpoints'}
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowShipmentsDrawer(false)}
+                  className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-xl transition-all cursor-pointer"
+                  aria-label="Close sidebar"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Drawer Search & Filter Chips */}
+              <div className="p-4 border-b border-slate-100 space-y-2.5 bg-white">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    value={drawerSearch}
+                    onChange={(e) => setDrawerSearch(e.target.value)}
+                    placeholder={language === 'zh' ? '搜索运单号、品名或目的地...' : 'Search by waybill #, cargo title, or destination...'}
+                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#E35D3B]/20 focus:border-[#E35D3B] transition-all"
+                  />
+                  {drawerSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setDrawerSearch('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center gap-1.5 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setDrawerFilter('all')}
+                    className={`px-2.5 py-1 rounded-lg font-medium text-[11px] transition-all cursor-pointer ${
+                      drawerFilter === 'all'
+                        ? 'bg-slate-900 text-white shadow-2xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+                    }`}
+                  >
+                    {language === 'zh' ? '全部专线' : 'All Freight'} ({activeShipments.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDrawerFilter('air')}
+                    className={`px-2.5 py-1 rounded-lg font-medium text-[11px] transition-all cursor-pointer ${
+                      drawerFilter === 'air'
+                        ? 'bg-slate-900 text-white shadow-2xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+                    }`}
+                  >
+                    {language === 'zh' ? '空运特快' : 'Air Express'} (2)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDrawerFilter('sea')}
+                    className={`px-2.5 py-1 rounded-lg font-medium text-[11px] transition-all cursor-pointer ${
+                      drawerFilter === 'sea'
+                        ? 'bg-slate-900 text-white shadow-2xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+                    }`}
+                  >
+                    {language === 'zh' ? '海运快船' : 'Sea Freight'} (1)
+                  </button>
+                </div>
+              </div>
+
+              {/* Drawer Content: Shipment Cards List */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                {activeShipments
+                  .filter((s) => {
+                    if (drawerFilter === 'air' && !s.carrier.includes('Air') && !s.carrier.includes('空运') && !s.carrier.includes('DHL')) return false;
+                    if (drawerFilter === 'sea' && !s.carrier.includes('Sea') && !s.carrier.includes('海运')) return false;
+                    if (drawerSearch) {
+                      const query = drawerSearch.toLowerCase();
+                      return (
+                        s.id.toLowerCase().includes(query) ||
+                        s.title.toLowerCase().includes(query) ||
+                        s.destination.toLowerCase().includes(query) ||
+                        s.carrier.toLowerCase().includes(query)
+                      );
+                    }
+                    return true;
+                  })
+                  .map((shipment) => {
+                    const origIndex = activeShipments.findIndex((x) => x.id === shipment.id);
+                    const isSelected = origIndex === activeShipmentIndex;
+                    return (
+                      <div
+                        key={shipment.id}
+                        className={`rounded-2xl border p-3.5 transition-all space-y-3 ${
+                          isSelected
+                            ? 'bg-orange-50/40 border-orange-300 ring-1 ring-[#E35D3B]/20 shadow-xs'
+                            : 'bg-white border-slate-200/80 hover:border-slate-300 shadow-2xs'
+                        }`}
+                      >
+                        {/* Top info */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-900 text-white">
+                                {shipment.carrierShort}
+                              </span>
+                              <span className="text-xs font-mono font-bold text-slate-900">
+                                {shipment.id}
+                              </span>
+                              {isSelected && (
+                                <span className="text-[10px] font-bold text-[#E35D3B] bg-orange-100/80 px-1.5 py-0.2 rounded">
+                                  {language === 'zh' ? '主图跟踪中' : 'Active on Map'}
+                                </span>
+                              )}
+                            </div>
+                            <h4 className="text-xs font-semibold text-slate-800 mt-1 leading-snug">
+                              {shipment.title}
+                            </h4>
+                          </div>
+
+                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">
+                            {shipment.status}
+                          </span>
+                        </div>
+
+                        {/* Route & ETA */}
+                        <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex items-center justify-between text-[11px]">
+                          <div className="min-w-0 pr-2">
+                            <span className="text-[10px] text-slate-400 block font-medium">
+                              {language === 'zh' ? '始发与目的口岸' : 'Origin → Destination'}
+                            </span>
+                            <span className="font-semibold text-slate-700 truncate block mt-0.5">
+                              {shipment.origin.split(' ')[0]} → {shipment.destination.split(',')[0]}
+                            </span>
+                          </div>
+
+                          <div className="shrink-0 text-right">
+                            <span className="text-[10px] text-slate-400 block font-medium">
+                              {language === 'zh' ? '预计送达' : 'Estimated ETA'}
+                            </span>
+                            <span className="font-mono font-bold text-slate-900 mt-0.5 block">
+                              {shipment.eta}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Cargo specs */}
+                        <div className="grid grid-cols-3 gap-1.5 text-[10px]">
+                          <div className="bg-white p-1.5 rounded-lg border border-slate-100">
+                            <span className="text-slate-400 block">{language === 'zh' ? '毛重/体积' : 'Weight/Vol'}</span>
+                            <span className="font-mono font-semibold text-slate-800 mt-0.5 block truncate">{shipment.weight}</span>
+                          </div>
+                          <div className="bg-white p-1.5 rounded-lg border border-slate-100">
+                            <span className="text-slate-400 block">{language === 'zh' ? '库区库位' : 'Hub Bay'}</span>
+                            <span className="font-semibold text-slate-800 mt-0.5 block truncate">{shipment.hubBay.split(' ')[1] || shipment.hubBay}</span>
+                          </div>
+                          <div className="bg-white p-1.5 rounded-lg border border-slate-100">
+                            <span className="text-slate-400 block">{language === 'zh' ? '包装规格' : 'Cartons'}</span>
+                            <span className="font-semibold text-slate-800 mt-0.5 block truncate">{shipment.cartons.split('(')[0]}</span>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveShipmentIndex(origIndex);
+                              setShowShipmentsDrawer(false);
+                              if (onShowToast) {
+                                onShowToast(language === 'zh' ? `已切换为主图实时跟踪: ${shipment.id}` : `Loaded live GPS telemetry on main map for ${shipment.id}`);
+                              }
+                            }}
+                            className={`flex-1 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-2xs'
+                                : 'bg-[#E35D3B] text-white hover:bg-[#c84d2e] shadow-2xs'
+                            }`}
+                          >
+                            <Navigation className="w-3 h-3" />
+                            <span>{isSelected ? (language === 'zh' ? '正在主图跟踪中' : 'Tracking on Map') : (language === 'zh' ? '切换为主图跟踪' : 'Track on Map')}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              navigator.clipboard.writeText(shipment.id);
+                              if (onShowToast) {
+                                onShowToast(language === 'zh' ? `已复制国际运单号: ${shipment.id}` : `Copied tracking number: ${shipment.id}`);
+                              }
+                            }}
+                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all cursor-pointer"
+                            title={t.copyWaybillId}
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const matchingOrder = orders.find(
+                                (o) => o.orderId === shipment.internalId || (o.trackingNumber && o.trackingNumber.includes(shipment.id))
+                              ) || orders[0];
+                              if (onOpenOrderDetail && matchingOrder) {
+                                setShowShipmentsDrawer(false);
+                                onOpenOrderDetail(matchingOrder);
+                              } else if (onShowToast) {
+                                onShowToast(language === 'zh' ? `正在调取 ${shipment.id} 实时品控与清关档案...` : `Opening QC dossier for ${shipment.id}...`);
+                              }
+                            }}
+                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all cursor-pointer"
+                            title={language === 'zh' ? '查看质检档案' : 'Inspect QC'}
+                          >
+                            <FileText className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+
+              {/* Drawer Footer Trust Banner */}
+              <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
+                <span className="flex items-center gap-1.5 text-slate-600 font-medium text-[11px]">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  {language === 'zh' ? '全额代管担保与货运一切险已生效' : '100% Escrow & Freight Cargo Protection'}
+                </span>
+                <span className="text-[10px] font-mono text-emerald-700 bg-emerald-100 font-semibold px-2 py-0.5 rounded">
+                  SLA: 99.4%
+                </span>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
+
