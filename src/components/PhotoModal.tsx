@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, Camera, ShieldCheck, Download } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface PhotoModalProps {
   photoUrl: string | null;
@@ -14,6 +15,8 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
   isOpen,
   onClose,
 }) => {
+  const { language } = useLanguage();
+
   if (!isOpen || !photoUrl) return null;
 
   return (
@@ -23,7 +26,9 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
         <div className="p-3.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs">
             <Camera className="w-4 h-4 text-slate-400" />
-            <span className="font-medium text-slate-200">{caption || 'Warehouse QC Inspection Photo'}</span>
+            <span className="font-medium text-slate-200">
+              {caption || (language === 'zh' ? '中转仓品控实物照片' : 'Warehouse QC Inspection Photo')}
+            </span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -32,13 +37,13 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
               target="_blank"
               rel="noreferrer"
               className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
-              title="Open full resolution in new tab"
+              title={language === 'zh' ? '在新标签页打开高分辨率原图' : 'Open full resolution in new tab'}
             >
               <Download className="w-4 h-4" />
             </a>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -58,9 +63,12 @@ export const PhotoModal: React.FC<PhotoModalProps> = ({
         {/* Footer Meta */}
         <div className="p-3 bg-slate-900 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
           <span className="flex items-center gap-1 text-slate-300 font-medium">
-            <ShieldCheck className="w-3.5 h-3.5 text-slate-400" /> High-Resolution Inspection Guarantee
+            <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+            {language === 'zh' ? '高清实拍质检承诺 • 100% 真实还原' : 'High-Resolution Inspection Guarantee'}
           </span>
-          <span className="font-mono text-slate-500">Dongguan / Shenzhen Hub Photographic Station</span>
+          <span className="font-mono text-slate-500">
+            {language === 'zh' ? '东莞 / 深圳中转枢纽品控摄影工作站' : 'Dongguan / Shenzhen Hub Photographic Station'}
+          </span>
         </div>
       </div>
     </div>

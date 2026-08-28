@@ -10,6 +10,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { OrderItem } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ActionModalProps {
   order: OrderItem | null;
@@ -26,6 +27,7 @@ export const ActionModal: React.FC<ActionModalProps> = ({
   onResolveAction,
   walletBalanceCNY,
 }) => {
+  const { t, translateOrderText, language } = useLanguage();
   const [taxIdInput, setTaxIdInput] = useState('EIN-84-9102948');
   const [customComment, setCustomComment] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -39,7 +41,9 @@ export const ActionModal: React.FC<ActionModalProps> = ({
       onResolveAction(
         order.id,
         'IN_PROGRESS',
-        `Payment Authorized (¥${order.priceRMB.toLocaleString()}) • Supplier dispatched to ${order.warehouse}`,
+        language === 'zh'
+          ? `采购款已授权划转 (¥${order.priceRMB.toLocaleString()}) • 供应商已发货至【${translateOrderText(order.warehouse)}】`
+          : `Payment Authorized (¥${order.priceRMB.toLocaleString()}) • Supplier dispatched to ${order.warehouse}`,
         -order.priceRMB
       );
       setIsProcessing(false);
@@ -54,7 +58,9 @@ export const ActionModal: React.FC<ActionModalProps> = ({
       onResolveAction(
         order.id,
         'IN_PROGRESS',
-        'Customization Spec Approved • Mass batch manufacturing started (Est. 3 days)'
+        language === 'zh'
+          ? '打样规格确认通过 • 工厂已启动批量排产（预计 3 天）'
+          : 'Customization Spec Approved • Mass batch manufacturing started (Est. 3 days)'
       );
       setIsProcessing(false);
       onClose();
@@ -68,7 +74,9 @@ export const ActionModal: React.FC<ActionModalProps> = ({
       onResolveAction(
         order.id,
         'NEEDS_ACTION',
-        `Customs ID Verified (${taxIdInput}) • Arrived at ${order.warehouse} • Ready to Consolidate`
+        language === 'zh'
+          ? `海关纳税申报号已核验 (${taxIdInput}) • 已送达【${translateOrderText(order.warehouse)}】• 待合并集运`
+          : `Customs ID Verified (${taxIdInput}) • Arrived at ${order.warehouse} • Ready to Consolidate`
       );
       setIsProcessing(false);
       onClose();
@@ -82,7 +90,9 @@ export const ActionModal: React.FC<ActionModalProps> = ({
       onResolveAction(
         order.id,
         'NEEDS_ACTION',
-        'QC Approved with ¥180 RMB Discount • Stored in Hub • Ready to Consolidate',
+        language === 'zh'
+          ? '已接受质检报告并立减退款 ¥180 RMB • 已入库 • 待合并集运'
+          : 'QC Approved with ¥180 RMB Discount • Stored in Hub • Ready to Consolidate',
         180
       );
       setIsProcessing(false);
@@ -97,7 +107,9 @@ export const ActionModal: React.FC<ActionModalProps> = ({
       onResolveAction(
         order.id,
         'IN_PROGRESS',
-        'Returned 4 defective units to vendor for replacement (ETA 2 days)'
+        language === 'zh'
+          ? '已将 4 件次品退回工厂免费换新（预计 2 天后重新入库）'
+          : 'Returned 4 defective units to vendor for replacement (ETA 2 days)'
       );
       setIsProcessing(false);
       onClose();
@@ -119,10 +131,10 @@ export const ActionModal: React.FC<ActionModalProps> = ({
             </div>
             <div>
               <span className="font-mono text-[11px] text-amber-700 font-bold uppercase tracking-wider">
-                {order.statusLabel}
+                {translateOrderText(order.statusLabel)}
               </span>
               <h2 className="text-sm font-bold text-slate-900 line-clamp-1">
-                {order.title}
+                {translateOrderText(order.title)}
               </h2>
             </div>
           </div>
@@ -131,7 +143,7 @@ export const ActionModal: React.FC<ActionModalProps> = ({
             type="button"
             aria-label="Close action modal"
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -170,35 +182,36 @@ export const ActionModal: React.FC<ActionModalProps> = ({
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-amber-950 space-y-1.5">
                 <h3 className="font-bold text-amber-900 flex items-center gap-1.5 text-xs">
-                  <CreditCard className="w-4 h-4 text-amber-700" /> Supplier Escrow Settlement
+                  <CreditCard className="w-4 h-4 text-amber-700" /> {language === 'zh' ? '供应商人民币担保交易划转' : 'Supplier Escrow Settlement'}
                 </h3>
                 <p className="text-amber-800 text-xs leading-relaxed">
-                  Authorize payment to <span className="font-bold text-slate-900">{order.supplierName}</span>.
-                  Funds remain protected in escrow until physical arrival and photographic QC inspection at {order.warehouse}.
+                  {language === 'zh' 
+                    ? `确认授权向【${translateOrderText(order.supplierName)}】划拨货款。在货物送达【${translateOrderText(order.warehouse)}】并通过 5 项实物品控前，资金全程受担保代管保护。`
+                    : `Authorize payment to ${order.supplierName}. Funds remain protected in escrow until physical arrival and photographic QC inspection at ${order.warehouse}.`}
                 </p>
               </div>
 
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
                 <div className="flex justify-between py-1 border-b border-slate-200/60">
-                  <span className="text-slate-500">Factory Goods Subtotal:</span>
+                  <span className="text-slate-500">{language === 'zh' ? '出厂商品货值小计：' : 'Factory Goods Subtotal:'}</span>
                   <span className="font-mono font-semibold text-slate-800">¥{order.priceRMB.toLocaleString()} RMB</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-200/60">
-                  <span className="text-slate-500">Domestic Freight (Supplier to Hub):</span>
-                  <span className="font-mono font-semibold text-emerald-700">Included (Free)</span>
+                  <span className="text-slate-500">{language === 'zh' ? '国内顺丰速运（厂商到中转仓）：' : 'Domestic Freight (Supplier to Hub):'}</span>
+                  <span className="font-mono font-semibold text-emerald-700">{language === 'zh' ? '已包含（包邮）' : 'Included (Free)'}</span>
                 </div>
                 <div className="flex justify-between py-1 border-b border-slate-200/60">
-                  <span className="text-slate-500">Photographic QC Inspection:</span>
-                  <span className="font-mono font-semibold text-emerald-700">Included (Free)</span>
+                  <span className="text-slate-500">{language === 'zh' ? '5项全高清实物拍照品控：' : 'Photographic QC Inspection:'}</span>
+                  <span className="font-mono font-semibold text-emerald-700">{language === 'zh' ? '已包含（免费）' : 'Included (Free)'}</span>
                 </div>
                 <div className="flex justify-between py-1 text-xs font-bold pt-2">
-                  <span className="text-slate-900">Total Wallet Debit:</span>
+                  <span className="text-slate-900">{language === 'zh' ? '本次钱包实际扣减：' : 'Total Wallet Debit:'}</span>
                   <span className="font-mono text-slate-950">¥{order.priceRMB.toLocaleString()} RMB</span>
                 </div>
               </div>
 
               <div className="flex items-center justify-between text-xs text-slate-500 px-1">
-                <span>Available RMB Wallet Balance:</span>
+                <span>{language === 'zh' ? '当前可用人民币钱包余额：' : 'Available RMB Wallet Balance:'}</span>
                 <span className="font-mono font-bold text-slate-900">¥{walletBalanceCNY.toLocaleString()}</span>
               </div>
             </div>
@@ -213,7 +226,7 @@ export const ActionModal: React.FC<ActionModalProps> = ({
                     {order.customizationDetails?.specType}
                   </h3>
                   <span className="text-[10px] font-mono bg-purple-200 text-purple-950 font-bold px-2 py-0.5 rounded-full">
-                    Sample Proof #1
+                    {language === 'zh' ? '首样核验单 #1' : 'Sample Proof #1'}
                   </span>
                 </div>
                 <p className="text-purple-800 text-xs">
@@ -239,13 +252,13 @@ export const ActionModal: React.FC<ActionModalProps> = ({
 
               <div>
                 <label className="block text-slate-700 font-medium mb-1">
-                  Optional revision feedback for factory:
+                  {language === 'zh' ? '提供给工厂的修改反馈备注（选填）：' : 'Optional revision feedback for factory:'}
                 </label>
                 <input
                   type="text"
                   value={customComment}
                   onChange={(e) => setCustomComment(e.target.value)}
-                  placeholder="e.g. Please shift laser logo 0.5mm higher..."
+                  placeholder={language === 'zh' ? '例如：激光打标位置请上移 0.5mm...' : 'e.g. Please shift laser logo 0.5mm higher...'}
                   className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs focus:outline-none focus:border-slate-400 focus:bg-white"
                 />
               </div>
@@ -257,7 +270,7 @@ export const ActionModal: React.FC<ActionModalProps> = ({
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-rose-50/70 border border-rose-200/80 space-y-1.5">
                 <h3 className="font-bold text-rose-950 flex items-center gap-1.5 text-xs">
-                  <ShieldAlert className="w-4 h-4 text-rose-700" /> Carrier Customs Requirement
+                  <ShieldAlert className="w-4 h-4 text-rose-700" /> {language === 'zh' ? '海关清关报关申报要素补充' : 'Carrier Customs Requirement'}
                 </h3>
                 <p className="text-rose-800 text-xs">
                   {order.addressDetails?.issueDescription}
@@ -266,7 +279,7 @@ export const ActionModal: React.FC<ActionModalProps> = ({
 
               <div className="space-y-2">
                 <label className="block text-slate-700 font-semibold text-xs">
-                  US Importer Tax ID / EIN / SSN:
+                  {language === 'zh' ? '美国进口商纳税人识别号 / EIN / SSN：' : 'US Importer Tax ID / EIN / SSN:'}
                 </label>
                 <input
                   type="text"
@@ -283,10 +296,12 @@ export const ActionModal: React.FC<ActionModalProps> = ({
             <div className="space-y-4">
               <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-1.5">
                 <h3 className="font-bold text-amber-950 flex items-center gap-1.5 text-xs">
-                  <AlertTriangle className="w-4 h-4 text-amber-700" /> Inspection Defect Review
+                  <AlertTriangle className="w-4 h-4 text-amber-700" /> {language === 'zh' ? '质检瑕疵审核与处置' : 'Inspection Defect Review'}
                 </h3>
                 <p className="text-amber-800 text-xs">
-                  4 out of 80 units showed minor glaze variation. 76 units passed 100% of inspection specs.
+                  {language === 'zh'
+                    ? '80 件商品中有 4 件存在表面釉色轻微不均。76 件 100% 达到出厂标准。'
+                    : '4 out of 80 units showed minor glaze variation. 76 units passed 100% of inspection specs.'}
                 </p>
               </div>
 
@@ -297,7 +312,7 @@ export const ActionModal: React.FC<ActionModalProps> = ({
                       <img src={photo.url} alt="" referrerPolicy="no-referrer" className="w-full h-28 object-cover" />
                       <div className="p-2 text-[10px]">
                         <span className={photo.passed ? 'text-emerald-700 font-bold' : 'text-rose-700 font-bold'}>
-                          {photo.passed ? '✓ Passed Spec' : 'Flagged Defect'}
+                          {photo.passed ? (language === 'zh' ? '✓ 品控合格' : '✓ Passed Spec') : (language === 'zh' ? '标记瑕疵' : 'Flagged Defect')}
                         </span>
                         <p className="text-slate-500 line-clamp-1 mt-0.5">{photo.caption}</p>
                       </div>
@@ -314,9 +329,9 @@ export const ActionModal: React.FC<ActionModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2.5 rounded-xl text-slate-500 hover:text-slate-800 text-xs font-semibold transition-colors"
+            className="px-4 py-2.5 rounded-xl text-slate-500 hover:text-slate-800 text-xs font-semibold transition-colors cursor-pointer"
           >
-            Cancel
+            {t.cancel}
           </button>
 
           {order.actionType === 'PAYMENT_PENDING' && (
@@ -324,9 +339,9 @@ export const ActionModal: React.FC<ActionModalProps> = ({
               type="button"
               onClick={handleAuthorizePayment}
               disabled={isProcessing || walletBalanceCNY < order.priceRMB}
-              className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md disabled:opacity-50 transition-colors flex items-center gap-1.5"
+              className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md disabled:opacity-50 transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              {isProcessing ? 'Authorizing...' : `Authorize ¥${order.priceRMB.toLocaleString()} RMB`}
+              {isProcessing ? (language === 'zh' ? '授权划转中...' : 'Authorizing...') : (language === 'zh' ? `确认授权付款 ¥${order.priceRMB.toLocaleString()} RMB` : `Authorize ¥${order.priceRMB.toLocaleString()} RMB`)}
             </button>
           )}
 
@@ -335,9 +350,9 @@ export const ActionModal: React.FC<ActionModalProps> = ({
               type="button"
               onClick={handleApproveCustomization}
               disabled={isProcessing}
-              className="px-6 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-colors flex items-center gap-1.5"
+              className="px-6 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              {isProcessing ? 'Submitting...' : 'Approve Proof & Start Batch'}
+              {isProcessing ? (language === 'zh' ? '提交中...' : 'Submitting...') : (language === 'zh' ? '确认打样并通过排产' : 'Approve Proof & Start Batch')}
             </button>
           )}
 
@@ -346,9 +361,9 @@ export const ActionModal: React.FC<ActionModalProps> = ({
               type="button"
               onClick={handleResolveAddress}
               disabled={isProcessing || !taxIdInput}
-              className="px-6 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-colors flex items-center gap-1.5"
+              className="px-6 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs shadow-md transition-colors flex items-center gap-1.5 cursor-pointer"
             >
-              {isProcessing ? 'Verifying...' : 'Save Customs Filing'}
+              {isProcessing ? (language === 'zh' ? '核验中...' : 'Verifying...') : (language === 'zh' ? '保存申报要素' : 'Save Customs Filing')}
             </button>
           )}
 
@@ -358,17 +373,17 @@ export const ActionModal: React.FC<ActionModalProps> = ({
                 type="button"
                 onClick={handleRequestQCExchange}
                 disabled={isProcessing}
-                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs border border-slate-200 transition-colors"
+                className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs border border-slate-200 transition-colors cursor-pointer"
               >
-                Exchange 4 Units (2 Days)
+                {language === 'zh' ? '退换 4 件（2天）' : 'Exchange 4 Units (2 Days)'}
               </button>
               <button
                 type="button"
                 onClick={handleAcceptQCDiscount}
                 disabled={isProcessing}
-                className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition-colors flex items-center gap-1.5"
+                className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md transition-colors flex items-center gap-1.5 cursor-pointer"
               >
-                Accept & Credit +¥180 RMB
+                {language === 'zh' ? '接受并退回 ¥180 RMB' : 'Accept & Credit +¥180 RMB'}
               </button>
             </div>
           )}
@@ -377,3 +392,4 @@ export const ActionModal: React.FC<ActionModalProps> = ({
     </div>
   );
 };
+

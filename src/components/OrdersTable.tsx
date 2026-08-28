@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { Tooltip } from './Tooltip';
 import { OrderItem } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 export type SortField = 'date' | 'price' | 'weight' | 'orderNumber' | 'status';
 export type SortDirection = 'asc' | 'desc';
@@ -83,6 +84,7 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
   recentlyUpdatedOrderIds = {},
   onAdvanceOrderStatus,
 }) => {
+  const { t, translateOrderText, language } = useLanguage();
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
@@ -94,7 +96,7 @@ export const OrdersTable: React.FC<OrdersTableProps> = ({
     setSortField(field);
     setSortDirection(dir);
     setIsSortMenuOpen(false);
-    onShowToast(`Sorted orders by ${label}`);
+    onShowToast(language === 'zh' ? `已按 ${label} 排序订单` : `Sorted orders by ${label}`);
   };
 
   const sortedOrders = useMemo(() => {
@@ -142,10 +144,10 @@ Supplier: ${order.supplierName}
 
 ITEM DETAILS
 Item Title: ${order.title}
-Category: ${order.category}
+Category: ${translateOrderText(order.category)}
 Unit Quantity: ${order.quantity} ${order.unit}
 Unit Weight: ${order.weightKg.toFixed(2)} kg
-China Warehouse: ${order.warehouse} Hub
+China Warehouse: ${translateOrderText(order.warehouse)} Hub
 
 FINANCIAL BREAKDOWN
 Purchase Price (RMB): ¥${order.priceRMB.toFixed(2)}
@@ -167,105 +169,105 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
-    onShowToast(`Downloaded Official Invoice for #${order.orderNumber}`);
+    onShowToast(language === 'zh' ? `已下载采购单 #${order.orderNumber} 官方票据 (RMB)` : `Downloaded Official Invoice for #${order.orderNumber}`);
   };
 
   // Helper for origin mapping
   const getOriginInfo = (order: OrderItem) => {
     if (order.supplierPlatform === '1688') {
-      return { city: 'Shenzhen, CN', flag: '🇨🇳' };
+      return { city: language === 'zh' ? '深圳，中国' : 'Shenzhen, CN', flag: '🇨🇳' };
     }
     if (order.supplierPlatform === 'Taobao') {
-      return { city: 'Hangzhou, CN', flag: '🇨🇳' };
+      return { city: language === 'zh' ? '杭州，中国' : 'Hangzhou, CN', flag: '🇨🇳' };
     }
-    return { city: 'Guangdong, CN', flag: '🇨🇳' };
+    return { city: language === 'zh' ? '广东，中国' : 'Guangdong, CN', flag: '🇨🇳' };
   };
 
   // Helper for destination mapping
   const getDestinationInfo = (order: OrderItem) => {
     if (order.intlTracking?.carrier.includes('DHL') || order.intlTracking?.carrier.includes('Air')) {
-      return { city: 'Los Angeles, USA', flag: '🇺🇸' };
+      return { city: language === 'zh' ? '洛杉矶，美国' : 'Los Angeles, USA', flag: '🇺🇸' };
     }
     if (order.warehouse.includes('Dongguan')) {
-      return { city: 'Dongguan Hub', flag: '🇨🇳' };
+      return { city: language === 'zh' ? '东莞仓' : 'Dongguan Hub', flag: '🇨🇳' };
     }
     if (order.warehouse.includes('Yiwu')) {
-      return { city: 'Yiwu Hub', flag: '🇨🇳' };
+      return { city: language === 'zh' ? '义乌仓' : 'Yiwu Hub', flag: '🇨🇳' };
     }
-    return { city: 'Shenzhen Hub', flag: '🇨🇳' };
+    return { city: language === 'zh' ? '深圳仓' : 'Shenzhen Hub', flag: '🇨🇳' };
   };
 
   // Helper for estimated delivery
   const getEstDelivery = (order: OrderItem) => {
     if (order.intlTracking?.etaDate) {
-      return order.intlTracking.etaDate.replace(', 2026', '');
+      return translateOrderText(order.intlTracking.etaDate.replace(', 2026', ''));
     }
-    return '28 Aug';
+    return language === 'zh' ? '8月28日' : '28 Aug';
   };
 
   // Status Badge Mapper
   const getStatusBadge = (order: OrderItem) => {
     if (order.zone === 'NEEDS_ACTION') {
       if (order.actionType === 'PAYMENT_PENDING') {
-        return { label: 'Payment Pending', dotColor: 'bg-yellow-400', textColor: 'text-yellow-800' };
+        return { label: t.statusPaymentPending, dotColor: 'bg-yellow-400', textColor: 'text-yellow-800' };
       }
       if (order.actionType === 'CUSTOMIZATION_CONFIRMATION') {
-        return { label: 'Proof Review', dotColor: 'bg-purple-500', textColor: 'text-purple-700' };
+        return { label: t.statusProofReview, dotColor: 'bg-purple-500', textColor: 'text-purple-700' };
       }
       if (order.actionType === 'ADDRESS_ISSUE') {
-        return { label: 'Address Error', dotColor: 'bg-rose-500', textColor: 'text-rose-700' };
+        return { label: t.statusAddressError, dotColor: 'bg-rose-500', textColor: 'text-rose-700' };
       }
-      return { label: 'Needs Action', dotColor: 'bg-yellow-400', textColor: 'text-yellow-800' };
+      return { label: t.statusNeedsAction, dotColor: 'bg-yellow-400', textColor: 'text-yellow-800' };
     }
 
     if (order.actionType === 'READY_TO_CONSOLIDATE') {
-      return { label: 'Ready in Hub', dotColor: 'bg-emerald-500', textColor: 'text-emerald-700' };
+      return { label: t.statusReadyInHub, dotColor: 'bg-emerald-500', textColor: 'text-emerald-700' };
     }
 
     if (order.inProgressStage === 'INTL_TRANSIT_AIR' || order.inProgressStage === 'INTL_TRANSIT_SEA') {
-      return { label: 'In Transit', dotColor: 'bg-emerald-500', textColor: 'text-emerald-700' };
+      return { label: t.statusInTransit, dotColor: 'bg-emerald-500', textColor: 'text-emerald-700' };
     }
 
     if (order.inProgressStage === 'OUT_FOR_DELIVERY') {
-      return { label: 'Delivered', dotColor: 'bg-emerald-500', textColor: 'text-emerald-700' };
+      return { label: t.statusDelivered, dotColor: 'bg-emerald-500', textColor: 'text-emerald-700' };
     }
 
-    return { label: 'In Process', dotColor: 'bg-emerald-500', textColor: 'text-emerald-700' };
+    return { label: t.statusInProcess, dotColor: 'bg-emerald-500', textColor: 'text-emerald-700' };
   };
 
   // Tab configuration
   const filterTabs = [
     { 
       id: 'ALL' as const, 
-      label: 'All Orders', 
+      label: t.tabAllOrders, 
       count: counts.all, 
       icon: null, 
       badgeClass: (active: boolean) => active ? 'bg-slate-950 text-white' : 'bg-slate-300/80 text-slate-700' 
     },
     { 
       id: 'PENDING' as const, 
-      label: 'Action Required', 
+      label: t.tabActionRequired, 
       count: counts.pending, 
       icon: <span className={`w-2 h-2 rounded-full ${counts.pending > 0 ? 'bg-amber-500 animate-pulse' : 'bg-slate-400'}`} />, 
       badgeClass: (active: boolean) => active ? 'bg-amber-500 text-white border-amber-600' : 'bg-amber-100 text-amber-900 border-amber-300/80' 
     },
     { 
       id: 'IN_TRANSIT' as const, 
-      label: 'In Transit', 
+      label: t.tabInTransit, 
       count: counts.inTransit, 
       icon: <Truck className="w-3.5 h-3.5 text-sky-600" />, 
       badgeClass: (active: boolean) => active ? 'bg-sky-600 text-white border-sky-700' : 'bg-sky-100 text-sky-900 border-sky-300/80' 
     },
     { 
       id: 'WAREHOUSE' as const, 
-      label: 'Warehouse Hub', 
+      label: t.tabWarehouseHub, 
       count: counts.warehouse, 
       icon: <Box className="w-3.5 h-3.5 text-emerald-600" />, 
       badgeClass: (active: boolean) => active ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-emerald-100 text-emerald-900 border-emerald-300/80' 
     },
     { 
       id: 'COMPLETED' as const, 
-      label: 'Completed', 
+      label: t.tabCompleted, 
       count: counts.completed, 
       icon: <CheckCircle2 className="w-3.5 h-3.5 text-slate-800" />, 
       badgeClass: (active: boolean) => active ? 'bg-slate-800 text-white border-slate-900' : 'bg-slate-200 text-slate-700 border-slate-300' 
@@ -325,7 +327,11 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
               className="h-8.5 px-3 bg-[#0e1118] hover:bg-slate-800 text-white rounded-lg text-xs font-bold inline-flex items-center gap-2 shadow-xs animate-in fade-in cursor-pointer"
             >
               <Layers className="w-3.5 h-3.5 text-[#E35D3B]" />
-              <span>Consolidate {selectedOrderIds.length} Parcels ({selectedTotalWeight.toFixed(1)}kg)</span>
+              <span>
+                {language === 'zh' 
+                  ? `合并集运 ${selectedOrderIds.length} 个包裹 (${selectedTotalWeight.toFixed(1)}kg)`
+                  : `Consolidate ${selectedOrderIds.length} Parcels (${selectedTotalWeight.toFixed(1)}kg)`}
+              </span>
             </button>
           )}
 
@@ -337,50 +343,50 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
               className="h-8.5 inline-flex items-center gap-1.5 px-3 bg-white hover:bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-700 shadow-2xs transition-colors cursor-pointer"
             >
               <ArrowUpDown className="w-3.5 h-3.5 text-slate-500" />
-              <span className="hidden sm:inline">Sort: {sortField.toUpperCase()}</span>
-              <span className="sm:hidden">Sort</span>
+              <span className="hidden sm:inline">{t.sort}: {sortField.toUpperCase()}</span>
+              <span className="sm:hidden">{t.sort}</span>
             </button>
 
             {isSortMenuOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 z-40 animate-in fade-in duration-100 text-xs">
+              <div className="absolute right-0 top-full mt-1.5 w-52 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 z-40 animate-in fade-in duration-100 text-xs">
                 <button
                   type="button"
-                  onClick={() => handleSetSort('date', 'desc', 'Date (Newest First)')}
+                  onClick={() => handleSetSort('date', 'desc', t.sortDateNewest)}
                   className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between cursor-pointer ${
                     sortField === 'date' ? 'bg-slate-100 font-bold text-slate-950' : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
-                  <span>Date (Newest First)</span>
+                  <span>{t.sortDateNewest}</span>
                   <Clock className="w-3.5 h-3.5 text-slate-400" />
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleSetSort('price', 'desc', 'RMB Amount (High to Low)')}
+                  onClick={() => handleSetSort('price', 'desc', t.sortAmountHigh)}
                   className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between cursor-pointer ${
                     sortField === 'price' ? 'bg-slate-100 font-bold text-slate-950' : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
-                  <span>RMB Amount (High to Low)</span>
+                  <span>{t.sortAmountHigh}</span>
                   <span className="font-mono text-xs">¥</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleSetSort('weight', 'desc', 'Weight (Heavy to Light)')}
+                  onClick={() => handleSetSort('weight', 'desc', t.sortWeightHeavy)}
                   className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between cursor-pointer ${
                     sortField === 'weight' ? 'bg-slate-100 font-bold text-slate-950' : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
-                  <span>Weight (Heavy to Light)</span>
+                  <span>{t.sortWeightHeavy}</span>
                   <Box className="w-3.5 h-3.5 text-slate-400" />
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleSetSort('orderNumber', 'asc', 'Order Number')}
+                  onClick={() => handleSetSort('orderNumber', 'asc', t.sortOrderNumber)}
                   className={`w-full text-left px-3 py-2 rounded-xl text-xs flex items-center justify-between cursor-pointer ${
                     sortField === 'orderNumber' ? 'bg-slate-100 font-bold text-slate-950' : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
-                  <span>Order Identifier</span>
+                  <span>{t.sortOrderNumber}</span>
                   <span className="font-mono text-[10px]">#P360</span>
                 </button>
               </div>
@@ -414,48 +420,48 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
               </th>
               <th 
                 className="py-2.5 px-2 font-medium cursor-pointer hover:text-slate-700"
-                onClick={() => handleSetSort('orderNumber', sortDirection === 'asc' ? 'desc' : 'asc', 'Order ID')}
+                onClick={() => handleSetSort('orderNumber', sortDirection === 'asc' ? 'desc' : 'asc', t.orderId)}
               >
-                <Tooltip title="Order ID" content="Proc360 unique purchase order tracking identifier" position="top" width="w-52">
+                <Tooltip title={t.orderId} content={language === 'zh' ? 'Proc360 采购单唯一跟踪编码' : "Proc360 unique purchase order tracking identifier"} position="top" width="w-52">
                   <div className="flex items-center gap-1">
-                    <span>Order ID</span>
+                    <span>{t.orderId}</span>
                     {sortField === 'orderNumber' && (sortDirection === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
                   </div>
                 </Tooltip>
               </th>
-              <th className="py-2.5 px-2.5 font-medium">Product & Supplier</th>
+              <th className="py-2.5 px-2.5 font-medium">{t.productSupplier}</th>
               <th 
                 className="py-2.5 px-2 font-medium cursor-pointer hover:text-slate-700"
-                onClick={() => handleSetSort('price', sortDirection === 'asc' ? 'desc' : 'asc', 'RMB Value')}
+                onClick={() => handleSetSort('price', sortDirection === 'asc' ? 'desc' : 'asc', t.amountRmb)}
               >
-                <Tooltip title="Procurement Amount" content="Total wholesale procurement cost in RMB & converted USD" position="top" width="w-56">
+                <Tooltip title={t.amountRmb} content={language === 'zh' ? '采购总额（人民币及折算美元）' : "Total wholesale procurement cost in RMB & converted USD"} position="top" width="w-56">
                   <div className="flex items-center gap-1">
-                    <span>Amount (RMB)</span>
+                    <span>{t.amountRmb}</span>
                     {sortField === 'price' && (sortDirection === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
                   </div>
                 </Tooltip>
               </th>
               <th className="py-2.5 px-2 font-medium">
-                <Tooltip title="Pickup Origin" content="Vendor factory & dispatch location in China" position="top" width="w-52">
-                  <span>Pickup</span>
+                <Tooltip title={t.pickup} content={language === 'zh' ? '国内供应商工厂与发货城市' : "Vendor factory & dispatch location in China"} position="top" width="w-52">
+                  <span>{t.pickup}</span>
                 </Tooltip>
               </th>
               <th className="py-2.5 px-2 font-medium">
-                <Tooltip title="Delivery Location" content="Hub warehouse (Dongguan/Yiwu) or overseas destination" position="top" width="w-56">
-                  <span>Delivery</span>
+                <Tooltip title={t.delivery} content={language === 'zh' ? '集运中转仓（东莞/义乌/深圳）或海外目的港' : "Hub warehouse (Dongguan/Yiwu) or overseas destination"} position="top" width="w-56">
+                  <span>{t.delivery}</span>
                 </Tooltip>
               </th>
               <th className="py-2.5 px-2 font-medium">
-                <Tooltip title="Estimated Delivery" content="Target transit date based on carrier telemetry" position="top" width="w-52">
-                  <span>Est. Delivery</span>
+                <Tooltip title={t.estDelivery} content={language === 'zh' ? '基于承运商遥测的预计送达时间' : "Target transit date based on carrier telemetry"} position="top" width="w-52">
+                  <span>{t.estDelivery}</span>
                 </Tooltip>
               </th>
               <th className="py-2.5 px-2 font-medium">
-                <Tooltip title="Order & QC Status" content="Real-time procurement, inspection, and shipping status" position="top" width="w-56">
-                  <span>Status</span>
+                <Tooltip title={t.status} content={language === 'zh' ? '采购、质检与跨境转运实时状态' : "Real-time procurement, inspection, and shipping status"} position="top" width="w-56">
+                  <span>{t.status}</span>
                 </Tooltip>
               </th>
-              <th className="py-2.5 px-2 text-right font-medium">Action</th>
+              <th className="py-2.5 px-2 text-right font-medium">{t.action}</th>
               <th className="py-2.5 px-2 sm:px-3 w-8 text-right"></th>
             </tr>
           </thead>
@@ -542,7 +548,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                                 onOpenPhotoModal(order.qcPhotos[0].url, order.qcPhotos[0].caption);
                               }
                             }}
-                            title="View QC inspection photos"
+                            title={t.inspectQcPhotos}
                             className="absolute -bottom-1 -right-1 p-0.5 bg-white rounded-md shadow-xs border border-slate-200 text-slate-600 hover:text-slate-950"
                           >
                             <Camera className="w-2.5 h-2.5 text-blue-600" />
@@ -551,13 +557,13 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                       </div>
                       <div className="min-w-0">
                         <p className="font-semibold text-slate-900 truncate group-hover:text-slate-950 text-xs">
-                          {order.title}
+                          {translateOrderText(order.title)}
                         </p>
                         <div className="flex items-center gap-1.5 text-[10px] mt-0.5 text-slate-400 truncate">
                           <span className="px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 font-semibold text-[9px] font-mono">
                             {order.supplierPlatform}
                           </span>
-                          <span className="truncate">{order.supplierName}</span>
+                          <span className="truncate">{translateOrderText(order.supplierName)}</span>
                         </div>
                       </div>
                     </div>
@@ -603,7 +609,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                       </span>
                       {isRecentlyUpdated && (
                         <span className="px-1.5 py-0.2 rounded bg-[#E35D3B]/15 text-[#E35D3B] text-[9.5px] font-bold font-mono animate-pulse">
-                          ⚡ Updated
+                          ⚡ {t.updatedPill}
                         </span>
                       )}
                     </div>
@@ -620,7 +626,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                         }}
                         className="px-2.5 py-1 text-xs rounded-xl bg-yellow-400 hover:bg-yellow-300 text-yellow-950 font-bold shadow-2xs transition-colors flex items-center gap-1 ml-auto cursor-pointer"
                       >
-                        <CreditCard className="w-3 h-3" /> Authorize PO
+                        <CreditCard className="w-3 h-3" /> {t.authorizePo}
                       </button>
                     ) : order.actionType === 'CUSTOMIZATION_CONFIRMATION' ? (
                       <button
@@ -631,7 +637,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                         }}
                         className="px-2.5 py-1 text-xs rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold shadow-2xs transition-colors flex items-center gap-1 ml-auto cursor-pointer"
                       >
-                        <Camera className="w-3 h-3" /> Review Proof
+                        <Camera className="w-3 h-3" /> {t.reviewProof}
                       </button>
                     ) : order.actionType === 'READY_TO_CONSOLIDATE' ? (
                       <button
@@ -645,7 +651,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                         }}
                         className="px-2.5 py-1 text-xs rounded-xl bg-[#0e1118] hover:bg-slate-800 text-white font-semibold shadow-2xs transition-colors flex items-center gap-1 ml-auto cursor-pointer"
                       >
-                        <Layers className="w-3 h-3" /> Consolidate
+                        <Layers className="w-3 h-3" /> {t.consolidate}
                       </button>
                     ) : order.actionType === 'ADDRESS_ISSUE' ? (
                       <button
@@ -656,7 +662,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                         }}
                         className="px-2.5 py-1 text-xs rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold shadow-2xs transition-colors flex items-center gap-1 ml-auto cursor-pointer"
                       >
-                        <ShieldAlert className="w-3 h-3" /> Fix Address
+                        <ShieldAlert className="w-3 h-3" /> {t.fixAddress}
                       </button>
                     ) : (
                       <button
@@ -667,7 +673,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                         }}
                         className="px-2.5 py-1 text-xs rounded-xl bg-white border border-slate-200/90 text-slate-700 hover:text-slate-950 hover:bg-slate-50 font-semibold shadow-2xs transition-colors cursor-pointer"
                       >
-                        See more
+                        {t.seeMore}
                       </button>
                     )}
                   </td>
@@ -705,7 +711,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                             className="w-full px-3 py-2 text-xs font-bold text-[#E35D3B] hover:bg-orange-50 rounded-xl flex items-center gap-2 cursor-pointer bg-orange-50/50 mb-1"
                           >
                             <Zap className="w-3.5 h-3.5 text-[#E35D3B]" />
-                            <span>⚡ Advance Stage & QC Update</span>
+                            <span>⚡ {t.advanceStageQc}</span>
                           </button>
                         )}
 
@@ -718,7 +724,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                           className="w-full px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 cursor-pointer"
                         >
                           <Eye className="w-3.5 h-3.5 text-slate-500" />
-                          <span>View Order Timeline & Bin</span>
+                          <span>{t.viewOrderTimelineBin}</span>
                         </button>
 
                         {order.qcPhotos && order.qcPhotos.length > 0 && (
@@ -731,7 +737,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                             className="w-full px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 cursor-pointer"
                           >
                             <Camera className="w-3.5 h-3.5 text-blue-600" />
-                            <span>Inspect QC Photos ({order.qcPhotos.length})</span>
+                            <span>{t.inspectQcPhotos} ({order.qcPhotos.length})</span>
                           </button>
                         )}
 
@@ -744,7 +750,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                           className="w-full px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 cursor-pointer"
                         >
                           <Download className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Download Invoice (RMB)</span>
+                          <span>{t.downloadInvoiceRmb}</span>
                         </button>
 
                         <button
@@ -753,36 +759,36 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                             setActiveMenuId(null);
                             const tracking = order.domesticTracking?.trackingNumber || order.intlTracking?.trackingNumber || order.orderNumber;
                             navigator.clipboard.writeText(tracking);
-                            onShowToast(`Copied tracking code: ${tracking}`);
+                            onShowToast(language === 'zh' ? `已复制运单号: ${tracking}` : `Copied tracking code: ${tracking}`);
                           }}
                           className="w-full px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 cursor-pointer"
                         >
                           <Copy className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Copy Tracking / Waybill</span>
+                          <span>{t.copyTrackingWaybill}</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={() => {
                             setActiveMenuId(null);
-                            onShowToast(`Warehouse repacking & moisture protection requested for #${order.orderNumber}`);
+                            onShowToast(language === 'zh' ? `已为 #${order.orderNumber} 提交中转仓重新打包及防潮加固需求` : `Warehouse repacking & moisture protection requested for #${order.orderNumber}`);
                           }}
                           className="w-full px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2 cursor-pointer"
                         >
                           <Box className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Request Warehouse Repack</span>
+                          <span>{t.requestWarehouseRepack}</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={() => {
                             setActiveMenuId(null);
-                            onShowToast(`Proc360 Agent assigned to ${order.supplierName} • WeChat chat active`);
+                            onShowToast(language === 'zh' ? `Proc360 中文驻厂采购专员已对接【${translateOrderText(order.supplierName)}】• 微信跟单中` : `Proc360 Agent assigned to ${order.supplierName} • WeChat chat active`);
                           }}
                           className="w-full px-3 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-50 rounded-xl flex items-center gap-2 cursor-pointer border-t border-slate-100 mt-1 pt-1"
                         >
                           <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Chat with China Agent</span>
+                          <span>{t.chatWithChinaAgent}</span>
                         </button>
                       </div>
                     )}
@@ -798,15 +804,15 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
       {sortedOrders.length > 10 && (
         <div className="p-3.5 sm:p-4 bg-slate-50/70 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="text-xs text-slate-500 font-medium flex items-center gap-1.5">
-            <span>Showing</span>
+            <span>{t.showing}</span>
             <span className="font-bold text-slate-900 font-mono">
               {displayedOrders.length}
             </span>
-            <span>of</span>
+            <span>{t.of}</span>
             <span className="font-bold text-slate-900 font-mono">
               {sortedOrders.length}
             </span>
-            <span>orders</span>
+            <span>{t.orders}</span>
           </div>
 
           <button
@@ -815,9 +821,9 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
               const nextState = !isExpandedView;
               setIsExpandedView(nextState);
               if (nextState) {
-                onShowToast(`Showing all ${sortedOrders.length} sourcing orders`);
+                onShowToast(language === 'zh' ? `正在展示全部 ${sortedOrders.length} 笔采购订单` : `Showing all ${sortedOrders.length} sourcing orders`);
               } else {
-                onShowToast('Collapsed to top 10 orders');
+                onShowToast(language === 'zh' ? '已折叠展示前 10 笔订单' : 'Collapsed to top 10 orders');
               }
             }}
             className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white hover:bg-slate-100 border border-slate-200/90 text-slate-800 text-xs font-bold shadow-2xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
@@ -825,12 +831,12 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
             {isExpandedView ? (
               <>
                 <ChevronUp className="w-4 h-4 text-[#E35D3B]" />
-                <span>Show Less (Collapse to 10)</span>
+                <span>{t.showLess}</span>
               </>
             ) : (
               <>
                 <ChevronDown className="w-4 h-4 text-[#E35D3B]" />
-                <span>View More ({sortedOrders.length - 10} remaining)</span>
+                <span>{t.viewMore} ({sortedOrders.length - 10} {t.remaining})</span>
               </>
             )}
           </button>
@@ -840,10 +846,11 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
       {orders.length === 0 && (
         <div className="p-12 text-center text-slate-400 space-y-1">
           <Package className="w-8 h-8 mx-auto text-slate-300 mb-2" />
-          <p className="font-semibold text-slate-700">No orders match this filter</p>
-          <p className="text-xs text-slate-400">Try switching tabs or resetting your search query.</p>
+          <p className="font-semibold text-slate-700">{t.noOrdersMatch}</p>
+          <p className="text-xs text-slate-400">{t.trySwitchingTabs}</p>
         </div>
       )}
     </div>
   );
 };
+

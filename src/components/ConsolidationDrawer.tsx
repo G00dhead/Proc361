@@ -13,6 +13,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { OrderItem } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ConsolidationDrawerProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
   onConfirmConsolidation,
   walletBalanceCNY,
 }) => {
+  const { t, translateOrderText, language } = useLanguage();
   const [shippingTier, setShippingTier] = useState<'AIR_EXPRESS' | 'AIR_DDP' | 'SEA_FAST' | 'RAIL_EUROPE'>('AIR_DDP');
   const [removeShoeBoxes, setRemoveShoeBoxes] = useState(true);
   const [bubbleWrap, setBubbleWrap] = useState(true);
@@ -77,8 +79,12 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
               <Layers className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-950">Consolidate International Parcel</h2>
-              <p className="text-xs text-slate-500">Combine multiple China warehouse parcels into one DDP shipment</p>
+              <h2 className="text-sm font-bold text-slate-950">
+                {language === 'zh' ? '合并打包国际集运' : 'Consolidate International Parcel'}
+              </h2>
+              <p className="text-xs text-slate-500">
+                {language === 'zh' ? '将多个中国中转仓包裹合并为单一 DDP 双清包税跨境运单' : 'Combine multiple China warehouse parcels into one DDP shipment'}
+              </p>
             </div>
           </div>
 
@@ -86,7 +92,7 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
             type="button"
             aria-label="Close consolidation drawer"
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -98,10 +104,12 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
           <div className="space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="font-bold text-slate-900 text-xs">
-                Selected Warehouse Parcels ({selectedOrders.length})
+                {language === 'zh' ? `已选择 ${selectedOrders.length} 个仓储包裹` : `Selected Warehouse Parcels (${selectedOrders.length})`}
               </span>
-              <span className="font-mono text-slate-500">
-                Gross: {totalWeightKg.toFixed(1)} kg • Value: ¥{totalGoodsValueRMB.toLocaleString()}
+              <span className="font-mono text-slate-500 text-[11px]">
+                {language === 'zh'
+                  ? `毛重: ${totalWeightKg.toFixed(1)} kg • 货值: ¥${totalGoodsValueRMB.toLocaleString()}`
+                  : `Gross: ${totalWeightKg.toFixed(1)} kg • Value: ¥${totalGoodsValueRMB.toLocaleString()}`}
               </span>
             </div>
 
@@ -116,12 +124,18 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
                       src={order.thumbnail}
                       alt=""
                       referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        if (!target.src.includes('photo-1577937927133-66ef06acdf18')) {
+                          target.src = 'https://images.unsplash.com/photo-1577937927133-66ef06acdf18?w=160&auto=format&fit=crop&q=80';
+                        }
+                      }}
                       className="w-9 h-9 rounded-xl object-cover border border-slate-200 bg-white shrink-0"
                     />
                     <div className="min-w-0">
-                      <p className="font-semibold text-slate-900 truncate text-xs">{order.title}</p>
+                      <p className="font-semibold text-slate-900 truncate text-xs">{translateOrderText(order.title)}</p>
                       <p className="text-[11px] text-slate-400 font-mono">
-                        {order.quantity} {order.unit} • {order.weightKg} kg • {order.warehouse}
+                        {order.quantity} {translateOrderText(order.unit)} • {order.weightKg} kg • {translateOrderText(order.warehouse)}
                       </p>
                     </div>
                   </div>
@@ -136,14 +150,19 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
           {/* Smart Repackaging Options */}
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
             <h3 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-slate-600" /> Volume Optimization & Repackaging
+              <Sparkles className="w-3.5 h-3.5 text-slate-600" />
+              {language === 'zh' ? '体积减重优化与增值合箱' : 'Volume Optimization & Repackaging'}
             </h3>
 
             <div className="space-y-2 text-xs">
               <label className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200/80 cursor-pointer">
                 <div>
-                  <span className="font-semibold text-slate-800 block">Discard bulky outer retail packaging</span>
-                  <span className="text-[11px] text-emerald-700">Reduces volumetric dimensional weight by ~22%</span>
+                  <span className="font-semibold text-slate-800 block">
+                    {language === 'zh' ? '拆除多余外盒原包装' : 'Discard bulky outer retail packaging'}
+                  </span>
+                  <span className="text-[11px] text-emerald-700">
+                    {language === 'zh' ? '立减计费体积重约 22%' : 'Reduces volumetric dimensional weight by ~22%'}
+                  </span>
                 </div>
                 <input
                   type="checkbox"
@@ -155,8 +174,12 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
 
               <label className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200/80 cursor-pointer">
                 <div>
-                  <span className="font-semibold text-slate-800 block">Corner protection & multi-layer bubble wrap</span>
-                  <span className="text-[11px] text-slate-500">+¥25 RMB flat packaging service</span>
+                  <span className="font-semibold text-slate-800 block">
+                    {language === 'zh' ? '多层气泡柱防震加固' : 'Corner protection & multi-layer bubble wrap'}
+                  </span>
+                  <span className="text-[11px] text-slate-500">
+                    {language === 'zh' ? '+¥25 RMB 易碎品防摔缓冲' : '+¥25 RMB flat packaging service'}
+                  </span>
                 </div>
                 <input
                   type="checkbox"
@@ -168,8 +191,12 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
 
               <label className="flex items-center justify-between p-2 rounded-xl bg-white border border-slate-200/80 cursor-pointer">
                 <div>
-                  <span className="font-semibold text-slate-800 block">Sealed heavy-duty waterproof bag</span>
-                  <span className="text-[11px] text-slate-500">+¥15 RMB moisture barrier</span>
+                  <span className="font-semibold text-slate-800 block">
+                    {language === 'zh' ? '全包裹重型防水袋封装' : 'Sealed heavy-duty waterproof bag'}
+                  </span>
+                  <span className="text-[11px] text-slate-500">
+                    {language === 'zh' ? '+¥15 RMB 防潮防雨隔层' : '+¥15 RMB moisture barrier'}
+                  </span>
                 </div>
                 <input
                   type="checkbox"
@@ -184,14 +211,14 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
           {/* International Carrier Selection */}
           <div className="space-y-2.5">
             <span className="font-bold text-slate-900 text-xs block">
-              Select International Shipping Line:
+              {language === 'zh' ? '选择跨境国际专线渠道：' : 'Select International Shipping Line:'}
             </span>
 
             <div className="grid grid-cols-2 gap-2.5">
               <button
                 type="button"
                 onClick={() => setShippingTier('AIR_DDP')}
-                className={`p-3.5 rounded-2xl border text-left transition-all ${
+                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                   shippingTier === 'AIR_DDP'
                     ? 'bg-slate-950 text-white border-slate-950 shadow-xs'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -200,19 +227,19 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
                 <div className="flex items-center justify-between mb-1">
                   <Plane className="w-4 h-4" />
                   <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/20">
-                    6-9 Days
+                    {language === 'zh' ? '6-9 工作日' : '6-9 Days'}
                   </span>
                 </div>
-                <p className="font-bold text-xs">Air Cargo DDP</p>
+                <p className="font-bold text-xs">{language === 'zh' ? '航空空运专线 DDP' : 'Air Cargo DDP'}</p>
                 <p className={`text-[11px] font-mono mt-0.5 ${shippingTier === 'AIR_DDP' ? 'text-slate-300' : 'text-slate-500'}`}>
-                  ¥52 / kg • Customs Included
+                  {language === 'zh' ? '¥52 / kg • 双清包税' : '¥52 / kg • Customs Included'}
                 </p>
               </button>
 
               <button
                 type="button"
                 onClick={() => setShippingTier('AIR_EXPRESS')}
-                className={`p-3.5 rounded-2xl border text-left transition-all ${
+                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                   shippingTier === 'AIR_EXPRESS'
                     ? 'bg-slate-950 text-white border-slate-950 shadow-xs'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -221,19 +248,19 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
                 <div className="flex items-center justify-between mb-1">
                   <Plane className="w-4 h-4" />
                   <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/20">
-                    3-5 Days
+                    {language === 'zh' ? '3-5 工作日' : '3-5 Days'}
                   </span>
                 </div>
-                <p className="font-bold text-xs">DHL / FedEx Express</p>
+                <p className="font-bold text-xs">{language === 'zh' ? 'DHL / FedEx 商业特快' : 'DHL / FedEx Express'}</p>
                 <p className={`text-[11px] font-mono mt-0.5 ${shippingTier === 'AIR_EXPRESS' ? 'text-slate-300' : 'text-slate-500'}`}>
-                  ¥85 / kg • Priority Flight
+                  {language === 'zh' ? '¥85 / kg • 极速直飞' : '¥85 / kg • Priority Flight'}
                 </p>
               </button>
 
               <button
                 type="button"
                 onClick={() => setShippingTier('SEA_FAST')}
-                className={`p-3.5 rounded-2xl border text-left transition-all ${
+                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                   shippingTier === 'SEA_FAST'
                     ? 'bg-slate-950 text-white border-slate-950 shadow-xs'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -242,19 +269,19 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
                 <div className="flex items-center justify-between mb-1">
                   <Ship className="w-4 h-4" />
                   <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/20">
-                    18-24 Days
+                    {language === 'zh' ? '18-24 天' : '18-24 Days'}
                   </span>
                 </div>
-                <p className="font-bold text-xs">Matson Fast Sea DDP</p>
+                <p className="font-bold text-xs">{language === 'zh' ? '美森快船海运 DDP' : 'Matson Fast Sea DDP'}</p>
                 <p className={`text-[11px] font-mono mt-0.5 ${shippingTier === 'SEA_FAST' ? 'text-slate-300' : 'text-slate-500'}`}>
-                  ¥22 / kg • Lowest Freight
+                  {language === 'zh' ? '¥22 / kg • 大宗高性价比' : '¥22 / kg • Lowest Freight'}
                 </p>
               </button>
 
               <button
                 type="button"
                 onClick={() => setShippingTier('RAIL_EUROPE')}
-                className={`p-3.5 rounded-2xl border text-left transition-all ${
+                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                   shippingTier === 'RAIL_EUROPE'
                     ? 'bg-slate-950 text-white border-slate-950 shadow-xs'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -263,12 +290,12 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
                 <div className="flex items-center justify-between mb-1">
                   <Truck className="w-4 h-4" />
                   <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-white/20">
-                    14-18 Days
+                    {language === 'zh' ? '14-18 天' : '14-18 Days'}
                   </span>
                 </div>
-                <p className="font-bold text-xs">Yiwu-Europe Rail Express</p>
+                <p className="font-bold text-xs">{language === 'zh' ? '义新欧中欧班列' : 'Yiwu-Europe Rail Express'}</p>
                 <p className={`text-[11px] font-mono mt-0.5 ${shippingTier === 'RAIL_EUROPE' ? 'text-slate-300' : 'text-slate-500'}`}>
-                  ¥28 / kg • EU Duty Paid
+                  {language === 'zh' ? '¥28 / kg • 欧线双清包税' : '¥28 / kg • EU Duty Paid'}
                 </p>
               </button>
             </div>
@@ -277,19 +304,19 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
           {/* Pricing Calculation Summary */}
           <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
             <div className="flex justify-between py-1 text-xs border-b border-slate-200/60">
-              <span className="text-slate-500">Billable Bill-of-Lading Weight:</span>
+              <span className="text-slate-500">{language === 'zh' ? '提单核算计费重量：' : 'Billable Bill-of-Lading Weight:'}</span>
               <span className="font-mono font-bold text-slate-800">{optimizedWeightKg.toFixed(1)} kg</span>
             </div>
             <div className="flex justify-between py-1 text-xs border-b border-slate-200/60">
-              <span className="text-slate-500">Freight Cost:</span>
+              <span className="text-slate-500">{language === 'zh' ? '国际干线运费：' : 'Freight Cost:'}</span>
               <span className="font-mono text-slate-800">¥{baseFreightCNY.toLocaleString()} RMB</span>
             </div>
             <div className="flex justify-between py-1 text-xs border-b border-slate-200/60">
-              <span className="text-slate-500">Repackaging & Barrier Services:</span>
+              <span className="text-slate-500">{language === 'zh' ? '加固与封装服务费：' : 'Repackaging & Barrier Services:'}</span>
               <span className="font-mono text-slate-800">¥{packagingFeeCNY} RMB</span>
             </div>
             <div className="flex justify-between py-1 text-sm font-bold pt-1">
-              <span className="text-slate-950">Total Consolidation Freight:</span>
+              <span className="text-slate-950">{language === 'zh' ? '国际集运应付总额：' : 'Total Consolidation Freight:'}</span>
               <div className="text-right">
                 <span className="font-mono text-slate-950">¥{totalConsolidationCNY.toLocaleString()} RMB</span>
                 <span className="block text-[11px] font-mono text-slate-400 font-normal">(${totalConsolidationUSD.toFixed(2)} USD)</span>
@@ -301,7 +328,7 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
         {/* Footer */}
         <div className="p-5 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between">
           <div className="text-xs">
-            <span className="text-slate-400 block font-mono text-[11px]">RMB Wallet Balance:</span>
+            <span className="text-slate-400 block font-mono text-[11px]">{language === 'zh' ? '人民币钱包可用余额：' : 'RMB Wallet Balance:'}</span>
             <span className="font-mono font-bold text-slate-900">¥{walletBalanceCNY.toLocaleString()}</span>
           </div>
 
@@ -309,17 +336,17 @@ export const ConsolidationDrawer: React.FC<ConsolidationDrawerProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 rounded-xl text-slate-500 hover:text-slate-800 text-xs font-semibold transition-colors"
+              className="px-4 py-2.5 rounded-xl text-slate-500 hover:text-slate-800 text-xs font-semibold transition-colors cursor-pointer"
             >
-              Cancel
+              {t.cancel}
             </button>
             <button
               type="button"
               onClick={handleDispatch}
               disabled={isProcessing || selectedOrders.length === 0}
-              className="px-6 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs shadow-md disabled:opacity-50 transition-colors flex items-center gap-2"
+              className="px-6 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white font-bold text-xs shadow-md disabled:opacity-50 transition-colors flex items-center gap-2 cursor-pointer"
             >
-              <span>{isProcessing ? 'Dispatching...' : 'Dispatch Consolidated Shipment'}</span>
+              <span>{isProcessing ? (language === 'zh' ? '正在派发...' : 'Dispatching...') : (language === 'zh' ? '确认发货并派送' : 'Dispatch Consolidated Shipment')}</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

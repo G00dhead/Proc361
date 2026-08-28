@@ -15,10 +15,16 @@ import {
   HelpCircle,
   ShieldCheck,
   DollarSign,
-  Truck
+  Truck,
+  Navigation,
+  Box,
+  Layers,
+  Headphones,
+  FileText
 } from 'lucide-react';
 import { Tooltip } from './Tooltip';
 import { OrderItem } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface SourcingAnalyticsSectionProps {
   orders: OrderItem[];
@@ -59,6 +65,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
   onShowToast,
   onOpenOrderDetail
 }) => {
+  const { t, language, translateOrderText } = useLanguage();
   const [timeInterval, setTimeInterval] = useState<TimeInterval>('Monthly');
   const [chartType, setChartType] = useState<ChartType>('line');
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -72,35 +79,89 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
     {
       id: '#170845-25-800NYK',
       internalId: 'P360-84920',
-      title: 'CNC Aluminum Mechanical Keyboards (Batch #2)',
-      carrier: 'SF International Air Express',
-      origin: 'Guangdong Consolidation Hub, Dongguan',
-      destination: 'Los Angeles, CA, USA',
-      status: 'In transit',
+      title: language === 'zh' ? 'CNC 铝合金客制化机械键盘 (第2批次)' : 'CNC Aluminum Mechanical Keyboards (Batch #2)',
+      carrier: language === 'zh' ? '顺丰国际空运特快专线' : 'SF International Air Express',
+      origin: language === 'zh' ? '广东集拼中心 (东莞仓)' : 'Guangdong Consolidation Hub, Dongguan',
+      destination: language === 'zh' ? '美国 洛杉矶仓库' : 'Los Angeles, CA, USA',
+      status: language === 'zh' ? '干线在途' : 'In transit',
       statusColor: 'text-[#E35D3B]',
       eta: '28 Aug 2026',
+      weight: '42.8 kg',
+      volume: '0.24 CBM',
+      cartons: language === 'zh' ? '3箱 (共50套)' : '3 Master Cartons (50 units)',
+      hubBay: language === 'zh' ? '东莞集运仓 4B库区' : 'Dongguan Hub Bay 4B',
+      customsStatus: language === 'zh' ? '双清包税 (DDP已放行)' : 'DDP Cleared & Duty Paid',
+      packagingType: language === 'zh' ? '加厚五层箱 • 防潮气柱' : 'Reinforced 5-Ply • Air Cushion',
       timeline: [
-        { label: 'Delivered', subtext: 'Estimated 28 Aug 2026', time: '10:20 AM', completed: false, isEstimate: true },
-        { label: 'In Transit', subtext: '27 Aug 2026', time: '09:15 AM', completed: true },
-        { label: 'In Sorting Centre', subtext: '26 Aug 2026', time: '06:21 AM', completed: true },
-        { label: 'Order Confirmed', subtext: '25 Aug 2026', time: '06:21 AM', completed: true },
+        { 
+          label: language === 'zh' ? '末端派送' : 'Delivered', 
+          subtext: language === 'zh' ? '预计 2026年8月28日 送达' : 'Estimated 28 Aug 2026', 
+          time: '10:20 AM', 
+          completed: false, 
+          isEstimate: true 
+        },
+        { 
+          label: language === 'zh' ? '国际航班在途' : 'In Transit', 
+          subtext: '27 Aug 2026', 
+          time: '09:15 AM', 
+          completed: true 
+        },
+        { 
+          label: language === 'zh' ? '出口海关分拨中心' : 'In Sorting Centre', 
+          subtext: '26 Aug 2026', 
+          time: '06:21 AM', 
+          completed: true 
+        },
+        { 
+          label: language === 'zh' ? '拼箱已封单' : 'Order Confirmed', 
+          subtext: '25 Aug 2026', 
+          time: '06:21 AM', 
+          completed: true 
+        },
       ]
     },
     {
       id: '#194820-99-410LAX',
       internalId: 'P360-84917',
-      title: 'Ergonomic Desk Accessories & Cable Rigs',
-      carrier: 'Matson Sea Expedited (CLX)',
-      origin: 'Shenzhen Yantian Terminal',
-      destination: 'Long Beach Port -> Inland Hub',
-      status: 'In transit',
+      title: language === 'zh' ? '人体工学桌面配件与线槽' : 'Ergonomic Desk Accessories & Cable Rigs',
+      carrier: language === 'zh' ? '美森快船加急海运 (CLX)' : 'Matson Sea Expedited (CLX)',
+      origin: language === 'zh' ? '深圳盐田码头出口仓' : 'Shenzhen Yantian Terminal',
+      destination: language === 'zh' ? '长滩港 -> 内陆集运仓' : 'Long Beach Port -> Inland Hub',
+      status: language === 'zh' ? '海运在途' : 'In transit',
       statusColor: 'text-[#E35D3B]',
       eta: '04 Sep 2026',
+      weight: '112.5 kg',
+      volume: '0.85 CBM',
+      cartons: language === 'zh' ? '6箱 (共200件)' : '6 Master Cartons (200 units)',
+      hubBay: language === 'zh' ? '深圳盐田仓 2A库区' : 'Shenzhen Bay 2A',
+      customsStatus: language === 'zh' ? '海关查验放行 • 美森快船' : 'Customs Cleared • Matson CLX',
+      packagingType: language === 'zh' ? '护角加固 • 熏蒸托盘' : 'Corner Guards • Fumigated Pallet',
       timeline: [
-        { label: 'Delivered', subtext: 'Estimated 04 Sep 2026', time: '02:00 PM', completed: false, isEstimate: true },
-        { label: 'Vessel In Pacific Transit', subtext: '30 Aug 2026', time: '11:40 AM', completed: true },
-        { label: 'Customs Cleared at Yantian', subtext: '26 Aug 2026', time: '04:15 PM', completed: true },
-        { label: 'Container Sealed & Loaded', subtext: '24 Aug 2026', time: '08:30 AM', completed: true },
+        { 
+          label: language === 'zh' ? '码头卸船派送' : 'Delivered', 
+          subtext: language === 'zh' ? '预计 2026年9月4日 到港' : 'Estimated 04 Sep 2026', 
+          time: '02:00 PM', 
+          completed: false, 
+          isEstimate: true 
+        },
+        { 
+          label: language === 'zh' ? '美森快船太平洋航行中' : 'Vessel In Pacific Transit', 
+          subtext: '30 Aug 2026', 
+          time: '11:40 AM', 
+          completed: true 
+        },
+        { 
+          label: language === 'zh' ? '盐田海关查验放行' : 'Customs Cleared at Yantian', 
+          subtext: '26 Aug 2026', 
+          time: '04:15 PM', 
+          completed: true 
+        },
+        { 
+          label: language === 'zh' ? '集装箱已封柜装船' : 'Container Sealed & Loaded', 
+          subtext: '24 Aug 2026', 
+          time: '08:30 AM', 
+          completed: true 
+        },
       ]
     }
   ];
@@ -176,11 +237,11 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                 <div className="w-7 h-7 rounded-xl border border-slate-200 flex items-center justify-center text-slate-700 bg-slate-50/50">
                   <Package className="w-3.5 h-3.5 text-slate-700" />
                 </div>
-                <span className="text-xs font-bold text-slate-900 tracking-tight">Total Orders</span>
+                <span className="text-xs font-bold text-slate-900 tracking-tight">{t.totalOrders}</span>
               </div>
               <Tooltip 
-                title="Total Orders"
-                content="Cumulative count of all Purchase Orders routed through 1688, Taobao, and OEM factories."
+                title={t.totalOrders}
+                content={language === 'zh' ? '通过 1688、淘宝及工厂直采的所有采购单累计汇总。' : "Cumulative count of all Purchase Orders routed through 1688, Taobao, and OEM factories."}
                 position="bottom"
               >
                 <div 
@@ -200,7 +261,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                 </div>
                 <div className="flex items-center gap-1 mt-2 text-xs font-bold text-emerald-600 font-mono">
                   <span>+1.1%</span>
-                  <span className="text-slate-400 font-normal font-sans text-[11px]">vs last week</span>
+                  <span className="text-slate-400 font-normal font-sans text-[11px]">{t.vsLastWeek}</span>
                 </div>
               </div>
 
@@ -224,8 +285,8 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
 
             {/* Helper Bar */}
             <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-              <span>All 1688 & factory POs</span>
-              <span className="text-slate-400 text-[10px]">Active</span>
+              <span>{t.all1688FactoryPos}</span>
+              <span className="text-slate-400 text-[10px]">{t.activeStatus}</span>
             </div>
           </div>
 
@@ -237,11 +298,11 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                 <div className="w-7 h-7 rounded-xl border border-rose-200/70 flex items-center justify-center text-rose-600 bg-rose-50/50">
                   <RotateCcw className="w-3.5 h-3.5 text-rose-600" />
                 </div>
-                <span className="text-xs font-bold text-slate-900 tracking-tight">Returns Orders</span>
+                <span className="text-xs font-bold text-slate-900 tracking-tight">{t.returnsOrders}</span>
               </div>
               <Tooltip 
-                title="Returns & Refunds"
-                content="Items that failed 5-point QC at China hubs and were returned to 1688/factories for full RMB refunds before international dispatch."
+                title={t.returnsOrders}
+                content={language === 'zh' ? '在中转仓 5 项品控中未达标并由采购专员退回 1688/工厂全额退款的人民币订单。' : "Items that failed 5-point QC at China hubs and were returned to 1688/factories for full RMB refunds before international dispatch."}
                 position="bottom"
               >
                 <div 
@@ -261,7 +322,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                 </div>
                 <div className="flex items-center gap-1 mt-2 text-xs font-bold text-[#E35D3B] font-mono">
                   <span>-3.3%</span>
-                  <span className="text-slate-400 font-normal font-sans text-[11px]">vs last week</span>
+                  <span className="text-slate-400 font-normal font-sans text-[11px]">{t.vsLastWeek}</span>
                 </div>
               </div>
 
@@ -278,9 +339,9 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
             {/* Helper Bar */}
             <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
               <span className="truncate pr-1">
-                China QC rejects & seller refunds
+                {t.returnsOrdersDesc}
               </span>
-              <span className="text-emerald-600 font-semibold text-[10px]">100% Escrow</span>
+              <span className="text-emerald-600 font-semibold text-[10px]">{t.escrow100}</span>
             </div>
           </div>
 
@@ -292,11 +353,11 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                 <div className="w-7 h-7 rounded-xl border border-emerald-200/70 flex items-center justify-center text-emerald-600 bg-emerald-50/50">
                   <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
                 </div>
-                <span className="text-xs font-bold text-slate-900 tracking-tight">Fulfilled Orders</span>
+                <span className="text-xs font-bold text-slate-900 tracking-tight">{t.fulfilledOrders}</span>
               </div>
               <Tooltip 
-                title="Fulfilled Orders"
-                content="302 orders verified via 5-point QC inspection and packed for export; 184 in active inspection."
+                title={t.fulfilledOrders}
+                content={language === 'zh' ? '302 笔订单已完成 5 项品控并打包入库；184 笔正在中转仓进行实物核验。' : "302 orders verified via 5-point QC inspection and packed for export; 184 in active inspection."}
                 position="bottom"
               >
                 <div 
@@ -313,11 +374,11 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               {/* Passed QC / Satisfied (Green) */}
               <div className="bg-emerald-50/50 p-2.5 rounded-2xl border border-emerald-100/80">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-emerald-800 font-bold">Passed QC</span>
+                  <span className="text-[11px] text-emerald-800 font-bold">{t.passedQc}</span>
                   <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded-md">62%</span>
                 </div>
                 <div className="text-xl sm:text-2xl font-extrabold text-emerald-950 font-mono leading-none mt-1.5">
-                  302 <span className="text-[11px] font-sans font-normal text-emerald-700">POs</span>
+                  302 <span className="text-[11px] font-sans font-normal text-emerald-700">{t.poUnit}</span>
                 </div>
                 <div className="w-full h-1.5 rounded-full bg-emerald-200 mt-2 overflow-hidden">
                   <div className="h-full bg-emerald-500 rounded-full w-[62%]" />
@@ -327,11 +388,11 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               {/* In Inspection / Pending (Amber/Yellow) */}
               <div className="bg-amber-50/50 p-2.5 rounded-2xl border border-amber-100/80">
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-amber-800 font-bold">In QC Queue</span>
+                  <span className="text-[11px] text-amber-800 font-bold">{t.inQcQueue}</span>
                   <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-100/70 px-1.5 py-0.5 rounded-md">38%</span>
                 </div>
                 <div className="text-xl sm:text-2xl font-extrabold text-amber-950 font-mono leading-none mt-1.5">
-                  184 <span className="text-[11px] font-sans font-normal text-amber-700">POs</span>
+                  184 <span className="text-[11px] font-sans font-normal text-amber-700">{t.poUnit}</span>
                 </div>
                 <div className="w-full h-1.5 rounded-full bg-amber-200 mt-2 overflow-hidden">
                   <div className="h-full bg-amber-500 rounded-full w-[38%]" />
@@ -339,11 +400,6 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               </div>
             </div>
 
-            {/* Helper Bar */}
-            <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-              <span className="text-slate-600">302 Passed QC • 184 In Hub Check</span>
-              <span className="text-emerald-700 font-semibold text-[10px] bg-emerald-50 px-1.5 py-0.5 rounded">486 Total Sourced</span>
-            </div>
           </div>
 
         </div>
@@ -355,17 +411,17 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
             {/* Title & Legend Pill */}
             <div className="flex items-center gap-3.5 flex-wrap">
               <h2 className="text-base font-bold text-slate-950 tracking-tight">
-                Order Analysis
+                {t.orderAnalysis}
               </h2>
               <Tooltip
-                title="Reimbursed Escrow"
-                content="Funds reclaimed from Chinese sellers via discounts, rebates, and defective batch returns."
+                title={t.escrowCommitted}
+                content={language === 'zh' ? '因质检次品、协议折扣或批次折损而成功由采购专员追回的人民币款项。' : "Funds reclaimed from Chinese sellers via discounts, rebates, and defective batch returns."}
                 position="top"
               >
                 <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200/60 cursor-pointer">
                   <span className="w-2.5 h-2.5 rounded-xs bg-slate-900" />
-                  <span className="font-semibold text-slate-800">Reimbursed $5,133</span>
-                  <span className="text-[11px] text-slate-400 font-mono hidden md:inline">(¥37,200 RMB)</span>
+                  <span className="font-semibold text-slate-800">{t.reimbursedAmount}</span>
+                  <span className="text-[11px] text-slate-400 font-mono hidden md:inline">{t.reimbursedAmountRmb}</span>
                 </div>
               </Tooltip>
             </div>
@@ -380,7 +436,9 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 transition-colors cursor-pointer"
                 >
                   <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                  <span>{timeInterval}</span>
+                  <span>
+                    {timeInterval === 'Monthly' ? t.monthly : timeInterval === 'Weekly' ? t.weekly : t.daily}
+                  </span>
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                 </button>
 
@@ -393,13 +451,13 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                         onClick={() => {
                           setTimeInterval(interval);
                           setIsIntervalDropdownOpen(false);
-                          if (onShowToast) onShowToast(`Switched view to ${interval} Sourcing Velocity`);
+                          if (onShowToast) onShowToast(language === 'zh' ? `已切换为 ${interval === 'Monthly' ? '月度' : interval === 'Weekly' ? '周度' : '日度'} 采购流速视图` : `Switched view to ${interval} Sourcing Velocity`);
                         }}
                         className={`w-full text-left px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer ${
                           timeInterval === interval ? 'bg-slate-100 font-bold text-slate-900' : 'text-slate-600 hover:bg-slate-50'
                         }`}
                       >
-                        {interval}
+                        {interval === 'Monthly' ? t.monthly : interval === 'Weekly' ? t.weekly : t.daily}
                       </button>
                     ))}
                   </div>
@@ -417,7 +475,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  Line
+                  {t.line}
                 </button>
                 <button
                   type="button"
@@ -428,7 +486,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  Bar
+                  {t.bar}
                 </button>
               </div>
             </div>
@@ -441,15 +499,15 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                  <span className="font-medium text-slate-800">Fulfilled Orders (USD / RMB)</span>
+                  <span className="font-medium text-slate-800">{t.fulfilledOrdersLegend}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                  <span className="font-medium text-rose-600">Cancel / QC Returned</span>
+                  <span className="font-medium text-rose-600">{t.cancelQcReturnedLegend}</span>
                 </div>
               </div>
               <div className="text-[11px] font-mono text-slate-400 hidden sm:block">
-                1 USD ≈ 7.24 RMB
+                {t.fxSpotRate}
               </div>
             </div>
 
@@ -765,17 +823,23 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
       </div>
 
       {/* RIGHT SECTION: TRACK NEW SHIPMENT CARD */}
-      <div className="w-full xl:w-[360px] shrink-0 bg-white rounded-3xl p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between overflow-hidden">
+      <div className="w-full xl:w-[360px] shrink-0 bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col gap-3.5 overflow-hidden">
         
         {/* Card Header */}
-        <div className="flex items-center justify-between relative pb-2 border-b border-slate-100">
+        <div className="flex items-center justify-between relative pb-2.5 border-b border-slate-100">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-bold text-slate-950 tracking-tight">
-              Track New Shipment
-            </h3>
+            <div className="w-7 h-7 rounded-xl border border-orange-200/70 flex items-center justify-center text-[#E35D3B] bg-orange-50/50">
+              <Navigation className="w-3.5 h-3.5 text-[#E35D3B]" />
+            </div>
+            <div>
+              <h3 className="text-xs font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
+                {t.trackNewShipment}
+                <span className="text-[10px] font-mono text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-semibold">LIVE</span>
+              </h3>
+            </div>
             <Tooltip 
-              title="Shipment Tracking"
-              content="Live GPS telemetry for domestic SF Express pickups and international Air Express/Ocean freight."
+              title={t.trackNewShipment}
+              content={language === 'zh' ? '顺丰国内速运及美森海运/空运特快专线的实时 GPS 轨迹回传。' : "Live GPS telemetry for domestic SF Express pickups and international Air Express/Ocean freight."}
               position="bottom"
             >
               <div 
@@ -787,48 +851,63 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
             </Tooltip>
           </div>
 
-          {/* Three-dots menu */}
-          <div className="relative">
+          {/* Action buttons in header */}
+          <div className="flex items-center gap-1">
             <button
               type="button"
-              onClick={() => setShowShipmentMenu(!showShipmentMenu)}
+              onClick={() => {
+                setActiveShipmentIndex((activeShipmentIndex + 1) % activeShipments.length);
+                if (onShowToast) onShowToast(language === 'zh' ? '已切换至当前跟踪运单' : 'Switched to active freight waybill');
+              }}
               className="p-1 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
-              aria-label="Shipment options"
+              title={t.switchActiveParcel}
+              aria-label="Switch active shipment"
             >
-              <MoreVertical className="w-4 h-4" />
+              <RefreshCw className="w-3.5 h-3.5" />
             </button>
 
-            {showShipmentMenu && (
-              <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 z-40 animate-in fade-in duration-100 text-xs">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveShipmentIndex((activeShipmentIndex + 1) % activeShipments.length);
-                    setShowShipmentMenu(false);
-                    if (onShowToast) onShowToast('Switched to active freight waybill');
-                  }}
-                  className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-50 flex items-center gap-2 text-slate-700 cursor-pointer"
-                >
-                  <RefreshCw className="w-3.5 h-3.5 text-slate-400" /> Switch Active Parcel
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowShipmentMenu(false);
-                    navigator.clipboard.writeText(currentShipment.id);
-                    if (onShowToast) onShowToast(`Copied tracking number: ${currentShipment.id}`);
-                  }}
-                  className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-50 flex items-center gap-2 text-slate-700 cursor-pointer"
-                >
-                  <Copy className="w-3.5 h-3.5 text-slate-400" /> Copy Waybill ID
-                </button>
-              </div>
-            )}
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setShowShipmentMenu(!showShipmentMenu)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+                aria-label="Shipment options"
+              >
+                <MoreVertical className="w-4 h-4" />
+              </button>
+
+              {showShipmentMenu && (
+                <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 z-40 animate-in fade-in duration-100 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setActiveShipmentIndex((activeShipmentIndex + 1) % activeShipments.length);
+                      setShowShipmentMenu(false);
+                      if (onShowToast) onShowToast(language === 'zh' ? '已切换至当前跟踪运单' : 'Switched to active freight waybill');
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-50 flex items-center gap-2 text-slate-700 cursor-pointer"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5 text-slate-400" /> {t.switchActiveParcel}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowShipmentMenu(false);
+                      navigator.clipboard.writeText(currentShipment.id);
+                      if (onShowToast) onShowToast(language === 'zh' ? `已复制国际运单号: ${currentShipment.id}` : `Copied tracking number: ${currentShipment.id}`);
+                    }}
+                    className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-50 flex items-center gap-2 text-slate-700 cursor-pointer"
+                  >
+                    <Copy className="w-3.5 h-3.5 text-slate-400" /> {t.copyWaybillId}
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Interactive Map Visualizer Container */}
-        <div className="relative my-3 rounded-2xl overflow-hidden border border-slate-200/90 bg-slate-900 h-44 shadow-inner">
+        <div className="relative rounded-2xl overflow-hidden border border-slate-200/90 bg-slate-900 h-40 shadow-inner">
           <svg className="w-full h-full absolute inset-0 opacity-40" xmlns="http://www.w3.org/2000/svg">
             <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
               <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
@@ -837,53 +916,60 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
           </svg>
 
           {/* Map Route Graphics */}
-          <svg className="w-full h-full absolute inset-0 overflow-visible" viewBox="0 0 320 180">
+          <svg className="w-full h-full absolute inset-0 overflow-visible" viewBox="0 0 320 160">
             <path
-              d="M 40,120 Q 140,30 270,75"
+              d="M 40,110 Q 140,25 270,65"
               fill="none"
               stroke="#475569"
               strokeWidth="2"
               strokeDasharray="4 4"
             />
             <path
-              d="M 40,120 Q 110,65 170,55"
+              d="M 40,110 Q 110,55 170,45"
               fill="none"
               stroke="#E35D3B"
               strokeWidth="3"
             />
 
-            <g transform="translate(40, 120)">
+            <g transform="translate(40, 110)">
               <circle r="5" fill="#10b981" />
               <circle r="9" fill="none" stroke="#10b981" strokeWidth="1.5" className="animate-ping opacity-60" />
             </g>
 
-            <g transform="translate(170, 55)">
+            <g transform="translate(170, 45)">
               <circle r="6" fill="#E35D3B" />
               <circle r="11" fill="none" stroke="#E35D3B" strokeWidth="2" className="animate-ping" />
             </g>
 
-            <g transform="translate(270, 75)">
+            <g transform="translate(270, 65)">
               <circle r="5" fill="#ffffff" />
             </g>
           </svg>
 
-          <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-950/80 backdrop-blur-xs border border-white/10 text-[11px] font-mono text-white">
+          <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-950/80 backdrop-blur-xs border border-white/10 text-[10px] font-mono text-white">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E35D3B] animate-pulse" />
-            <span>SF-EXPRESS AIR</span>
+            <span>{currentShipment.carrier.toUpperCase()}</span>
+          </div>
+
+          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-950/80 backdrop-blur-xs border border-emerald-500/30 text-[10px] font-mono text-emerald-300">
+            <span>ETA: {currentShipment.eta}</span>
           </div>
 
           <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono text-slate-300 bg-slate-950/85 backdrop-blur-xs px-3 py-1.5 rounded-xl border border-white/10">
-            <span>{currentShipment.origin.split(',')[0]}</span>
-            <span className="text-[#E35D3B] font-bold">● IN TRANSIT</span>
-            <span>{currentShipment.destination.split(',')[0]}</span>
+            <span className="truncate max-w-[100px]">{currentShipment.origin.split(',')[0]}</span>
+            <span className="text-[#E35D3B] font-bold">● {t.inTransitBadge}</span>
+            <span className="truncate max-w-[100px] text-right">{currentShipment.destination.split(',')[0]}</span>
           </div>
         </div>
 
-        {/* Tracking ID & Summary Bar */}
-        <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between mb-3">
-          <div>
-            <p className="text-[10px] text-slate-400 font-semibold leading-tight">Current Consignment</p>
-            <p className="text-xs font-mono font-bold text-slate-950 leading-snug mt-0.5">
+        {/* Tracking ID & Telemetry Summary Bar */}
+        <div className="p-2.5 bg-slate-50 rounded-2xl border border-slate-200/70 flex items-center justify-between">
+          <div className="min-w-0 pr-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] text-slate-400 font-semibold leading-tight">{t.currentConsignment}</span>
+              <span className="text-[9px] bg-slate-200 text-slate-700 px-1 py-0.2 rounded font-mono font-medium">42.8 kg</span>
+            </div>
+            <p className="text-xs font-mono font-bold text-slate-950 leading-snug mt-0.5 truncate">
               {currentShipment.id}
             </p>
           </div>
@@ -891,18 +977,18 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
             type="button"
             onClick={() => {
               navigator.clipboard.writeText(currentShipment.id);
-              if (onShowToast) onShowToast(`Copied tracking number: ${currentShipment.id}`);
+              if (onShowToast) onShowToast(language === 'zh' ? `已复制国际运单号: ${currentShipment.id}` : `Copied tracking number: ${currentShipment.id}`);
             }}
-            className="p-1.5 text-slate-400 hover:text-slate-800 hover:bg-white rounded-xl border border-transparent hover:border-slate-200 transition-all cursor-pointer"
-            title="Copy Tracking ID"
+            className="p-1.5 text-slate-500 hover:text-slate-900 bg-white hover:bg-slate-100 rounded-xl border border-slate-200/80 shadow-2xs transition-all cursor-pointer shrink-0"
+            title={t.copyWaybillId}
           >
             <Copy className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Stepper Timeline with Checkboxes matching screenshot */}
-        <div className="space-y-2.5 pt-1 relative">
-          <div className="absolute left-[7px] top-3 bottom-3 w-0.5 bg-slate-200 -z-0" />
+        {/* Stepper Timeline with Checkboxes */}
+        <div className="space-y-2 pt-0.5 relative">
+          <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-slate-200 -z-0" />
 
           {currentShipment.timeline.map((step) => (
             <div 
@@ -922,7 +1008,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                 </div>
 
                 <div className="min-w-0">
-                  <p className={`font-semibold leading-tight ${step.completed ? 'text-slate-900' : 'text-slate-500'}`}>
+                  <p className={`font-semibold leading-tight text-xs ${step.completed ? 'text-slate-900' : 'text-slate-500'}`}>
                     {step.label}
                   </p>
                   <p className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5 truncate">
@@ -932,11 +1018,108 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               </div>
 
               {/* Timestamp on right */}
-              <span className="text-[10px] font-mono text-slate-400 shrink-0 font-medium">
+              <span className="text-[10px] font-mono text-slate-400 shrink-0 font-medium pt-0.5">
                 {step.time}
               </span>
             </div>
           ))}
+        </div>
+
+        {/* Consignment Specs & Warehouse Hub Bay Info */}
+        <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-200/80 space-y-2 text-xs">
+          <div className="flex items-center justify-between border-b border-slate-200/60 pb-1.5">
+            <span className="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
+              <Box className="w-3.5 h-3.5 text-slate-600" />
+              {language === 'zh' ? '集运货运与库位详情' : 'Cargo Specs & Warehouse Bay'}
+            </span>
+            <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded font-semibold flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3 text-emerald-600" />
+              {currentShipment.customsStatus}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 text-[11px]">
+            <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs">
+              <span className="text-[10px] text-slate-400 block font-medium">
+                {language === 'zh' ? '中转库区与库位' : 'Consolidation Bay'}
+              </span>
+              <span className="font-semibold text-slate-800 truncate block mt-0.5">
+                {currentShipment.hubBay}
+              </span>
+            </div>
+
+            <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs">
+              <span className="text-[10px] text-slate-400 block font-medium">
+                {language === 'zh' ? '总毛重与体积' : 'Gross Weight & Vol'}
+              </span>
+              <span className="font-semibold text-slate-800 truncate block mt-0.5 font-mono">
+                {currentShipment.weight} • {currentShipment.volume}
+              </span>
+            </div>
+
+            <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs">
+              <span className="text-[10px] text-slate-400 block font-medium">
+                {language === 'zh' ? '外箱规格' : 'Master Cartons'}
+              </span>
+              <span className="font-semibold text-slate-800 truncate block mt-0.5">
+                {currentShipment.cartons}
+              </span>
+            </div>
+
+            <div className="bg-white p-2 rounded-xl border border-slate-100 shadow-2xs">
+              <span className="text-[10px] text-slate-400 block font-medium">
+                {language === 'zh' ? '强化加固工艺' : 'Packaging Grade'}
+              </span>
+              <span className="font-semibold text-slate-800 truncate block mt-0.5">
+                {currentShipment.packagingType}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Controls & Dispatch Drawer Trigger */}
+        <div className="space-y-2 pt-0.5">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                const matchingOrder = orders.find(
+                  (o) => o.orderId === currentShipment.internalId || (o.trackingNumber && o.trackingNumber.includes(currentShipment.id))
+                ) || orders[0];
+                if (onOpenOrderDetail && matchingOrder) {
+                  onOpenOrderDetail(matchingOrder);
+                } else if (onShowToast) {
+                  onShowToast(language === 'zh' ? `正在调取 ${currentShipment.id} 实时品控与清关档案...` : `Opening QC Station & Customs dossier for ${currentShipment.id}...`);
+                }
+              }}
+              className="flex-1 py-2 px-3 bg-slate-950 hover:bg-slate-800 text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>{language === 'zh' ? '查看质检库位与运单档案' : 'Inspect QC Station & Dossier'}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (onShowToast) {
+                  onShowToast(language === 'zh' ? `已连接驻华双语跟单客服 (顺丰/美森专属对接)` : `Connected with Dedicated China Forwarding Agent`);
+                }
+              }}
+              className="p-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-all cursor-pointer"
+              title={language === 'zh' ? '联系驻华跟单客服' : 'Contact Sourcing Agent'}
+            >
+              <Headphones className="w-4 h-4 text-slate-600" />
+            </button>
+          </div>
+
+          {/* Escrow & Transpacific Protection Assurance */}
+          <div className="flex items-center justify-between text-[10px] text-slate-500 px-1 pt-1 border-t border-slate-100">
+            <span className="flex items-center gap-1 text-slate-500 font-medium">
+              <ShieldCheck className="w-3 h-3 text-emerald-600 shrink-0" />
+              {language === 'zh' ? '全额担保代管与货运一切险已生效' : '100% Escrow & Marine Cargo Insurance'}
+            </span>
+            <span className="font-mono text-slate-400 font-semibold">SLA: 99.4%</span>
+          </div>
         </div>
 
       </div>

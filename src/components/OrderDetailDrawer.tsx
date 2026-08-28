@@ -17,6 +17,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { OrderItem } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface OrderDetailDrawerProps {
   order: OrderItem | null;
@@ -37,6 +38,8 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
   onConsolidateOrder,
   walletBalanceCNY,
 }) => {
+  const { t, translateOrderText, language } = useLanguage();
+
   if (!isOpen || !order) return null;
 
   return (
@@ -50,10 +53,10 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
             </div>
             <div>
               <span className="text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider">
-                {order.supplierPlatform} • {order.category}
+                {order.supplierPlatform} • {translateOrderText(order.category)}
               </span>
               <h2 className="text-sm font-bold text-slate-900 line-clamp-1">
-                {order.title}
+                {translateOrderText(order.title)}
               </h2>
             </div>
           </div>
@@ -62,7 +65,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
             type="button"
             aria-label="Close order details drawer"
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -75,14 +78,15 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
             <div className="p-4 rounded-2xl bg-amber-50 border border-amber-200/80 space-y-2.5">
               <div className="flex items-center justify-between">
                 <span className="font-bold text-amber-900 flex items-center gap-1.5 text-xs">
-                  <AlertTriangle className="w-4 h-4 text-amber-600" /> Action Required
+                  <AlertTriangle className="w-4 h-4 text-amber-600" />
+                  {language === 'zh' ? '待处理操作要求' : 'Action Required'}
                 </span>
                 <span className="font-mono text-[11px] bg-amber-200/70 text-amber-900 font-bold px-2 py-0.5 rounded-full">
-                  {order.statusLabel}
+                  {translateOrderText(order.statusLabel)}
                 </span>
               </div>
               <p className="text-amber-800 text-xs leading-relaxed">
-                {order.actionSummary}
+                {translateOrderText(order.actionSummary)}
               </p>
               <button
                 type="button"
@@ -93,12 +97,12 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                     onOpenActionModal(order);
                   }
                 }}
-                className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
+                className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 {order.actionType === 'PAYMENT_PENDING' && <CreditCard className="w-4 h-4" />}
                 {order.actionType === 'CUSTOMIZATION_CONFIRMATION' && <Camera className="w-4 h-4" />}
                 {order.actionType === 'READY_TO_CONSOLIDATE' && <Layers className="w-4 h-4" />}
-                <span>Resolve Action Now</span>
+                <span>{language === 'zh' ? '立即处理此待办事项' : 'Resolve Action Now'}</span>
               </button>
             </div>
           )}
@@ -119,10 +123,11 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
             />
             <div className="flex-1 min-w-0 space-y-1">
               <h3 className="font-bold text-slate-900 text-sm leading-snug">
-                {order.title}
+                {translateOrderText(order.title)}
               </h3>
               <p className="text-slate-500 text-xs">
-                Supplier: <span className="font-medium text-slate-800">{order.supplierName}</span>
+                {language === 'zh' ? '工厂/供应商：' : 'Supplier: '}
+                <span className="font-medium text-slate-800">{translateOrderText(order.supplierName)}</span>
               </p>
               <div className="flex items-center gap-2 pt-1">
                 <a
@@ -131,7 +136,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                   rel="noreferrer"
                   className="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-700 hover:text-slate-950 underline"
                 >
-                  <span>View 1688 / Factory Listing</span>
+                  <span>{language === 'zh' ? '查看 1688 / 工厂原始货源页' : 'View 1688 / Factory Listing'}</span>
                   <ExternalLink className="w-3 h-3" />
                 </a>
               </div>
@@ -141,7 +146,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
           {/* Sourcing & Logistics Specifications */}
           <div className="grid grid-cols-2 gap-3">
             <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
-              <span className="text-[11px] text-slate-400 font-medium">Batch Order Value</span>
+              <span className="text-[11px] text-slate-400 font-medium">{language === 'zh' ? '批量订购货值' : 'Batch Order Value'}</span>
               <p className="text-base font-bold font-mono text-slate-900 mt-0.5">
                 ¥{order.priceRMB.toLocaleString()} RMB
               </p>
@@ -151,34 +156,34 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
             </div>
 
             <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
-              <span className="text-[11px] text-slate-400 font-medium">Quantity & Parcel Weight</span>
+              <span className="text-[11px] text-slate-400 font-medium">{language === 'zh' ? '订购数量与包裹毛重' : 'Quantity & Parcel Weight'}</span>
               <p className="text-base font-bold font-mono text-slate-900 mt-0.5">
-                {order.quantity} {order.unit}
+                {order.quantity} {translateOrderText(order.unit)}
               </p>
               <p className="text-[11px] font-mono text-slate-500">
-                {order.weightKg} kg gross
+                {order.weightKg} kg {language === 'zh' ? '毛重' : 'gross'}
               </p>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
-              <span className="text-[11px] text-slate-400 font-medium">Assigned Warehouse Hub</span>
+              <span className="text-[11px] text-slate-400 font-medium">{language === 'zh' ? '所在中国中转枢纽' : 'Assigned Warehouse Hub'}</span>
               <p className="text-xs font-bold text-slate-900 mt-0.5">
-                {order.warehouse}
+                {translateOrderText(order.warehouse)}
               </p>
               {order.warehouseBin && (
                 <p className="text-[11px] font-mono text-slate-500">
-                  Bin: {order.warehouseBin}
+                  {language === 'zh' ? '库位号：' : 'Bin: '}{order.warehouseBin}
                 </p>
               )}
             </div>
 
             <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-2xs">
-              <span className="text-[11px] text-slate-400 font-medium">Current Status</span>
+              <span className="text-[11px] text-slate-400 font-medium">{language === 'zh' ? '当前执行状态' : 'Current Status'}</span>
               <p className="text-xs font-bold text-slate-900 mt-0.5">
-                {order.statusLabel}
+                {translateOrderText(order.statusLabel)}
               </p>
               <p className="text-[11px] text-slate-500">
-                Updated {order.updatedAt}
+                {language === 'zh' ? '更新于 ' : 'Updated '}{order.updatedAt}
               </p>
             </div>
           </div>
@@ -188,10 +193,11 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-                  <Camera className="w-4 h-4 text-slate-500" /> High-Resolution Inspection Photos
+                  <Camera className="w-4 h-4 text-slate-500" />
+                  {language === 'zh' ? '中转仓高清实物拍照品控' : 'High-Resolution Inspection Photos'}
                 </h3>
                 <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  Passed Warehouse QC
+                  {language === 'zh' ? '通过仓库品控核验' : 'Passed Warehouse QC'}
                 </span>
               </div>
 
@@ -209,7 +215,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] font-semibold p-1 text-center">
-                      View Full Res
+                      {language === 'zh' ? '查看原图' : 'View Full Res'}
                     </div>
                   </div>
                 ))}
@@ -221,26 +227,33 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
           {(order.domesticTracking || order.intlTracking) && (
             <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-2xs space-y-3">
               <h3 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-                <Truck className="w-4 h-4 text-slate-500" /> Active Tracking Waybills
+                <Truck className="w-4 h-4 text-slate-500" />
+                {language === 'zh' ? '国内与跨境实时物流运单' : 'Active Tracking Waybills'}
               </h3>
 
               {order.domesticTracking && (
                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-between text-xs">
                   <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">Domestic China Courier (SF Express)</span>
+                    <span className="text-[11px] text-slate-400 block font-medium">
+                      {language === 'zh' ? '中国国内干线速运（顺丰/德邦）' : 'Domestic China Courier (SF Express)'}
+                    </span>
                     <span className="font-mono font-bold text-slate-800">{order.domesticTracking.trackingNumber}</span>
                   </div>
-                  <span className="text-[11px] text-slate-500">{order.domesticTracking.origin} → {order.domesticTracking.destination}</span>
+                  <span className="text-[11px] text-slate-500">{order.domesticTracking.origin} → {translateOrderText(order.domesticTracking.destination)}</span>
                 </div>
               )}
 
               {order.intlTracking && (
                 <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-between text-xs">
                   <div>
-                    <span className="text-[11px] text-slate-400 block font-medium">International Forwarding ({order.intlTracking.carrier})</span>
+                    <span className="text-[11px] text-slate-400 block font-medium">
+                      {language === 'zh' ? `国际跨境专线 (${order.intlTracking.carrier})` : `International Forwarding (${order.intlTracking.carrier})`}
+                    </span>
                     <span className="font-mono font-bold text-slate-800">{order.intlTracking.trackingNumber}</span>
                   </div>
-                  <span className="text-[11px] font-semibold text-emerald-700">ETA: {order.intlTracking.etaDate}</span>
+                  <span className="text-[11px] font-semibold text-emerald-700">
+                    {language === 'zh' ? `预计送达: ${order.intlTracking.etaDate}` : `ETA: ${order.intlTracking.etaDate}`}
+                  </span>
                 </div>
               )}
             </div>
@@ -249,7 +262,8 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
           {/* Timeline Milestones */}
           <div className="space-y-3">
             <h3 className="font-bold text-slate-900 text-xs flex items-center gap-1.5">
-              <Clock className="w-4 h-4 text-slate-500" /> Sourcing & Logistics Milestones
+              <Clock className="w-4 h-4 text-slate-500" />
+              {language === 'zh' ? '采购与物流节点追踪时间轴' : 'Sourcing & Logistics Milestones'}
             </h3>
 
             <div className="space-y-4 relative pl-4 border-l border-slate-200 ml-2">
@@ -268,11 +282,11 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                   <div>
                     <div className="flex items-center justify-between">
                       <span className={`font-semibold ${event.current ? 'text-amber-900' : 'text-slate-900'}`}>
-                        {event.title}
+                        {translateOrderText(event.title)}
                       </span>
                       <span className="text-[11px] font-mono text-slate-400">{event.timestamp}</span>
                     </div>
-                    <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{event.description}</p>
+                    <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{translateOrderText(event.description)}</p>
                   </div>
                 </div>
               ))}
@@ -283,14 +297,14 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
         {/* Footer */}
         <div className="p-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between">
           <span className="text-[11px] font-mono text-slate-400">
-            Escrow ID: ESC-{order.id.slice(-6)}
+            {language === 'zh' ? '担保代管协议编号：' : 'Escrow ID: '}ESC-{order.id.slice(-6)}
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-xs transition-colors"
+            className="px-4 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold text-xs transition-colors cursor-pointer"
           >
-            Close
+            {t.close}
           </button>
         </div>
       </div>
