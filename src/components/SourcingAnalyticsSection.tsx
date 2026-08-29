@@ -223,13 +223,13 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
   const currentShipment = activeShipments[activeShipmentIndex];
   const activeMonth = hoveredIndex !== null ? MONTHLY_DATA[hoveredIndex] : null;
 
-  // SVG Chart coordinate configuration with natural aspect ratio & proper padding
-  const chartWidth = 900;
-  const chartHeight = 280;
-  const paddingLeft = 60;
-  const paddingRight = 40;
-  const paddingTop = 30;
-  const paddingBottom = 40;
+  // SVG Chart coordinate configuration with natural aspect ratio & responsive scale
+  const chartWidth = 520;
+  const chartHeight = 220;
+  const paddingLeft = 44;
+  const paddingRight = 20;
+  const paddingTop = 16;
+  const paddingBottom = 38;
 
   const plotWidth = chartWidth - paddingLeft - paddingRight;
   const plotHeight = chartHeight - paddingTop - paddingBottom;
@@ -459,41 +459,43 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
         </div>
 
         {/* BOTTOM ROW: ORDER ANALYSIS CHART */}
-        <div className="bg-white rounded-3xl p-5 sm:p-6 border border-slate-200/90 shadow-2xs relative overflow-hidden">
-          {/* Header Controls */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3">
+        <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs relative overflow-hidden flex flex-col gap-3">
+          {/* Header Controls: Responsive Flex Wrap Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100/90">
             {/* Title & Legend Pill */}
-            <div className="flex items-center gap-3.5 flex-wrap">
-              <h2 className="text-base font-bold text-slate-950 tracking-tight">
-                {t.orderAnalysis}
+            <div className="flex items-center gap-2.5 sm:gap-3 flex-wrap">
+              <h2 className="text-sm sm:text-base font-bold text-slate-950 tracking-tight flex items-center gap-2">
+                <span>{t.orderAnalysis}</span>
               </h2>
               <Tooltip
                 title={t.escrowCommitted}
                 content={language === 'zh' ? '因质检次品、协议折扣或批次折损而成功由采购专员追回的人民币款项。' : "Funds reclaimed from Chinese sellers via discounts, rebates, and defective batch returns."}
                 position="top"
               >
-                <div className="flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-200/60 cursor-pointer">
-                  <span className="w-2.5 h-2.5 rounded-xs bg-slate-900" />
-                  <span className="font-semibold text-slate-800">{t.reimbursedAmount}</span>
-                  <span className="text-[11px] text-slate-400 font-mono hidden md:inline">{t.reimbursedAmountRmb}</span>
+                <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-600 bg-slate-50 hover:bg-slate-100 px-2 sm:px-2.5 py-1 rounded-xl border border-slate-200/70 cursor-pointer transition-colors shadow-2xs">
+                  <span className="w-2 h-2 rounded-xs bg-slate-900 shrink-0" />
+                  <span className="font-semibold text-slate-800 whitespace-nowrap">{t.reimbursedAmount}</span>
+                  <span className="text-[10px] sm:text-[11px] text-slate-500 font-mono hidden md:inline">{t.reimbursedAmountRmb}</span>
                 </div>
               </Tooltip>
             </div>
 
             {/* Right Interactive Selectors: Time Interval + Line/Bar Switcher */}
-            <div className="flex items-center gap-2 self-end sm:self-auto">
+            <div className="flex items-center gap-2 justify-between sm:justify-end w-full sm:w-auto">
               {/* Time Interval Dropdown */}
-              <div className="relative">
+              <div className="relative flex-1 sm:flex-initial">
                 <button
                   type="button"
                   onClick={() => setIsIntervalDropdownOpen(!isIntervalDropdownOpen)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 transition-colors cursor-pointer"
+                  className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-1.5 px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200/90 rounded-xl text-xs font-medium text-slate-700 transition-colors cursor-pointer shadow-2xs"
                 >
-                  <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                  <span>
-                    {timeInterval === 'Monthly' ? t.monthly : timeInterval === 'Weekly' ? t.weekly : t.daily}
-                  </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                  <div className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                    <span>
+                      {timeInterval === 'Monthly' ? t.monthly : timeInterval === 'Weekly' ? t.weekly : t.daily}
+                    </span>
+                  </div>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-1" />
                 </button>
 
                 {isIntervalDropdownOpen && (
@@ -519,13 +521,13 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               </div>
 
               {/* Line vs Bar Switcher */}
-              <div className="flex items-center bg-slate-100 p-0.5 rounded-xl border border-slate-200/60">
+              <div className="flex items-center bg-slate-100/90 p-0.5 rounded-xl border border-slate-200/80 shrink-0">
                 <button
                   type="button"
                   onClick={() => setChartType('line')}
                   className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     chartType === 'line'
-                      ? 'bg-white text-slate-950 shadow-2xs'
+                      ? 'bg-white text-slate-950 shadow-2xs font-bold'
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
@@ -536,7 +538,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   onClick={() => setChartType('bar')}
                   className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     chartType === 'bar'
-                      ? 'bg-white text-slate-950 shadow-2xs'
+                      ? 'bg-white text-slate-950 shadow-2xs font-bold'
                       : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
@@ -547,37 +549,37 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
           </div>
 
           {/* Chart Content Area */}
-          <div className="pt-2">
+          <div className="pt-0">
             {/* Chart Legend Indicators */}
-            <div className="flex items-center justify-between gap-4 text-xs font-medium text-slate-600 mb-3 flex-wrap">
-              <div className="flex items-center gap-4">
+            <div className="flex items-center justify-between gap-3 text-xs font-medium text-slate-600 mb-2.5 flex-wrap">
+              <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                  <span className="font-medium text-slate-800">{t.fulfilledOrdersLegend}</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="font-medium text-slate-800 text-[11px] sm:text-xs">{t.fulfilledOrdersLegend}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                  <span className="font-medium text-rose-600">{t.cancelQcReturnedLegend}</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
+                  <span className="font-medium text-rose-600 text-[11px] sm:text-xs">{t.cancelQcReturnedLegend}</span>
                 </div>
               </div>
-              <div className="text-[11px] font-mono text-slate-400 hidden sm:block">
+              <div className="text-[10px] sm:text-[11px] font-mono text-slate-400">
                 {t.fxSpotRate}
               </div>
             </div>
 
             {/* Custom SVG Visualization Container */}
             <div 
-              className="relative w-full bg-slate-50/40 rounded-2xl p-2 sm:p-3 border border-slate-100/80 select-none"
+              className="relative w-full bg-slate-50/40 rounded-2xl p-2 sm:p-3.5 border border-slate-100/80 select-none"
               onMouseLeave={() => setHoveredIndex(null)}
               onClick={() => setHoveredIndex(null)}
             >
-              {/* Main Chart Graphic Canvas */}
-              <div className="relative w-full h-[260px] sm:h-[280px]">
+              {/* Main Chart Graphic Canvas (Fully Responsive & Fluid on all screen sizes) */}
+              <div className="relative w-full h-[200px] xs:h-[220px] sm:h-[260px] md:h-[280px]">
                 {chartType === 'line' ? (
                   <svg 
-                    className="w-full h-full" 
+                    className="w-full h-full block" 
                     viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
-                    preserveAspectRatio="xMidYMid meet"
+                    preserveAspectRatio="none"
                   >
                     <defs>
                       <linearGradient id="fulfilledGrad" x1="0" y1="0" x2="0" y2="1">
@@ -604,12 +606,12 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                           y1={grid.y}
                           x2={chartWidth - paddingRight}
                           y2={grid.y}
-                          stroke={idx === 4 ? '#cbd5e1' : '#f1f5f9'}
-                          strokeWidth={idx === 4 ? '1.5' : '1'}
-                          strokeDasharray={idx === 4 ? 'none' : '4 4'}
+                          stroke={idx === 4 ? '#94a3b8' : '#e2e8f0'}
+                          strokeWidth={idx === 4 ? '1.2' : '0.8'}
+                          strokeDasharray={idx === 4 ? 'none' : '3 3'}
                         />
                         <text
-                          x={paddingLeft - 8}
+                          x={paddingLeft - 6}
                           y={grid.y + 3.5}
                           textAnchor="end"
                           className="text-[11px] font-mono fill-slate-400 font-medium"
@@ -617,7 +619,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                           {grid.val}
                         </text>
                         <text
-                          x={chartWidth - paddingRight + 8}
+                          x={chartWidth - paddingRight + 6}
                           y={grid.y + 3.5}
                           textAnchor="start"
                           className="text-[10px] font-mono fill-slate-300 hidden md:block"
@@ -638,8 +640,8 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                       d={pathCancel}
                       fill="none"
                       stroke="#EF4444"
-                      strokeWidth="2.2"
-                      strokeDasharray="5 5"
+                      strokeWidth="2.0"
+                      strokeDasharray="4 4"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
@@ -649,7 +651,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                       d={pathFulfilled}
                       fill="none"
                       stroke="#10B981"
-                      strokeWidth="3"
+                      strokeWidth="2.8"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       filter="url(#shadowGlow)"
@@ -666,7 +668,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                           stroke="#10B981"
                           strokeWidth="1.5"
                           strokeDasharray="3 3"
-                          opacity="0.7"
+                          opacity="0.85"
                         />
                       </g>
                     )}
@@ -677,10 +679,10 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                         <circle
                           cx={pt.x}
                           cy={pt.y}
-                          r="3.5"
+                          r="3"
                           fill="#ffffff"
                           stroke="#EF4444"
-                          strokeWidth="1.8"
+                          strokeWidth="1.6"
                         />
                       </g>
                     ))}
@@ -706,10 +708,10 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                         >
                           {/* Invisible larger hover hit area */}
                           <rect
-                            x={pt.x - 25}
+                            x={pt.x - 22}
                             y={paddingTop}
-                            width="50"
-                            height={plotHeight}
+                            width="44"
+                            height={plotHeight + 40}
                             fill="transparent"
                           />
 
@@ -718,7 +720,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                             <circle
                               cx={pt.x}
                               cy={pt.y}
-                              r="11"
+                              r="10"
                               fill="#10B981"
                               fillOpacity="0.25"
                               className="animate-pulse"
@@ -739,16 +741,75 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                           <circle
                             cx={pt.x}
                             cy={pt.y}
-                            r={isHovered ? 2.5 : 2}
+                            r={isHovered ? 2.8 : 2}
                             fill="#10B981"
                           />
                         </g>
                       );
                     })}
+
+                    {/* Synchronized X-Axis Month Markers & Interactive Labels inside SVG */}
+                    <g className="x-axis-month-markers">
+                      {pointsFulfilled.map((pt, i) => {
+                        const isHovered = hoveredIndex === i;
+                        return (
+                          <g
+                            key={`axis-month-${pt.month}`}
+                            className="cursor-pointer select-none group"
+                            onMouseEnter={(e) => {
+                              e.stopPropagation();
+                              setHoveredIndex(i);
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setHoveredIndex((prev) => (prev === i ? null : i));
+                              if (onShowToast) {
+                                onShowToast(`${pt.month} Sourcing: ${pt.fulfilled} orders fulfilled ($${pt.fulfilledValUSD.toLocaleString()} / ¥${pt.fulfilledValRMB.toLocaleString()} RMB)`);
+                              }
+                            }}
+                          >
+                            {/* Tick mark directly below point */}
+                            <line
+                              x1={pt.x}
+                              y1={chartBaselineY}
+                              x2={pt.x}
+                              y2={chartBaselineY + 5}
+                              stroke={isHovered ? '#0f172a' : '#94a3b8'}
+                              strokeWidth={isHovered ? '2' : '1'}
+                            />
+
+                            {/* Active selection background capsule pill */}
+                            {isHovered && (
+                              <rect
+                                x={pt.x - 20}
+                                y={chartBaselineY + 8}
+                                width="40"
+                                height="22"
+                                rx="11"
+                                fill="#0f172a"
+                              />
+                            )}
+
+                            {/* Crisp Scalable Month Label text */}
+                            <text
+                              x={pt.x}
+                              y={chartBaselineY + 23}
+                              textAnchor="middle"
+                              fill={isHovered ? '#ffffff' : '#64748b'}
+                              fontSize="12"
+                              fontWeight={isHovered ? '700' : '500'}
+                              fontFamily="system-ui, -apple-system, sans-serif"
+                            >
+                              {pt.month}
+                            </text>
+                          </g>
+                        );
+                      })}
+                    </g>
                   </svg>
                 ) : (
                   /* Volume Bar Chart View */
-                  <div className="w-full h-full flex items-end justify-between px-6 sm:px-10 pb-4">
+                  <div className="w-full h-full flex items-end justify-between px-2 sm:px-8 pb-1 pt-2">
                     {MONTHLY_DATA.map((d, i) => {
                       const isHovered = hoveredIndex === i;
                       const fulfilledHeightPercent = (d.fulfilledValUSD / maxVal) * 100;
@@ -763,24 +824,34 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                           onClick={(e) => {
                             e.stopPropagation();
                             setHoveredIndex((prev) => (prev === i ? null : i));
+                            if (onShowToast) {
+                              onShowToast(`${d.month} Volume: ${d.fulfilled} orders fulfilled ($${d.fulfilledValUSD.toLocaleString()} / ¥${d.fulfilledValRMB.toLocaleString()} RMB)`);
+                            }
                           }}
-                          className="flex flex-col items-center gap-1.5 h-full justify-end group cursor-pointer"
+                          className="flex flex-col items-center gap-1.5 h-full justify-end group cursor-pointer flex-1 max-w-[64px]"
                         >
-                          <div className="flex items-end gap-1.5 h-[210px]">
+                          <div className="flex items-end justify-center gap-1 sm:gap-1.5 h-[160px] sm:h-[190px] w-full">
                             {/* Fulfilled Bar (Green) */}
                             <div
-                              style={{ height: `${fulfilledHeightPercent}%` }}
-                              className={`w-4 sm:w-6 rounded-t-lg transition-all ${
-                                isHovered ? 'bg-emerald-500 shadow-md scale-y-[1.02]' : 'bg-emerald-500/80 group-hover:bg-emerald-500'
+                              style={{ height: `${Math.max(fulfilledHeightPercent, 6)}%` }}
+                              className={`w-3.5 sm:w-5 rounded-t-lg transition-all ${
+                                isHovered ? 'bg-emerald-500 shadow-md scale-y-[1.02]' : 'bg-emerald-500/85 group-hover:bg-emerald-500'
                               }`}
                             />
                             {/* Cancel / QC Bar (Red) */}
                             <div
-                              style={{ height: `${cancelHeightPercent}%` }}
-                              className={`w-3 sm:w-4 rounded-t-lg transition-all ${
-                                isHovered ? 'bg-rose-500 shadow-xs' : 'bg-rose-400/70 group-hover:bg-rose-500'
+                              style={{ height: `${Math.max(cancelHeightPercent, 4)}%` }}
+                              className={`w-2.5 sm:w-3.5 rounded-t-lg transition-all ${
+                                isHovered ? 'bg-rose-500 shadow-xs' : 'bg-rose-400/75 group-hover:bg-rose-500'
                               }`}
                             />
+                          </div>
+
+                          {/* Integrated Month Label directly under Bar */}
+                          <div className={`px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold font-mono transition-all ${
+                            isHovered ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-500 group-hover:text-slate-800'
+                          }`}>
+                            {d.month}
                           </div>
                         </div>
                       );
@@ -788,91 +859,62 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   </div>
                 )}
 
-                {/* Floating Tooltip Card with Hover Entrance & Exit Animation */}
-                <AnimatePresence>
-                  {hoveredIndex !== null && activeMonth && (
-                    <motion.div 
-                      key={`tooltip-${hoveredIndex}`}
-                      initial={{ opacity: 0, scale: 0.94, y: 6 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.94, y: 4 }}
-                      transition={{ duration: 0.15, ease: 'easeOut' }}
-                      style={{
-                        left: `${((hoveredIndex) / (MONTHLY_DATA.length - 1)) * 74 + 13}%`,
-                        top: '10%',
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setHoveredIndex(null);
-                      }}
-                      className="absolute z-20 bg-slate-950/95 text-white border border-white/15 rounded-2xl p-3 shadow-2xl pointer-events-auto cursor-pointer -translate-x-1/2 min-w-[175px] backdrop-blur-md"
-                    >
-                      <div className="text-xs font-bold text-white mb-2 border-b border-white/10 pb-1.5 flex items-center justify-between">
-                        <span>{activeMonth.month} 2026</span>
-                        <span className="text-[10px] font-mono text-emerald-400 font-bold">● Active</span>
-                      </div>
-                      <div className="space-y-1.5 text-xs font-mono">
-                        <div className="flex items-center justify-between gap-3 text-slate-200">
-                          <span className="flex items-center gap-1.5 font-sans text-[11px] text-slate-300">
-                            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                            <span>Fulfilled</span>
-                          </span>
-                          <span className="font-extrabold text-emerald-400">
-                            ${activeMonth.fulfilledValUSD.toLocaleString()}
-                          </span>
+                  {/* Floating Tooltip Card with Hover Entrance & Exit Animation */}
+                  <AnimatePresence>
+                    {hoveredIndex !== null && activeMonth && (
+                      <motion.div 
+                        key={`tooltip-${hoveredIndex}`}
+                        initial={{ opacity: 0, scale: 0.94, y: 6 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.94, y: 4 }}
+                        transition={{ duration: 0.15, ease: 'easeOut' }}
+                        style={{
+                          left: hoveredIndex === 0 ? '22%' : hoveredIndex === MONTHLY_DATA.length - 1 ? '78%' : `${((hoveredIndex) / (MONTHLY_DATA.length - 1)) * 62 + 19}%`,
+                          top: '8%',
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setHoveredIndex(null);
+                        }}
+                        className="absolute z-20 bg-slate-950/95 text-white border border-white/15 rounded-2xl p-3 shadow-2xl pointer-events-auto cursor-pointer -translate-x-1/2 min-w-[170px] max-w-[230px] backdrop-blur-md"
+                      >
+                        <div className="text-xs font-bold text-white mb-2 border-b border-white/10 pb-1.5 flex items-center justify-between">
+                          <span>{activeMonth.month} 2026</span>
+                          <span className="text-[10px] font-mono text-emerald-400 font-bold">● Active</span>
                         </div>
-                        <div className="text-[10px] text-right text-slate-400 leading-tight">
-                          ¥{activeMonth.fulfilledValRMB.toLocaleString()} RMB ({activeMonth.fulfilled} POs)
+                        <div className="space-y-1.5 text-xs font-mono">
+                          <div className="flex items-center justify-between gap-3 text-slate-200">
+                            <span className="flex items-center gap-1.5 font-sans text-[11px] text-slate-300">
+                              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                              <span>Fulfilled</span>
+                            </span>
+                            <span className="font-extrabold text-emerald-400">
+                              ${activeMonth.fulfilledValUSD.toLocaleString()}
+                            </span>
+                          </div>
+                          <div className="text-[10px] text-right text-slate-400 leading-tight">
+                            ¥{activeMonth.fulfilledValRMB.toLocaleString()} RMB ({activeMonth.fulfilled} POs)
+                          </div>
+                          <div className="flex items-center justify-between gap-3 text-slate-300 pt-1 border-t border-white/10">
+                            <span className="flex items-center gap-1.5 font-sans text-[11px] text-slate-400">
+                              <span className="w-2 h-2 rounded-full bg-rose-500" />
+                              <span>Cancel / QC</span>
+                            </span>
+                            <span className="font-bold text-rose-400">
+                              ${activeMonth.cancelValUSD.toLocaleString()}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex items-center justify-between gap-3 text-slate-300 pt-1 border-t border-white/10">
-                          <span className="flex items-center gap-1.5 font-sans text-[11px] text-slate-400">
-                            <span className="w-2 h-2 rounded-full bg-rose-500" />
-                            <span>Cancel / QC</span>
-                          </span>
-                          <span className="font-bold text-rose-400">
-                            ${activeMonth.cancelValUSD.toLocaleString()}
-                          </span>
+                        <div className="mt-2 pt-1.5 border-t border-white/10 text-[9px] text-slate-400 text-center font-sans">
+                          Tap to dismiss
                         </div>
-                      </div>
-                      <div className="mt-2 pt-1.5 border-t border-white/10 text-[9px] text-slate-400 text-center font-sans">
-                        Click or move away to dismiss
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Dedicated X-Axis Month Markers (Cleanly separated from line graph) */}
-              <div className="flex items-center justify-between text-xs font-medium text-slate-500 pt-2.5 px-6 sm:px-10 border-t border-slate-200/60 mt-1">
-                {MONTHLY_DATA.map((d, i) => {
-                  const isSelected = hoveredIndex === i;
-                  return (
-                    <button
-                      key={d.month}
-                      type="button"
-                      onMouseEnter={(e) => {
-                        e.stopPropagation();
-                        setHoveredIndex(i);
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setHoveredIndex((prev) => (prev === i ? null : i));
-                        if (onShowToast) onShowToast(`${d.month} Sourcing: ${d.fulfilled} orders fulfilled ($${d.fulfilledValUSD.toLocaleString()} / ¥${d.fulfilledValRMB.toLocaleString()} RMB)`);
-                      }}
-                      className={`px-2.5 py-1 rounded-xl transition-all cursor-pointer font-medium ${
-                        isSelected 
-                          ? 'text-slate-950 font-bold bg-white shadow-xs border border-slate-200 scale-105' 
-                          : 'hover:text-slate-900 hover:bg-slate-100/80 text-slate-500'
-                      }`}
-                    >
-                      {d.month}
-                    </button>
-                  );
-                })}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
       </div>
 
