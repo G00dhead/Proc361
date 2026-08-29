@@ -223,13 +223,13 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
   const currentShipment = activeShipments[activeShipmentIndex];
   const activeMonth = hoveredIndex !== null ? MONTHLY_DATA[hoveredIndex] : null;
 
-  // SVG Chart coordinate configuration (High-res 1000x240 viewBox)
-  const chartWidth = 1000;
-  const chartHeight = 240;
-  const paddingLeft = 55;
-  const paddingRight = 45;
-  const paddingTop = 25;
-  const paddingBottom = 35;
+  // SVG Chart coordinate configuration with natural aspect ratio & proper padding
+  const chartWidth = 900;
+  const chartHeight = 280;
+  const paddingLeft = 60;
+  const paddingRight = 40;
+  const paddingTop = 30;
+  const paddingBottom = 40;
 
   const plotWidth = chartWidth - paddingLeft - paddingRight;
   const plotHeight = chartHeight - paddingTop - paddingBottom;
@@ -572,12 +572,12 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               onClick={() => setHoveredIndex(null)}
             >
               {/* Main Chart Graphic Canvas */}
-              <div className="relative w-full h-[210px] sm:h-[230px]">
+              <div className="relative w-full h-[260px] sm:h-[280px]">
                 {chartType === 'line' ? (
                   <svg 
                     className="w-full h-full" 
                     viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
-                    preserveAspectRatio="none"
+                    preserveAspectRatio="xMidYMid meet"
                   >
                     <defs>
                       <linearGradient id="fulfilledGrad" x1="0" y1="0" x2="0" y2="1">
@@ -748,7 +748,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   </svg>
                 ) : (
                   /* Volume Bar Chart View */
-                  <div className="w-full h-full flex items-end justify-between px-8 sm:px-12 pb-2">
+                  <div className="w-full h-full flex items-end justify-between px-6 sm:px-10 pb-4">
                     {MONTHLY_DATA.map((d, i) => {
                       const isHovered = hoveredIndex === i;
                       const fulfilledHeightPercent = (d.fulfilledValUSD / maxVal) * 100;
@@ -766,18 +766,18 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                           }}
                           className="flex flex-col items-center gap-1.5 h-full justify-end group cursor-pointer"
                         >
-                          <div className="flex items-end gap-1 h-[170px]">
+                          <div className="flex items-end gap-1.5 h-[210px]">
                             {/* Fulfilled Bar (Green) */}
                             <div
                               style={{ height: `${fulfilledHeightPercent}%` }}
-                              className={`w-3.5 sm:w-5 rounded-t-md transition-all ${
+                              className={`w-4 sm:w-6 rounded-t-lg transition-all ${
                                 isHovered ? 'bg-emerald-500 shadow-md scale-y-[1.02]' : 'bg-emerald-500/80 group-hover:bg-emerald-500'
                               }`}
                             />
                             {/* Cancel / QC Bar (Red) */}
                             <div
                               style={{ height: `${cancelHeightPercent}%` }}
-                              className={`w-2.5 sm:w-3.5 rounded-t-md transition-all ${
+                              className={`w-3 sm:w-4 rounded-t-lg transition-all ${
                                 isHovered ? 'bg-rose-500 shadow-xs' : 'bg-rose-400/70 group-hover:bg-rose-500'
                               }`}
                             />
