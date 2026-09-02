@@ -1,0 +1,4 @@
+Operational Overview: Details the core architecture of Proc360, including the dual-zone action system (Needs Action urgent triage vs. In-Progress logistics tracking), China warehouse hubs (Guangdong, Shenzhen, Yiwu), and direct factory sourcing channels (1688, Taobao, Weidian).
+Feature Breakdown: Documents the RMB Escrow Wallet with Bank of China spot FX rate tracking, the multi-order freight consolidation engine, the high-resolution warehouse QC photo inspection tool, and the interactive SVG sourcing velocity analytics.
+Tech Stack & Structure: Lists dependencies (React 19, TypeScript, Tailwind CSS v4, Motion, Lucide React) and outlines the clean modular folder hierarchy (/src/components, /src/context, /src/data, /src/i18n, etc.).
+Getting Started Guide: Provides quick commands for local development (npm run dev), production builds (npm run build), and TypeScript linting (npm run lint).
