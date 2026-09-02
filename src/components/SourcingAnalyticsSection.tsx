@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Package, 
@@ -108,6 +108,36 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
   const [chartType, setChartType] = useState<ChartType>('line');
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(9);
   const [isIntervalDropdownOpen, setIsIntervalDropdownOpen] = useState(false);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  const chartScrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll on mobile to make active point or timeline range immediately visible
+  useEffect(() => {
+    if (chartScrollRef.current) {
+      const el = chartScrollRef.current;
+      if (el.scrollWidth > el.clientWidth) {
+        if (safeHoveredIndex !== null && pointsFulfilled[safeHoveredIndex]) {
+          const targetX = (pointsFulfilled[safeHoveredIndex].x / chartWidth) * el.scrollWidth;
+          el.scrollLeft = Math.max(0, targetX - el.clientWidth / 2);
+        } else {
+          el.scrollLeft = (el.scrollWidth - el.clientWidth) * 0.4;
+        }
+      }
+    }
+  }, [timeInterval]);
+
+  // Global listener to dismiss tooltip whenever clicking anywhere outside the chart component
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent | TouchEvent) => {
+      if (chartContainerRef.current && !chartContainerRef.current.contains(e.target as Node)) {
+        setHoveredIndex(null);
+      }
+    };
+    document.addEventListener('pointerdown', handleGlobalClick);
+    return () => {
+      document.removeEventListener('pointerdown', handleGlobalClick);
+    };
+  }, []);
   const [mapMode, setMapMode] = useState<'map' | 'satellite'>('map');
   const [showShipmentMenu, setShowShipmentMenu] = useState(false);
   const [activeShipmentIndex, setActiveShipmentIndex] = useState(0);
@@ -304,7 +334,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
 
   return (
     <>
-      <div className="w-full flex flex-col xl:flex-row items-stretch gap-4 sm:gap-5 overflow-hidden">
+      <div className="w-full flex flex-col xl:flex-row items-stretch gap-4 sm:gap-5">
         {/* LEFT SECTION: 3 STAT CARDS + ORDER ANALYSIS CHART */}
         <div className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-5">
           {/* TOP ROW: 3 STAT CARDS */}
@@ -486,7 +516,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
         </div>
 
         {/* BOTTOM ROW: ORDER ANALYSIS CHART */}
-        <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs relative overflow-hidden flex flex-col gap-3">
+        <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs relative flex flex-col gap-3">
           {/* Header Controls: Responsive Flex Wrap Row */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100/90">
             {/* Title & Legend Pill */}
@@ -596,16 +626,37 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
 
             {/* Custom SVG Visualization Container */}
             <div 
+              ref={chartContainerRef}
               className="relative w-full bg-white rounded-2xl p-2 sm:p-3.5 border border-slate-200/80 select-none shadow-2xs"
-              onMouseLeave={() => setHoveredIndex(9)}
+              onClick={() => {
+                // Clicking on the container background clears the tooltip
+                setHoveredIndex(null);
+              }}
             >
-              {/* Main Chart Graphic Canvas (Fully Responsive & Fluid on all screen sizes) */}
-              <div className="relative w-full h-[210px] xs:h-[230px] sm:h-[270px] md:h-[290px]">
+              {/* Mobile Swipe Hint */}
+              <div className="flex sm:hidden items-center justify-between px-1 pb-2 text-[10px] text-slate-400 font-mono">
+                <span className="flex items-center gap-1">
+                  <span>←</span>
+                  <span>{language === 'zh' ? '滑动查看完整采购周期' : 'Swipe to explore all dates'}</span>
+                  <span>→</span>
+                </span>
+                <span className="text-slate-500 font-semibold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200/70">
+                  {currentData[0]?.label} – {currentData[currentData.length - 1]?.label}
+                </span>
+              </div>
+
+              {/* Main Chart Graphic Canvas (Fully Responsive with Touch Pan on Mobile) */}
+              <div 
+                ref={chartScrollRef}
+                className="relative w-full overflow-x-auto overflow-y-visible scrollbar-none sm:overflow-visible -mx-0.5 px-0.5 touch-pan-x"
+              >
+                <div className="min-w-[620px] sm:min-w-full relative h-[215px] xs:h-[235px] sm:h-[270px] md:h-[290px]">
                 {chartType === 'line' ? (
                   <svg 
-                    className="w-full h-full block" 
+                    className="w-full h-full block cursor-pointer" 
                     viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
                     preserveAspectRatio="none"
+                    onClick={() => setHoveredIndex(null)}
                   >
                     <defs>
                       {/* Subtle Blue Area Gradient */}
@@ -622,6 +673,16 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                         <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
                       </linearGradient>
                     </defs>
+
+                    {/* Full-canvas clickable backdrop to dismiss tooltip when clicking empty space */}
+                    <rect
+                      x={0}
+                      y={0}
+                      width={chartWidth}
+                      height={chartHeight}
+                      fill="transparent"
+                      onClick={() => setHoveredIndex(null)}
+                    />
 
                     {/* Horizontal Grid Lines & Y-Axis Reference Guides (50, 40, 30, 20, 10, 0) */}
                     {[50, 40, 30, 20, 10, 0].map((val) => {
@@ -807,9 +868,10 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                           fill="transparent"
                           className="cursor-pointer"
                           onMouseEnter={() => setHoveredIndex(i)}
-                          onClick={() => {
-                            setHoveredIndex(i);
-                            if (onShowToast) {
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setHoveredIndex((prev) => (prev === i ? null : i));
+                            if (hoveredIndex !== i && onShowToast) {
                               onShowToast(`${pt.label} Sourcing Velocity: ${pt.dealsBlue} deals (${pt.fulfilledValUSD.toLocaleString()} USD) • QC Claims: ${pt.dealsGreen} deals`);
                             }
                           }}
@@ -819,7 +881,10 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   </svg>
                 ) : (
                   /* Volume Bar Chart View (Synchronized with Blue & Green Palette) */
-                  <div className="w-full h-full flex items-end justify-between px-2 sm:px-6 pb-1 pt-2">
+                  <div 
+                    className="w-full h-full flex items-end justify-between px-2 sm:px-6 pb-1 pt-2 cursor-pointer"
+                    onClick={() => setHoveredIndex(null)}
+                  >
                     {currentData.map((d, i) => {
                       const isHovered = safeHoveredIndex === i;
                       const fulfilledHeightPercent = (d.fulfilled / maxY) * 100;
@@ -833,8 +898,8 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setHoveredIndex(i);
-                            if (onShowToast) {
+                            setHoveredIndex((prev) => (prev === i ? null : i));
+                            if (hoveredIndex !== i && onShowToast) {
                               onShowToast(`${d.label} Deals: ${d.dealsBlue} fulfilled / ${d.dealsGreen} QC claims`);
                             }
                           }}
@@ -871,69 +936,93 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
 
                 {/* Floating Tooltip Card (Styled matching reference image) */}
                 <AnimatePresence>
-                  {safeHoveredIndex !== null && activePoint && (
-                    <motion.div 
-                      key={`tooltip-${safeHoveredIndex}`}
-                      initial={{ opacity: 0, scale: 0.95, y: 4 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: 4 }}
-                      transition={{ duration: 0.12 }}
-                      style={{
-                        left: safeHoveredIndex <= 3
-                          ? `${(pointsFulfilled[safeHoveredIndex].x / chartWidth) * 100 + 2.5}%`
-                          : `${(pointsFulfilled[safeHoveredIndex].x / chartWidth) * 100 - 2}%`,
-                        transform: safeHoveredIndex <= 3 ? 'none' : 'translateX(-100%)',
-                        top: '6%',
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setHoveredIndex(null);
-                      }}
-                      className="absolute z-30 bg-white text-slate-900 border border-slate-200/90 rounded-xl p-3 shadow-xl shadow-slate-900/10 pointer-events-auto cursor-pointer min-w-[195px] max-w-[245px]"
-                    >
-                      <div className="text-[10px] font-bold text-slate-700 tracking-wider uppercase mb-2 pb-1.5 border-b border-slate-100 flex items-center justify-between">
-                        <span>{safeHoveredIndex === 9 ? '5 DAYS BEFORE START' : `${activePoint.label} • SOURCING CYCLE`}</span>
-                        <span className="text-[9px] font-mono font-semibold text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded">● ACTIVE</span>
-                      </div>
+                  {safeHoveredIndex !== null && activePoint && (() => {
+                    const currentPt = pointsFulfilled[safeHoveredIndex] || pointsFulfilled[0];
+                    const xRatio = currentPt ? currentPt.x / chartWidth : 0.5;
+                    const isRightSide = xRatio > 0.5;
 
-                      <div className="space-y-2.5">
-                        {/* Series 1 (Blue) */}
-                        <div>
-                          <div className="text-[11px] font-bold text-slate-900 leading-tight">
-                            {language === 'zh' ? '采购订单 (1688/工厂直采)' : 'Procurement Sourcing'}
-                          </div>
-                          <div className="text-[10px] text-slate-500 font-mono">
-                            {activePoint.label}.2026 • SF Express
-                          </div>
-                          <div className="flex items-center gap-1.5 mt-1 text-xs text-slate-800">
-                            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
-                            <span className="font-semibold text-slate-900">Deals: {activePoint.dealsBlue}</span>
-                            <span className="text-[10px] text-slate-500 font-mono ml-auto">
-                              ${activePoint.fulfilledValUSD.toLocaleString()}
-                            </span>
+                    return (
+                      <motion.div 
+                        key={`tooltip-${safeHoveredIndex}`}
+                        initial={{ opacity: 0, scale: 0.95, y: 4 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 4 }}
+                        transition={{ duration: 0.12 }}
+                        style={{
+                          left: isRightSide ? 'auto' : `${Math.max(1, Math.min(94, xRatio * 100 + 2))}%`,
+                          right: isRightSide ? `${Math.max(1, Math.min(94, (1 - xRatio) * 100 + 2))}%` : 'auto',
+                          top: '6%',
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setHoveredIndex(null);
+                        }}
+                        className="absolute z-30 bg-white text-slate-900 border border-slate-200/90 rounded-xl p-3 shadow-xl shadow-slate-900/10 pointer-events-auto cursor-pointer w-[210px] sm:w-[245px] max-w-[calc(100vw-40px)]"
+                      >
+                        <div className="text-[10px] font-bold text-slate-700 tracking-wider uppercase mb-2 pb-1.5 border-b border-slate-100 flex items-center justify-between">
+                          <span className="truncate mr-1.5">{safeHoveredIndex === 9 ? '5 DAYS BEFORE START' : `${activePoint.label} • SOURCING`}</span>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className="text-[9px] font-mono font-semibold text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded">● ACTIVE</span>
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setHoveredIndex(null);
+                              }}
+                              className="w-4 h-4 rounded flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                              title="Close tooltip"
+                              aria-label="Close tooltip"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
                           </div>
                         </div>
 
-                        {/* Series 2 (Green) */}
-                        <div className="pt-2 border-t border-slate-100">
-                          <div className="text-[11px] font-bold text-slate-900 leading-tight">
-                            {language === 'zh' ? '质检核验与退款' : 'QC Verified & Reimbursed'}
+                        <div className="space-y-2.5">
+                          {/* Series 1 (Blue) */}
+                          <div>
+                            <div className="text-[11px] font-bold text-slate-900 leading-tight">
+                              {language === 'zh' ? '采购订单 (1688/工厂直采)' : 'Procurement Sourcing'}
+                            </div>
+                            <div className="text-[10px] text-slate-500 font-mono">
+                              {activePoint.label}.2026 • SF Express
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1 text-xs text-slate-800">
+                              <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
+                              <span className="font-semibold text-slate-900">Deals: {activePoint.dealsBlue}</span>
+                              <span className="text-[10px] text-slate-500 font-mono ml-auto">
+                                ${activePoint.fulfilledValUSD.toLocaleString()}
+                              </span>
+                            </div>
                           </div>
-                          <div className="text-[10px] text-slate-500 font-mono">
-                            {activePoint.label}.2026 • China Hubs
-                          </div>
-                          <div className="flex items-center gap-1.5 mt-1 text-xs text-slate-800">
-                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
-                            <span className="font-semibold text-slate-900">Deals: {activePoint.dealsGreen}</span>
-                            <span className="text-[10px] text-slate-500 font-mono ml-auto">
-                              ${activePoint.cancelValUSD.toLocaleString()}
-                            </span>
+
+                          {/* Series 2 (Green) */}
+                          <div className="pt-2 border-t border-slate-100">
+                            <div className="text-[11px] font-bold text-slate-900 leading-tight">
+                              {language === 'zh' ? '质检核验与退款' : 'QC Verified & Reimbursed'}
+                            </div>
+                            <div className="text-[10px] text-slate-500 font-mono">
+                              {activePoint.label}.2026 • China Hubs
+                            </div>
+                            <div className="flex items-center gap-1.5 mt-1 text-xs text-slate-800">
+                              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                              <span className="font-semibold text-slate-900">Deals: {activePoint.dealsGreen}</span>
+                              <span className="text-[10px] text-slate-500 font-mono ml-auto">
+                                ${activePoint.cancelValUSD.toLocaleString()}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  )}
+
+                        {/* Clear hint */}
+                        <div className="mt-2.5 pt-1.5 text-[9px] text-slate-400 text-center font-medium border-t border-slate-100">
+                          {language === 'zh' ? '点击此处或空白处关闭' : 'Click card or canvas to clear'}
+                        </div>
+                      </motion.div>
+                    );
+                  })()}
                 </AnimatePresence>
+              </div>
               </div>
             </div>
             </div>
@@ -1164,13 +1253,16 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               {language === 'zh' ? '运输节点时效' : 'Delivery Progress'}
             </div>
 
-            <div className="flex flex-col gap-2.5 relative pl-4 border-l border-slate-200 ml-2">
+            <div className="relative flex flex-col gap-2.5 ml-1">
+              {/* Vertical connecting line - perfectly centered with circles */}
+              <div className="absolute left-[7px] top-2 bottom-2 w-[2px] -translate-x-1/2 bg-slate-200" />
+
               {currentShipment.timeline.map((step, sIdx) => {
                 const isFirst = sIdx === 0;
                 return (
-                  <div key={sIdx} className="relative flex items-start justify-between text-xs group">
-                    {/* Node Dot */}
-                    <div className={`absolute -left-[21px] top-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${
+                  <div key={sIdx} className="relative flex items-start justify-between text-xs group pl-6">
+                    {/* Node Dot - anchored to exact same center as the vertical line */}
+                    <div className={`absolute left-[7px] -translate-x-1/2 top-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${
                       step.completed 
                         ? 'bg-emerald-500 border-white text-white shadow-xs' 
                         : isFirst 

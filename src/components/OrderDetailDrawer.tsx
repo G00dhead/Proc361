@@ -266,12 +266,14 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
               {language === 'zh' ? '采购与物流节点追踪时间轴' : 'Sourcing & Logistics Milestones'}
             </h3>
 
-            <div className="space-y-4 relative pl-4 border-l border-slate-200 ml-2">
+            <div className="relative space-y-4 ml-1">
+              {/* Vertical connecting line */}
+              <div className="absolute left-[6px] top-2 bottom-2 w-[2px] -translate-x-1/2 bg-slate-200" />
               {order.timeline.map((event, idx) => (
-                <div key={idx} className="relative">
+                <div key={idx} className="relative pl-6">
                   {/* Dot */}
                   <div
-                    className={`absolute -left-[21px] top-0.5 w-3 h-3 rounded-full border-2 ${
+                    className={`absolute left-[6px] -translate-x-1/2 top-0.5 w-3 h-3 rounded-full border-2 ${
                       event.completed
                         ? 'bg-slate-950 border-slate-950'
                         : event.current

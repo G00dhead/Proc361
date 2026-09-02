@@ -298,11 +298,13 @@ export const OrderRow: React.FC<OrderRowProps> = ({
                 <Clock className="w-3.5 h-3.5 text-slate-400" /> Milestone Tracking Log
               </h4>
 
-              <div className="space-y-3 relative pl-3.5 before:content-[''] before:absolute before:left-1 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-800">
+              <div className="space-y-3 relative">
+                {/* Vertical connecting line */}
+                <div className="absolute left-1 top-2 bottom-2 w-0.5 bg-slate-800 -translate-x-1/2" />
                 {order.timeline.map((step, idx) => (
-                  <div key={idx} className="relative">
+                  <div key={idx} className="relative pl-4">
                     {/* Bullet */}
-                    <div className={`absolute -left-[15px] top-0.5 w-2 h-2 rounded-full ${
+                    <div className={`absolute left-1 -translate-x-1/2 top-1 w-2 h-2 rounded-full ${
                       step.completed
                         ? 'bg-slate-400'
                         : step.current
