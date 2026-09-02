@@ -25,7 +25,7 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     } catch {
       // ignore
     }
-    return 'en';
+    return 'zh';
   });
 
   const setLanguage = (lang: Language) => {
@@ -74,10 +74,26 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   const translateOrderText = (text: string): string => {
     if (!text) return '';
     if (language === 'en') return text;
-    const match = orderTextTranslations[text];
+    
+    const trimmed = text.trim();
+    const match = orderTextTranslations[trimmed] || orderTextTranslations[text];
     if (match) {
       return match[language] || text;
     }
+
+    // Dynamic date translations for ETA strings
+    if (trimmed.includes('Today by 6:00 PM')) return '今日 18:00 前';
+    if (trimmed.includes('Today by 5:00 PM')) return '今日 17:00 前';
+    if (trimmed.includes('Delivered Aug 24')) return '已送达 (8月24日)';
+    if (trimmed.includes('Delivered Aug 23')) return '已送达 (8月23日)';
+    if (trimmed.includes('Aug 27, 2026') || trimmed === '27 Aug') return '8月27日';
+    if (trimmed.includes('Aug 28, 2026') || trimmed === '28 Aug') return '8月28日';
+    if (trimmed.includes('Aug 29, 2026') || trimmed === '29 Aug' || trimmed.includes('29 Aug 2026')) return '8月29日';
+    if (trimmed.includes('Aug 30, 2026') || trimmed === '30 Aug' || trimmed.includes('30 Aug 2026')) return '8月30日';
+    if (trimmed.includes('Sep 05, 2026') || trimmed === '05 Sep' || trimmed.includes('05 Sep 2026')) return '9月5日';
+    if (trimmed.includes('Sep 12, 2026') || trimmed === '12 Sep' || trimmed.includes('12 Sep 2026')) return '9月12日';
+    if (trimmed.includes('24 Sep, 2026')) return '9月24日';
+
     return text;
   };
 

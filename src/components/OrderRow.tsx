@@ -14,6 +14,7 @@ import {
   Maximize2
 } from 'lucide-react';
 import { OrderItem } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface OrderRowProps {
   order: OrderItem;
@@ -30,6 +31,7 @@ export const OrderRow: React.FC<OrderRowProps> = ({
   onExecuteAction,
   onViewPhoto,
 }) => {
+  const { language, translateOrderText } = useLanguage();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const isNeedsAction = order.zone === 'NEEDS_ACTION';
@@ -40,34 +42,36 @@ export const OrderRow: React.FC<OrderRowProps> = ({
     switch (order.actionType) {
       case 'PAYMENT_PENDING':
         return {
-          btnText: `Pay ¥${order.priceRMB.toLocaleString()}`,
+          btnText: language === 'zh' ? `授权付款 ¥${order.priceRMB.toLocaleString()}` : `Pay ¥${order.priceRMB.toLocaleString()}`,
           btnColor: 'bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-bold',
         };
       case 'CUSTOMIZATION_CONFIRMATION':
         return {
-          btnText: 'Review Sample Proof',
+          btnText: language === 'zh' ? '审核打样效果' : 'Review Sample Proof',
           btnColor: 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold',
         };
       case 'ADDRESS_ISSUE':
         return {
-          btnText: 'Provide Customs ID',
+          btnText: language === 'zh' ? '补全海关税号' : 'Provide Customs ID',
           btnColor: 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold',
         };
       case 'QC_REVISION':
         return {
-          btnText: 'Resolve QC Decision',
+          btnText: language === 'zh' ? '处理质检瑕疵' : 'Resolve QC Decision',
           btnColor: 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold',
         };
       case 'READY_TO_CONSOLIDATE':
         return {
-          btnText: isSelected ? '✓ Selected' : '+ Consolidate',
+          btnText: isSelected 
+            ? (language === 'zh' ? '✓ 已选中' : '✓ Selected') 
+            : (language === 'zh' ? '+ 拼箱集运' : '+ Consolidate'),
           btnColor: isSelected
             ? 'bg-slate-700 text-white font-medium'
             : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium',
         };
       default:
         return {
-          btnText: 'Take Action',
+          btnText: language === 'zh' ? '处理待办' : 'Take Action',
           btnColor: 'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold',
         };
     }
@@ -98,7 +102,7 @@ export const OrderRow: React.FC<OrderRowProps> = ({
               checked={isSelected}
               onChange={() => onToggleSelect(order.id)}
               className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-slate-200 focus:ring-0 cursor-pointer"
-              title={isReadyToConsolidate ? "Select for international consolidation" : "Select order"}
+              title={isReadyToConsolidate ? (language === 'zh' ? "勾选以进行国际拼箱" : "Select for international consolidation") : (language === 'zh' ? "选择订单" : "Select order")}
             />
           </div>
 
@@ -106,15 +110,15 @@ export const OrderRow: React.FC<OrderRowProps> = ({
           <div className="relative group/thumb shrink-0">
             <img
               src={order.thumbnail}
-              alt={order.title}
+              alt={translateOrderText(order.title)}
               referrerPolicy="no-referrer"
               className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg object-cover bg-slate-800 border border-slate-700 cursor-pointer"
-              onClick={() => onViewPhoto(order.thumbnail, order.title)}
+              onClick={() => onViewPhoto(order.thumbnail, translateOrderText(order.title))}
             />
             {order.qcPhotos && order.qcPhotos.length > 0 && (
               <span 
                 className="absolute -bottom-1 -right-1 bg-slate-800 text-slate-300 border border-slate-700 text-[9px] font-mono font-medium px-1 rounded flex items-center gap-0.5"
-                title={`${order.qcPhotos.length} Inspection Photos Available`}
+                title={`${order.qcPhotos.length} ${language === 'zh' ? '张质检实拍图' : 'Inspection Photos Available'}`}
               >
                 <Camera className="w-2.5 h-2.5" /> {order.qcPhotos.length}
               </span>
@@ -130,11 +134,11 @@ export const OrderRow: React.FC<OrderRowProps> = ({
               
               {/* Neutral Platform Tag */}
               <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
-                {order.supplierPlatform}
+                {translateOrderText(order.supplierPlatform)}
               </span>
 
-              <span className="text-[11px] text-slate-400 truncate max-w-[140px] sm:max-w-[200px]" title={order.supplierName}>
-                {order.supplierName}
+              <span className="text-[11px] text-slate-400 truncate max-w-[140px] sm:max-w-[200px]" title={translateOrderText(order.supplierName)}>
+                {translateOrderText(order.supplierName)}
               </span>
 
               <a
@@ -142,19 +146,19 @@ export const OrderRow: React.FC<OrderRowProps> = ({
                 target="_blank"
                 rel="noreferrer"
                 className="text-slate-500 hover:text-slate-300 transition-colors"
-                title="View original Chinese product page"
+                title={language === 'zh' ? '在原平台查看商品详情' : 'View original Chinese product page'}
               >
                 <ExternalLink className="w-3 h-3" />
               </a>
             </div>
 
-            <h3 className="text-xs sm:text-sm font-medium text-slate-100 truncate pr-2" title={order.title}>
-              {order.title}
+            <h3 className="text-xs sm:text-sm font-medium text-slate-100 truncate pr-2" title={translateOrderText(order.title)}>
+              {translateOrderText(order.title)}
             </h3>
 
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-400 mt-1">
               <span className="font-mono text-slate-300">
-                {order.quantity} {order.unit}
+                {order.quantity} {translateOrderText(order.unit)}
               </span>
               <span>•</span>
               <span className="font-mono font-semibold text-slate-200">
@@ -166,7 +170,7 @@ export const OrderRow: React.FC<OrderRowProps> = ({
               <span>•</span>
               <span className="flex items-center gap-1 text-slate-400">
                 <MapPin className="w-3 h-3 text-slate-500" />
-                <span className="truncate max-w-[120px]">{order.warehouse.replace(' Central Hub', '').replace(' Export Terminal', '')}</span>
+                <span className="truncate max-w-[120px]">{translateOrderText(order.warehouse.replace(' Central Hub', '').replace(' Export Terminal', ''))}</span>
                 {order.warehouseBin && <span className="font-mono text-slate-400 text-[10px]">({order.warehouseBin})</span>}
               </span>
               <span>•</span>
@@ -186,11 +190,11 @@ export const OrderRow: React.FC<OrderRowProps> = ({
                 <div className="flex items-center md:justify-end gap-1.5">
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-500/10 border border-amber-500/30 text-amber-300">
                     <AlertTriangle className="w-3 h-3 text-amber-400" />
-                    {order.statusLabel}
+                    {translateOrderText(order.statusLabel)}
                   </span>
                 </div>
-                <p className="text-xs text-slate-300 mt-1 line-clamp-1 font-medium" title={order.actionSummary}>
-                  {order.actionSummary}
+                <p className="text-xs text-slate-300 mt-1 line-clamp-1 font-medium" title={translateOrderText(order.actionSummary)}>
+                  {translateOrderText(order.actionSummary)}
                 </p>
               </>
             ) : (
@@ -198,11 +202,11 @@ export const OrderRow: React.FC<OrderRowProps> = ({
                 <div className="flex items-center md:justify-end gap-1.5">
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800 text-slate-300 border border-slate-700">
                     <Clock className="w-3 h-3 text-slate-400" />
-                    {order.statusLabel}
+                    {translateOrderText(order.statusLabel)}
                   </span>
                 </div>
-                <p className="text-xs text-slate-400 mt-1 line-clamp-1" title={order.actionSummary}>
-                  {order.actionSummary}
+                <p className="text-xs text-slate-400 mt-1 line-clamp-1" title={translateOrderText(order.actionSummary)}>
+                  {translateOrderText(order.actionSummary)}
                 </p>
               </>
             )}
@@ -240,27 +244,27 @@ export const OrderRow: React.FC<OrderRowProps> = ({
             {/* Column 1: Order Specifications & Warehouse Logistics */}
             <div className="space-y-3 bg-[#0f1219] p-3.5 rounded-lg border border-slate-800 text-xs">
               <h4 className="font-semibold text-slate-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                <Box className="w-3.5 h-3.5 text-slate-400" /> Package & Storage Spec
+                <Box className="w-3.5 h-3.5 text-slate-400" /> {language === 'zh' ? '包装与仓储规格' : 'Package & Storage Spec'}
               </h4>
 
               <div className="space-y-2 text-slate-300">
                 <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-500">Warehouse Hub:</span>
-                  <span className="text-slate-200">{order.warehouse}</span>
+                  <span className="text-slate-500">{language === 'zh' ? '中转集运仓:' : 'Warehouse Hub:'}</span>
+                  <span className="text-slate-200">{translateOrderText(order.warehouse)}</span>
                 </div>
                 {order.warehouseBin && (
                   <div className="flex justify-between py-1 border-b border-slate-800">
-                    <span className="text-slate-500">Rack / Bin Location:</span>
+                    <span className="text-slate-500">{language === 'zh' ? '存放货架库位:' : 'Rack / Bin Location:'}</span>
                     <span className="font-mono text-slate-200">{order.warehouseBin}</span>
                   </div>
                 )}
                 <div className="flex justify-between py-1 border-b border-slate-800">
-                  <span className="text-slate-500">Actual Weight:</span>
+                  <span className="text-slate-500">{language === 'zh' ? '实重 (毛重):' : 'Actual Weight:'}</span>
                   <span className="font-mono text-slate-200">{order.weightKg} kg</span>
                 </div>
                 {order.dimensionsCm && (
                   <div className="flex justify-between py-1 border-b border-slate-800">
-                    <span className="text-slate-500">Dimensions:</span>
+                    <span className="text-slate-500">{language === 'zh' ? '外箱尺寸:' : 'Dimensions:'}</span>
                     <span className="font-mono text-slate-200">
                       {order.dimensionsCm.length} × {order.dimensionsCm.width} × {order.dimensionsCm.height} cm
                     </span>
@@ -268,14 +272,14 @@ export const OrderRow: React.FC<OrderRowProps> = ({
                 )}
                 {order.dimensionsCm && (
                   <div className="flex justify-between py-1 border-b border-slate-800">
-                    <span className="text-slate-500">Volumetric Weight:</span>
+                    <span className="text-slate-500">{language === 'zh' ? '计费材积重:' : 'Volumetric Weight:'}</span>
                     <span className="font-mono text-slate-300">
                       {((order.dimensionsCm.length * order.dimensionsCm.width * order.dimensionsCm.height) / 5000).toFixed(2)} kg
                     </span>
                   </div>
                 )}
                 <div className="flex justify-between py-1">
-                  <span className="text-slate-500">Unit Cost (RMB / USD):</span>
+                  <span className="text-slate-500">{language === 'zh' ? '单件采购成本:' : 'Unit Cost (RMB / USD):'}</span>
                   <span className="font-mono text-slate-200">
                     ¥{(order.priceRMB / order.quantity).toFixed(2)} / ${(order.priceUSD / order.quantity).toFixed(2)}
                   </span>
@@ -286,7 +290,7 @@ export const OrderRow: React.FC<OrderRowProps> = ({
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {order.tags.map((tag, i) => (
                   <span key={i} className="px-2 py-0.5 rounded bg-slate-800 text-slate-400 text-[10px] font-mono border border-slate-700">
-                    #{tag}
+                    #{translateOrderText(tag)}
                   </span>
                 ))}
               </div>
@@ -295,7 +299,7 @@ export const OrderRow: React.FC<OrderRowProps> = ({
             {/* Column 2: Milestone Lifecycle Timeline */}
             <div className="bg-[#0f1219] p-3.5 rounded-lg border border-slate-800 text-xs">
               <h4 className="font-semibold text-slate-200 uppercase tracking-wider text-[11px] flex items-center gap-1.5 mb-3">
-                <Clock className="w-3.5 h-3.5 text-slate-400" /> Milestone Tracking Log
+                <Clock className="w-3.5 h-3.5 text-slate-400" /> {language === 'zh' ? '全链路节点追踪日志' : 'Milestone Tracking Log'}
               </h4>
 
               <div className="space-y-3 relative">
@@ -317,14 +321,14 @@ export const OrderRow: React.FC<OrderRowProps> = ({
                         <span className={`font-medium ${
                           step.current ? 'text-amber-300' : step.completed ? 'text-slate-200' : 'text-slate-500'
                         }`}>
-                          {step.title}
+                          {translateOrderText(step.title)}
                         </span>
                         <span className="text-[10px] font-mono text-slate-500 shrink-0">
-                          {step.timestamp}
+                          {translateOrderText(step.timestamp)}
                         </span>
                       </div>
                       <p className="text-[11px] text-slate-400 mt-0.5">
-                        {step.description}
+                        {translateOrderText(step.description)}
                       </p>
                     </div>
                   </div>
@@ -335,7 +339,7 @@ export const OrderRow: React.FC<OrderRowProps> = ({
               {order.domesticTracking && (
                 <div className="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between text-[11px]">
                   <span className="text-slate-400 flex items-center gap-1">
-                    <Truck className="w-3 h-3 text-slate-400" /> {order.domesticTracking.carrier}:
+                    <Truck className="w-3 h-3 text-slate-400" /> {translateOrderText(order.domesticTracking.carrier)}:
                   </span>
                   <span className="font-mono text-slate-200">
                     {order.domesticTracking.trackingNumber}
@@ -347,10 +351,10 @@ export const OrderRow: React.FC<OrderRowProps> = ({
               {order.intlTracking && (
                 <div className="mt-3 pt-2.5 border-t border-slate-800 flex items-center justify-between text-[11px]">
                   <span className="text-slate-400 flex items-center gap-1">
-                    <Send className="w-3 h-3 text-slate-400" /> {order.intlTracking.carrier}:
+                    <Send className="w-3 h-3 text-slate-400" /> {translateOrderText(order.intlTracking.carrier)}:
                   </span>
                   <span className="font-mono text-slate-200">
-                    {order.intlTracking.trackingNumber}
+                    {order.intlTracking.trackingNumber} ({translateOrderText(order.intlTracking.etaDate)})
                   </span>
                 </div>
               )}
@@ -361,11 +365,11 @@ export const OrderRow: React.FC<OrderRowProps> = ({
               <div>
                 <h4 className="font-semibold text-slate-200 uppercase tracking-wider text-[11px] flex items-center justify-between mb-3">
                   <span className="flex items-center gap-1.5">
-                    <Camera className="w-3.5 h-3.5 text-slate-400" /> Inspection & QC Photos
+                    <Camera className="w-3.5 h-3.5 text-slate-400" /> {language === 'zh' ? '中转仓入库质检高清图' : 'Inspection & QC Photos'}
                   </span>
                   {order.qcPhotos && (
                     <span className="text-[10px] font-mono text-slate-400">
-                      {order.qcPhotos.length} Images
+                      {order.qcPhotos.length} {language === 'zh' ? '张实拍' : 'Images'}
                     </span>
                   )}
                 </h4>
@@ -376,18 +380,18 @@ export const OrderRow: React.FC<OrderRowProps> = ({
                     {order.qcPhotos.map((photo) => (
                       <div 
                         key={photo.id}
-                        onClick={() => onViewPhoto(photo.url, photo.caption)}
+                        onClick={() => onViewPhoto(photo.url, translateOrderText(photo.caption))}
                         className="relative group rounded-lg overflow-hidden border border-slate-800 bg-slate-900 cursor-pointer aspect-video"
                       >
                         <img 
                           src={photo.url} 
-                          alt={photo.caption} 
+                          alt={translateOrderText(photo.caption)} 
                           referrerPolicy="no-referrer"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-150"
                         />
                         <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 p-1.5 flex items-end justify-between transition-opacity">
                           <span className="text-[10px] text-slate-200 font-medium line-clamp-1">
-                            {photo.caption}
+                            {translateOrderText(photo.caption)}
                           </span>
                           <Maximize2 className="w-3 h-3 text-slate-300 shrink-0" />
                         </div>
@@ -397,7 +401,7 @@ export const OrderRow: React.FC<OrderRowProps> = ({
                 ) : (
                   <div className="p-4 rounded border border-dashed border-slate-800 text-center text-slate-500 mb-3">
                     <Camera className="w-5 h-5 mx-auto mb-1 opacity-40" />
-                    <p className="text-[11px]">Inspection photos will be taken upon warehouse arrival.</p>
+                    <p className="text-[11px]">{language === 'zh' ? '商品抵达中转仓后将自动上传高保真质检图。' : 'Inspection photos will be taken upon warehouse arrival.'}</p>
                   </div>
                 )}
 
@@ -405,9 +409,9 @@ export const OrderRow: React.FC<OrderRowProps> = ({
                 {order.customizationDetails && (
                   <div className="p-2.5 rounded bg-slate-900 border border-slate-800 text-[11px] text-slate-300 space-y-1">
                     <div className="font-semibold text-slate-200">
-                      {order.customizationDetails.specType}
+                      {translateOrderText(order.customizationDetails.specType)}
                     </div>
-                    <p className="text-slate-400">{order.customizationDetails.factoryFeedback}</p>
+                    <p className="text-slate-400">{translateOrderText(order.customizationDetails.factoryFeedback)}</p>
                   </div>
                 )}
               </div>
@@ -415,7 +419,7 @@ export const OrderRow: React.FC<OrderRowProps> = ({
               {/* Direct Action Trigger in drawer */}
               {isNeedsAction && (
                 <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
-                  <span className="text-[11px] text-slate-400">Action Required:</span>
+                  <span className="text-[11px] text-slate-400">{language === 'zh' ? '需要您的授权处理:' : 'Action Required:'}</span>
                   <button
                     type="button"
                     onClick={() => onExecuteAction(order)}

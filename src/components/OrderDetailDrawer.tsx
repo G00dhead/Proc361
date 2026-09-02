@@ -53,7 +53,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
             </div>
             <div>
               <span className="text-[11px] font-mono font-bold text-slate-500 uppercase tracking-wider">
-                {order.supplierPlatform} • {translateOrderText(order.category)}
+                {translateOrderText(order.supplierPlatform)} • {translateOrderText(order.category)}
               </span>
               <h2 className="text-sm font-bold text-slate-900 line-clamp-1">
                 {translateOrderText(order.title)}
@@ -286,7 +286,7 @@ export const OrderDetailDrawer: React.FC<OrderDetailDrawerProps> = ({
                       <span className={`font-semibold ${event.current ? 'text-amber-900' : 'text-slate-900'}`}>
                         {translateOrderText(event.title)}
                       </span>
-                      <span className="text-[11px] font-mono text-slate-400">{event.timestamp}</span>
+                      <span className="text-[11px] font-mono text-slate-400">{translateOrderText(event.timestamp)}</span>
                     </div>
                     <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">{translateOrderText(event.description)}</p>
                   </div>
