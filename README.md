@@ -1,56 +1,151 @@
-# Proc360
+# Proc360 | China Sourcing, RMB Wallet & Consolidation Console
 
-A B2B sourcing and cross border procurement dashboard. Built for buyers who order from Chinese wholesale marketplaces and factories and need one place to track everything from first contact to final delivery.
+An operations dashboard for cross-border China sourcing, direct factory procurement (1688, Taobao, Weidian), multi-currency RMB escrow management, warehouse quality control (QC), and shipping consolidation.
 
-## Overview
+---
 
-Proc360 splits order management into two zones.
+## Key Features
 
-**Needs Action** is the urgent triage view. Anything that needs a decision, a payment, or a reply shows up here first.
+### 1. Dual-Zone Action Architecture
+- **Needs Action Zone**: Surfaces urgent, blocker-level operational tasks requiring immediate buyer attention:
+  - Escrow payment authorization & supplier deposit release
+  - Pantone/CAD sample customization approvals
+  - Factory shipping address error resolutions
+  - High-resolution QC photo inspection sign-offs
+  - Ready-to-consolidate warehouse package alerts
+- **In-Progress Logistics Pipeline**: Tracks active consignments across end-to-end milestone stages:
+  - Sourcing & Factory Communication
+  - China Domestic Transit (SF Express, ZTO, Deppon)
+  - Warehouse Receiving & Dimensional Weighing
+  - Hub Storage & Bin Allocation
+  - International Air Express, Air Cargo, or Sea DDP Transit
+  - Customs Clearance & Final-Mile Delivery
 
-**In Progress** is the logistics tracker. Once an order is moving, it lives here until it lands.
+### 2. Multi-Currency RMB Escrow Wallet
+- Real-time Bank of China Spot FX integration (USD ⇄ CNY & EUR ⇄ CNY).
+- Live available balance, locked factory escrow reserves, and auto-converting RMB/USD calculators.
+- Top-up modal with payment methods (Wire Transfer, Card, Alipay/WeChat Pay, Virtual Accounts).
+- Transparent fee breakdowns and transaction audit logs.
 
-Orders route through three China warehouse hubs: Guangdong, Shenzhen, and Yiwu. Sourcing connects directly to 1688, Taobao, Weidian, and OEM factories, so buyers aren't stuck relying on a middleman for every step.
+### 3. Warehouse Hubs & Quality Control (QC)
+- Unified multi-hub tracking across major export facilities:
+  - **Guangdong Hub** (Dongguan)
+  - **Shenzhen Central Hub** (Bao'an)
+  - **Yiwu Export Terminal** (Zhejiang)
+- Multi-angle high-resolution photo proof viewer with zoom, pass/fail status, defect tagging, and warehouse inspector notes.
 
-## Features
+### 4. Smart Freight Consolidation Engine
+- Select multiple stored packages to combine into a single international shipment.
+- **Custom Packaging Options**: Waterproof shrink wrap, bubble reinforcement, reinforced corner protectors, or custom wooden crating.
+- **Shipping Method Comparator**: Dynamic rates, transit times, and volumetric weight calculations for:
+  - DHL/FedEx Air Express (3–5 days)
+  - Air Cargo Expedited (6–9 days)
+  - Matson Sea Shipping DDP (18–25 days)
+  - China-Europe Railway Express (16–22 days)
 
-**RMB Escrow Wallet**
-Holds funds in RMB and tracks live spot FX rates from Bank of China, so buyers know the real cost of every payment before it goes out.
+### 5. Sourcing & Order Velocity Analytics
+- High-precision SVG and bar visualizations showing monthly and weekly purchasing volumes in both USD and RMB.
+- Fulfilled vs. QC returned/cancelled order metrics.
+- Touch-friendly, responsive canvas with floating inspect tooltips.
 
-**Freight Consolidation Engine**
-Combines multiple orders into a single shipment, which cuts freight cost per unit for buyers running several small orders at once.
+### 6. Internationalization & Workflow Tools
+- Instant bilingual localization between **English** and **Chinese (简体中文)**.
+- High-density search, tag filtering, and CSV export of all procurement and tracking data.
 
-**Warehouse QC Photo Inspection**
-High resolution photo checks at the warehouse before anything ships, so buyers catch defects early instead of finding out after delivery.
-
-**Sourcing Velocity Analytics**
-Interactive SVG charts showing how fast orders move from sourcing to delivery, so buyers can spot bottlenecks in their own pipeline.
+---
 
 ## Tech Stack
 
-- React 19
-- TypeScript
-- Tailwind CSS v4
-- Motion
-- Lucide React
+- **Framework**: [React 19](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Animation**: [Motion](https://motion.dev/) (Framer Motion)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Typography**: Rethink Sans & JetBrains Mono
+
+---
 
 ## Project Structure
 
+```text
+├── src/
+│   ├── components/                 # UI components and modules
+│   │   ├── TopBar.tsx              # Header console, FX rate, notifications, quick actions
+│   │   ├── MenuBar.tsx             # Navigation tabs, search, and view switches
+│   │   ├── ActionZone.tsx          # "Needs Action" urgent item cards and triage
+│   │   ├── InProgressZone.tsx      # Multi-stage tracking pipeline cards
+│   │   ├── OrdersTable.tsx         # Tabular view with filtering and bulk actions
+│   │   ├── OrderRow.tsx            # Expandable order row item
+│   │   ├── SourcingAnalyticsSection.tsx # Order volume and velocity SVG charts
+│   │   ├── ConsolidationDrawer.tsx # Multi-package shipment consolidation drawer
+│   │   ├── OrderDetailDrawer.tsx   # Detailed order view, tracking timeline, and QC specs
+│   │   ├── PhotoModal.tsx          # High-resolution warehouse QC photo gallery
+│   │   ├── WalletModal.tsx         # RMB top-up and escrow balance manager
+│   │   ├── NewOrderModal.tsx       # Manual order creation modal
+│   │   ├── ActionModal.tsx         # Blocker resolution modal (payment, address, specs)
+│   │   └── FilterBar.tsx           # Multi-criteria filter strip
+│   ├── context/                    # React Context providers (orders, wallet, i18n)
+│   ├── data/                       # Seed orders, warehouses, and freight options
+│   ├── i18n/                       # Translation dictionaries (EN / ZH)
+│   ├── types.ts                    # Global TypeScript interfaces and domain types
+│   ├── index.css                   # Global styles & Tailwind CSS configuration
+│   ├── App.tsx                     # Main layout and view coordination
+│   └── main.tsx                    # React application entry point
+├── metadata.json                   # Application metadata configuration
+├── package.json                    # Project dependencies and scripts
+├── tsconfig.json                   # TypeScript compiler configuration
+└── vite.config.ts                  # Vite build and plugin setup
 ```
-src/
-├── components/   UI components
-├── context/      App state and providers
-├── data/         Static and mock data
-├── i18n/         Localization files
-└── ...
-```
+
+---
 
 ## Getting Started
 
-Install dependencies, then run:
+### Prerequisites
+- Node.js 18.0 or higher
+- npm 9.0 or higher
 
+### Installation
+
+1. Clone or download the repository:
+   ```bash
+   git clone <repository-url>
+   cd <project-folder>
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Development
+
+Run the development server on `http://localhost:3000`:
 ```bash
-npm run dev       # start local development
-npm run build     # production build
-npm run lint      # TypeScript linting
+npm run dev
 ```
+
+### Production Build
+
+Compile the application for production:
+```bash
+npm run build
+```
+
+Preview the production build locally:
+```bash
+npm run preview
+```
+
+### Code Quality
+
+Run the TypeScript compiler to check for type errors:
+```bash
+npm run lint
+```
+
+---
+
+## License
+
+Private and proprietary. All rights reserved.

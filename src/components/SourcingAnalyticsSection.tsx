@@ -5,26 +5,24 @@ import {
   RotateCcw, 
   CheckCircle, 
   Info, 
-  MoreVertical, 
   Calendar, 
   Check, 
-  ExternalLink,
   ChevronDown,
+  DollarSign,
+  Navigation,
+  Truck,
+  ExternalLink,
   Copy,
   RefreshCw,
-  HelpCircle,
-  ShieldCheck,
-  DollarSign,
-  Truck,
-  Navigation,
-  Box,
-  Layers,
-  Headphones,
-  FileText,
+  Search,
   X,
   ChevronRight,
-  ArrowRight,
-  Search
+  ShieldCheck,
+  Box,
+  Layers,
+  MapPin,
+  Plane,
+  Anchor
 } from 'lucide-react';
 import { Tooltip } from './Tooltip';
 import { OrderItem } from '../types';
@@ -41,25 +39,61 @@ interface SourcingAnalyticsSectionProps {
 type TimeInterval = 'Monthly' | 'Weekly' | 'Daily';
 type ChartType = 'line' | 'bar';
 
-interface MonthlyDataPoint {
-  month: string;
-  fulfilled: number;
+interface SourcingDataPoint {
+  label: string;
+  fulfilled: number; // Volume coordinate (0 - 50 scale matching visual curve)
+  dealsBlue: number; // Deals count shown in tooltip
   fulfilledValUSD: number;
   fulfilledValRMB: number;
-  cancel: number;
+  cancel: number; // Volume coordinate (0 - 50 scale matching visual curve)
+  dealsGreen: number; // Deals count shown in tooltip
   cancelValUSD: number;
   volumeBarHeight: number; // percentage
 }
 
-const MONTHLY_DATA: MonthlyDataPoint[] = [
-  { month: 'Jan', fulfilled: 210, fulfilledValUSD: 6800, fulfilledValRMB: 49232, cancel: 45, cancelValUSD: 3400, volumeBarHeight: 35 },
-  { month: 'Feb', fulfilled: 245, fulfilledValUSD: 7400, fulfilledValRMB: 53576, cancel: 50, cancelValUSD: 3900, volumeBarHeight: 45 },
-  { month: 'Mar', fulfilled: 290, fulfilledValUSD: 8200, fulfilledValRMB: 59368, cancel: 42, cancelValUSD: 3800, volumeBarHeight: 52 },
-  { month: 'Apr', fulfilled: 260, fulfilledValUSD: 6400, fulfilledValRMB: 46336, cancel: 60, cancelValUSD: 4100, volumeBarHeight: 40 },
-  { month: 'May', fulfilled: 320, fulfilledValUSD: 7800, fulfilledValRMB: 56472, cancel: 55, cancelValUSD: 4300, volumeBarHeight: 58 },
-  { month: 'Jun', fulfilled: 356, fulfilledValUSD: 8900, fulfilledValRMB: 64436, cancel: 75, cancelValUSD: 5133, volumeBarHeight: 70 },
-  { month: 'Jul', fulfilled: 380, fulfilledValUSD: 9400, fulfilledValRMB: 68056, cancel: 68, cancelValUSD: 4600, volumeBarHeight: 82 },
-  { month: 'Aug', fulfilled: 410, fulfilledValUSD: 8600, fulfilledValRMB: 62264, cancel: 70, cancelValUSD: 4800, volumeBarHeight: 78 },
+// 14 daily data points matching the exact X-axis (29.04 to 12.05) and curve coordinates from reference graph
+export const DAILY_DATA: SourcingDataPoint[] = [
+  { label: '29.04', fulfilled: 5, dealsBlue: 5, fulfilledValUSD: 2400, fulfilledValRMB: 17376, cancel: 3, dealsGreen: 3, cancelValUSD: 1100, volumeBarHeight: 12 },
+  { label: '30.04', fulfilled: 14, dealsBlue: 14, fulfilledValUSD: 4200, fulfilledValRMB: 30408, cancel: 24, dealsGreen: 24, cancelValUSD: 3600, volumeBarHeight: 28 },
+  { label: '1.05', fulfilled: 21, dealsBlue: 21, fulfilledValUSD: 5900, fulfilledValRMB: 42716, cancel: 16, dealsGreen: 16, cancelValUSD: 2400, volumeBarHeight: 42 },
+  { label: '2.05', fulfilled: 21, dealsBlue: 21, fulfilledValUSD: 6100, fulfilledValRMB: 44164, cancel: 16, dealsGreen: 16, cancelValUSD: 2400, volumeBarHeight: 42 },
+  { label: '3.05', fulfilled: 15, dealsBlue: 15, fulfilledValUSD: 4800, fulfilledValRMB: 34752, cancel: 23, dealsGreen: 23, cancelValUSD: 3500, volumeBarHeight: 30 },
+  { label: '4.05', fulfilled: 15, dealsBlue: 15, fulfilledValUSD: 4900, fulfilledValRMB: 35476, cancel: 9, dealsGreen: 9, cancelValUSD: 1500, volumeBarHeight: 30 },
+  { label: '5.05', fulfilled: 23, dealsBlue: 23, fulfilledValUSD: 6800, fulfilledValRMB: 49232, cancel: 27, dealsGreen: 27, cancelValUSD: 4100, volumeBarHeight: 46 },
+  { label: '6.05', fulfilled: 20, dealsBlue: 20, fulfilledValUSD: 6200, fulfilledValRMB: 44888, cancel: 27, dealsGreen: 27, cancelValUSD: 4100, volumeBarHeight: 40 },
+  { label: '7.05', fulfilled: 20, dealsBlue: 20, fulfilledValUSD: 6200, fulfilledValRMB: 44888, cancel: 27, dealsGreen: 27, cancelValUSD: 4100, volumeBarHeight: 40 },
+  { label: '8.05', fulfilled: 15, dealsBlue: 29, fulfilledValUSD: 8900, fulfilledValRMB: 64436, cancel: 32, dealsGreen: 27, cancelValUSD: 5133, volumeBarHeight: 30 },
+  { label: '9.05', fulfilled: 30, dealsBlue: 30, fulfilledValUSD: 7900, fulfilledValRMB: 57196, cancel: 35, dealsGreen: 35, cancelValUSD: 5100, volumeBarHeight: 60 },
+  { label: '10.05', fulfilled: 42, dealsBlue: 42, fulfilledValUSD: 9600, fulfilledValRMB: 69504, cancel: 37, dealsGreen: 37, cancelValUSD: 5300, volumeBarHeight: 84 },
+  { label: '11.05', fulfilled: 34, dealsBlue: 34, fulfilledValUSD: 8500, fulfilledValRMB: 61540, cancel: 38, dealsGreen: 38, cancelValUSD: 5400, volumeBarHeight: 68 },
+  { label: '12.05', fulfilled: 45, dealsBlue: 45, fulfilledValUSD: 10200, fulfilledValRMB: 73848, cancel: 41, dealsGreen: 41, cancelValUSD: 5800, volumeBarHeight: 90 },
+];
+
+export const WEEKLY_DATA: SourcingDataPoint[] = [
+  { label: 'W21', fulfilled: 12, dealsBlue: 12, fulfilledValUSD: 3600, fulfilledValRMB: 26064, cancel: 8, dealsGreen: 8, cancelValUSD: 1800, volumeBarHeight: 24 },
+  { label: 'W22', fulfilled: 18, dealsBlue: 18, fulfilledValUSD: 4800, fulfilledValRMB: 34752, cancel: 14, dealsGreen: 14, cancelValUSD: 2600, volumeBarHeight: 36 },
+  { label: 'W23', fulfilled: 24, dealsBlue: 24, fulfilledValUSD: 6200, fulfilledValRMB: 44888, cancel: 19, dealsGreen: 19, cancelValUSD: 3100, volumeBarHeight: 48 },
+  { label: 'W24', fulfilled: 22, dealsBlue: 22, fulfilledValUSD: 5900, fulfilledValRMB: 42716, cancel: 15, dealsGreen: 15, cancelValUSD: 2800, volumeBarHeight: 44 },
+  { label: 'W25', fulfilled: 26, dealsBlue: 26, fulfilledValUSD: 6800, fulfilledValRMB: 49232, cancel: 21, dealsGreen: 21, cancelValUSD: 3400, volumeBarHeight: 52 },
+  { label: 'W26', fulfilled: 20, dealsBlue: 20, fulfilledValUSD: 5400, fulfilledValRMB: 39096, cancel: 12, dealsGreen: 12, cancelValUSD: 2200, volumeBarHeight: 40 },
+  { label: 'W27', fulfilled: 28, dealsBlue: 28, fulfilledValUSD: 7400, fulfilledValRMB: 53576, cancel: 25, dealsGreen: 25, cancelValUSD: 3900, volumeBarHeight: 56 },
+  { label: 'W28', fulfilled: 25, dealsBlue: 25, fulfilledValUSD: 7100, fulfilledValRMB: 51404, cancel: 26, dealsGreen: 26, cancelValUSD: 4000, volumeBarHeight: 50 },
+  { label: 'W29', fulfilled: 29, dealsBlue: 29, fulfilledValUSD: 7800, fulfilledValRMB: 56472, cancel: 27, dealsGreen: 27, cancelValUSD: 4200, volumeBarHeight: 58 },
+  { label: 'W30', fulfilled: 36, dealsBlue: 36, fulfilledValUSD: 8900, fulfilledValRMB: 64436, cancel: 32, dealsGreen: 32, cancelValUSD: 4800, volumeBarHeight: 72 },
+  { label: 'W31', fulfilled: 42, dealsBlue: 42, fulfilledValUSD: 9800, fulfilledValRMB: 70952, cancel: 36, dealsGreen: 36, cancelValUSD: 5200, volumeBarHeight: 84 },
+  { label: 'W32', fulfilled: 38, dealsBlue: 38, fulfilledValUSD: 9100, fulfilledValRMB: 65884, cancel: 37, dealsGreen: 37, cancelValUSD: 5300, volumeBarHeight: 76 },
+  { label: 'W33', fulfilled: 46, dealsBlue: 46, fulfilledValUSD: 10400, fulfilledValRMB: 75296, cancel: 40, dealsGreen: 40, cancelValUSD: 5600, volumeBarHeight: 92 },
+];
+
+export const MONTHLY_DATA: SourcingDataPoint[] = [
+  { label: 'Jan', fulfilled: 12, dealsBlue: 210, fulfilledValUSD: 6800, fulfilledValRMB: 49232, cancel: 8, dealsGreen: 45, cancelValUSD: 3400, volumeBarHeight: 35 },
+  { label: 'Feb', fulfilled: 16, dealsBlue: 245, fulfilledValUSD: 7400, fulfilledValRMB: 53576, cancel: 14, dealsGreen: 50, cancelValUSD: 3900, volumeBarHeight: 45 },
+  { label: 'Mar', fulfilled: 22, dealsBlue: 290, fulfilledValUSD: 8200, fulfilledValRMB: 59368, cancel: 19, dealsGreen: 42, cancelValUSD: 3800, volumeBarHeight: 52 },
+  { label: 'Apr', fulfilled: 18, dealsBlue: 260, fulfilledValUSD: 6400, fulfilledValRMB: 46336, cancel: 15, dealsGreen: 60, cancelValUSD: 4100, volumeBarHeight: 40 },
+  { label: 'May', fulfilled: 25, dealsBlue: 320, fulfilledValUSD: 7800, fulfilledValRMB: 56472, cancel: 24, dealsGreen: 55, cancelValUSD: 4300, volumeBarHeight: 58 },
+  { label: 'Jun', fulfilled: 29, dealsBlue: 356, fulfilledValUSD: 8900, fulfilledValRMB: 64436, cancel: 27, dealsGreen: 75, cancelValUSD: 5133, volumeBarHeight: 70 },
+  { label: 'Jul', fulfilled: 38, dealsBlue: 380, fulfilledValUSD: 9400, fulfilledValRMB: 68056, cancel: 34, dealsGreen: 68, cancelValUSD: 4600, volumeBarHeight: 82 },
+  { label: 'Aug', fulfilled: 45, dealsBlue: 410, fulfilledValUSD: 8600, fulfilledValRMB: 62264, cancel: 39, dealsGreen: 70, cancelValUSD: 4800, volumeBarHeight: 78 },
 ];
 
 export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> = ({
@@ -70,9 +104,9 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
   onOpenOrderDetail
 }) => {
   const { t, language, translateOrderText } = useLanguage();
-  const [timeInterval, setTimeInterval] = useState<TimeInterval>('Monthly');
+  const [timeInterval, setTimeInterval] = useState<TimeInterval>('Daily');
   const [chartType, setChartType] = useState<ChartType>('line');
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(9);
   const [isIntervalDropdownOpen, setIsIntervalDropdownOpen] = useState(false);
   const [mapMode, setMapMode] = useState<'map' | 'satellite'>('map');
   const [showShipmentMenu, setShowShipmentMenu] = useState(false);
@@ -87,6 +121,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
       id: '#170845-25-800NYK',
       internalId: 'P360-84920',
       title: language === 'zh' ? 'CNC 铝合金客制化机械键盘 (第2批次)' : 'CNC Aluminum Mechanical Keyboards (Batch #2)',
+      type: 'air' as const,
       carrier: language === 'zh' ? '顺丰国际空运特快专线' : 'SF International Air Express',
       carrierShort: 'SF Express Air',
       origin: language === 'zh' ? '广东集拼中心 (东莞仓)' : 'Guangdong Consolidation Hub, Dongguan',
@@ -132,6 +167,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
       id: '#194820-99-410LAX',
       internalId: 'P360-84917',
       title: language === 'zh' ? '人体工学桌面配件与线槽' : 'Ergonomic Desk Accessories & Cable Rigs',
+      type: 'sea' as const,
       carrier: language === 'zh' ? '美森快船加急海运 (CLX)' : 'Matson Sea Expedited (CLX)',
       carrierShort: 'Matson Sea (CLX)',
       origin: language === 'zh' ? '深圳盐田码头出口仓' : 'Shenzhen Yantian Terminal',
@@ -177,6 +213,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
       id: '#205118-14-620ORD',
       internalId: 'P360-84915',
       title: language === 'zh' ? '阳极氧化铝 CNC 外壳总成' : 'Anodized Aluminum CNC Enclosures',
+      type: 'air' as const,
       carrier: language === 'zh' ? 'DHL 国际特快专递' : 'DHL Express Priority',
       carrierShort: 'DHL Express',
       origin: language === 'zh' ? '上海浦东转运中心' : 'Shanghai Pudong Hub',
@@ -195,8 +232,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
           label: language === 'zh' ? '派送员上门派送中' : 'Out for Delivery', 
           subtext: '28 Aug 2026', 
           time: '08:45 AM', 
-          completed: true, 
-          isEstimate: false 
+          completed: true 
         },
         { 
           label: language === 'zh' ? '抵达芝加哥分拨枢纽' : 'Arrived at Chicago Hub', 
@@ -221,67 +257,58 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
   ];
 
   const currentShipment = activeShipments[activeShipmentIndex];
-  const activeMonth = hoveredIndex !== null ? MONTHLY_DATA[hoveredIndex] : null;
 
-  // SVG Chart coordinate configuration with natural aspect ratio & responsive scale
-  const chartWidth = 520;
-  const chartHeight = 220;
-  const paddingLeft = 44;
-  const paddingRight = 20;
-  const paddingTop = 16;
-  const paddingBottom = 38;
+  // Dynamic dataset based on selected interval
+  const currentData = timeInterval === 'Daily' ? DAILY_DATA : timeInterval === 'Weekly' ? WEEKLY_DATA : MONTHLY_DATA;
+  const safeHoveredIndex = hoveredIndex !== null ? Math.min(hoveredIndex, currentData.length - 1) : null;
+  const activePoint = safeHoveredIndex !== null ? currentData[safeHoveredIndex] : null;
+
+  // SVG Chart coordinate configuration matching image.png exactly
+  const chartWidth = 840;
+  const chartHeight = 240;
+  const paddingLeft = 36;
+  const paddingRight = 48; // Room for dashed vertical line and "PROJECT START" label
+  const paddingTop = 20;
+  const paddingBottom = 32;
 
   const plotWidth = chartWidth - paddingLeft - paddingRight;
   const plotHeight = chartHeight - paddingTop - paddingBottom;
   const chartBaselineY = chartHeight - paddingBottom;
 
-  // Max value in USD is 10,000
-  const maxVal = 10000;
-  const minVal = 0;
+  // Y-axis scale is 0 to 50
+  const maxY = 50;
+  const minY = 0;
 
-  const pointsFulfilled = MONTHLY_DATA.map((d, i) => {
-    const x = paddingLeft + (i * plotWidth) / (MONTHLY_DATA.length - 1);
-    const y = chartBaselineY - ((d.fulfilledValUSD - minVal) / (maxVal - minVal)) * plotHeight;
+  const pointsFulfilled = currentData.map((d, i) => {
+    const x = paddingLeft + (i * plotWidth) / (currentData.length - 1);
+    const y = chartBaselineY - ((Math.min(maxY, Math.max(minY, d.fulfilled)) - minY) / (maxY - minY)) * plotHeight;
     return { x, y, ...d };
   });
 
-  const pointsCancel = MONTHLY_DATA.map((d, i) => {
-    const x = paddingLeft + (i * plotWidth) / (MONTHLY_DATA.length - 1);
-    const y = chartBaselineY - ((d.cancelValUSD - minVal) / (maxVal - minVal)) * plotHeight;
+  const pointsCancel = currentData.map((d, i) => {
+    const x = paddingLeft + (i * plotWidth) / (currentData.length - 1);
+    const y = chartBaselineY - ((Math.min(maxY, Math.max(minY, d.cancel)) - minY) / (maxY - minY)) * plotHeight;
     return { x, y, ...d };
   });
 
-  // High quality Catmull-Rom to Cubic Bezier spline generator
-  const getSplinePath = (pts: { x: number; y: number }[]) => {
+  // Polyline generator with straight sharp segments (matching image.png)
+  const getPolylinePath = (pts: { x: number; y: number }[]) => {
     if (pts.length === 0) return '';
-    if (pts.length === 1) return `M ${pts[0].x},${pts[0].y}`;
-    let d = `M ${pts[0].x.toFixed(1)},${pts[0].y.toFixed(1)}`;
-    for (let i = 0; i < pts.length - 1; i++) {
-      const p0 = i > 0 ? pts[i - 1] : pts[i];
-      const p1 = pts[i];
-      const p2 = pts[i + 1];
-      const p3 = i < pts.length - 2 ? pts[i + 2] : p2;
-
-      const cp1x = p1.x + (p2.x - p0.x) / 6;
-      const cp1y = p1.y + (p2.y - p0.y) / 6;
-      const cp2x = p2.x - (p3.x - p1.x) / 6;
-      const cp2y = p2.y - (p3.y - p1.y) / 6;
-
-      d += ` C ${cp1x.toFixed(1)},${cp1y.toFixed(1)} ${cp2x.toFixed(1)},${cp2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`;
-    }
-    return d;
+    return pts.map((pt, i) => `${i === 0 ? 'M' : 'L'} ${pt.x.toFixed(1)},${pt.y.toFixed(1)}`).join(' ');
   };
 
-  const pathFulfilled = getSplinePath(pointsFulfilled);
-  const pathCancel = getSplinePath(pointsCancel);
-  const areaFulfilled = `${pathFulfilled} L ${pointsFulfilled[pointsFulfilled.length - 1].x},${chartBaselineY} L ${pointsFulfilled[0].x},${chartBaselineY} Z`;
+  const pathFulfilled = getPolylinePath(pointsFulfilled);
+  const pathCancel = getPolylinePath(pointsCancel);
+  const areaFulfilled = `${pathFulfilled} L ${pointsFulfilled[pointsFulfilled.length - 1].x.toFixed(1)},${chartBaselineY} L ${pointsFulfilled[0].x.toFixed(1)},${chartBaselineY} Z`;
+  const areaCancel = `${pathCancel} L ${pointsCancel[pointsCancel.length - 1].x.toFixed(1)},${chartBaselineY} L ${pointsCancel[0].x.toFixed(1)},${chartBaselineY} Z`;
 
   return (
-    <div className="w-full flex flex-col xl:flex-row items-stretch gap-4 sm:gap-5 overflow-hidden">
-      {/* LEFT SECTION: 3 STAT CARDS + ORDER ANALYSIS CHART */}
-      <div className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-5">
-        {/* TOP ROW: 3 STAT CARDS */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+    <>
+      <div className="w-full flex flex-col xl:flex-row items-stretch gap-4 sm:gap-5 overflow-hidden">
+        {/* LEFT SECTION: 3 STAT CARDS + ORDER ANALYSIS CHART */}
+        <div className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-5">
+          {/* TOP ROW: 3 STAT CARDS */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
           
           {/* Card 1: Total Orders */}
           <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
@@ -554,12 +581,12 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
             <div className="flex items-center justify-between gap-3 text-xs font-medium text-slate-600 mb-2.5 flex-wrap">
               <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
                   <span className="font-medium text-slate-800 text-[11px] sm:text-xs">{t.fulfilledOrdersLegend}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
-                  <span className="font-medium text-rose-600 text-[11px] sm:text-xs">{t.cancelQcReturnedLegend}</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="font-medium text-emerald-700 text-[11px] sm:text-xs">{t.cancelQcReturnedLegend}</span>
                 </div>
               </div>
               <div className="text-[10px] sm:text-[11px] font-mono text-slate-400">
@@ -569,12 +596,11 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
 
             {/* Custom SVG Visualization Container */}
             <div 
-              className="relative w-full bg-slate-50/40 rounded-2xl p-2 sm:p-3.5 border border-slate-100/80 select-none"
-              onMouseLeave={() => setHoveredIndex(null)}
-              onClick={() => setHoveredIndex(null)}
+              className="relative w-full bg-white rounded-2xl p-2 sm:p-3.5 border border-slate-200/80 select-none shadow-2xs"
+              onMouseLeave={() => setHoveredIndex(9)}
             >
               {/* Main Chart Graphic Canvas (Fully Responsive & Fluid on all screen sizes) */}
-              <div className="relative w-full h-[200px] xs:h-[220px] sm:h-[260px] md:h-[280px]">
+              <div className="relative w-full h-[210px] xs:h-[230px] sm:h-[270px] md:h-[290px]">
                 {chartType === 'line' ? (
                   <svg 
                     className="w-full h-full block" 
@@ -582,276 +608,260 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                     preserveAspectRatio="none"
                   >
                     <defs>
-                      <linearGradient id="fulfilledGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#10B981" stopOpacity="0.25" />
-                        <stop offset="60%" stopColor="#10B981" stopOpacity="0.08" />
+                      {/* Subtle Blue Area Gradient */}
+                      <linearGradient id="blueAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#2563EB" stopOpacity="0.14" />
+                        <stop offset="75%" stopColor="#2563EB" stopOpacity="0.02" />
+                        <stop offset="100%" stopColor="#2563EB" stopOpacity="0.0" />
+                      </linearGradient>
+
+                      {/* Subtle Green Area Gradient */}
+                      <linearGradient id="greenAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10B981" stopOpacity="0.12" />
+                        <stop offset="75%" stopColor="#10B981" stopOpacity="0.02" />
                         <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
                       </linearGradient>
-                      <filter id="shadowGlow" x="-20%" y="-20%" width="140%" height="140%">
-                        <feDropShadow dx="0" dy="2" stdDeviation="3" floodColor="#10B981" floodOpacity="0.3" />
-                      </filter>
                     </defs>
 
-                    {/* Horizontal Grid Lines & Y-Axis Reference Guides */}
-                    {[
-                      { val: '$10k', rmb: '¥72.4k', y: paddingTop },
-                      { val: '$7.5k', rmb: '¥54.3k', y: paddingTop + plotHeight * 0.25 },
-                      { val: '$5.0k', rmb: '¥36.2k', y: paddingTop + plotHeight * 0.5 },
-                      { val: '$2.5k', rmb: '¥18.1k', y: paddingTop + plotHeight * 0.75 },
-                      { val: '$0k', rmb: '¥0', y: chartBaselineY },
-                    ].map((grid, idx) => (
-                      <g key={grid.val}>
-                        <line
-                          x1={paddingLeft}
-                          y1={grid.y}
-                          x2={chartWidth - paddingRight}
-                          y2={grid.y}
-                          stroke={idx === 4 ? '#94a3b8' : '#e2e8f0'}
-                          strokeWidth={idx === 4 ? '1.2' : '0.8'}
-                          strokeDasharray={idx === 4 ? 'none' : '3 3'}
-                        />
-                        <text
-                          x={paddingLeft - 6}
-                          y={grid.y + 3.5}
-                          textAnchor="end"
-                          className="text-[11px] font-mono fill-slate-400 font-medium"
-                        >
-                          {grid.val}
-                        </text>
-                        <text
-                          x={chartWidth - paddingRight + 6}
-                          y={grid.y + 3.5}
-                          textAnchor="start"
-                          className="text-[10px] font-mono fill-slate-300 hidden md:block"
-                        >
-                          {grid.rmb}
-                        </text>
-                      </g>
-                    ))}
-
-                    {/* Gradient Fill under Fulfilled Line */}
-                    <path
-                      d={areaFulfilled}
-                      fill="url(#fulfilledGrad)"
-                    />
-
-                    {/* Cancelled Curve (Red / Bad - Dashed) */}
-                    <path
-                      d={pathCancel}
-                      fill="none"
-                      stroke="#EF4444"
-                      strokeWidth="2.0"
-                      strokeDasharray="4 4"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-
-                    {/* Fulfilled Curve (Emerald Green / Good - High-Precision Spline) */}
-                    <path
-                      d={pathFulfilled}
-                      fill="none"
-                      stroke="#10B981"
-                      strokeWidth="2.8"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      filter="url(#shadowGlow)"
-                    />
-
-                    {/* Vertical Active Cursor Guide Line */}
-                    {hoveredIndex !== null && pointsFulfilled[hoveredIndex] && (
-                      <g>
-                        <line
-                          x1={pointsFulfilled[hoveredIndex].x}
-                          y1={paddingTop}
-                          x2={pointsFulfilled[hoveredIndex].x}
-                          y2={chartBaselineY}
-                          stroke="#10B981"
-                          strokeWidth="1.5"
-                          strokeDasharray="3 3"
-                          opacity="0.85"
-                        />
-                      </g>
-                    )}
-
-                    {/* Cancelled Data Points (Subtle Red Dots) */}
-                    {pointsCancel.map((pt) => (
-                      <g key={`cancel-${pt.month}`}>
-                        <circle
-                          cx={pt.x}
-                          cy={pt.y}
-                          r="3"
-                          fill="#ffffff"
-                          stroke="#EF4444"
-                          strokeWidth="1.6"
-                        />
-                      </g>
-                    ))}
-
-                    {/* Fulfilled Data Points (Emerald Dual-Ring Circular Points) */}
-                    {pointsFulfilled.map((pt, i) => {
-                      const isHovered = hoveredIndex === i;
+                    {/* Horizontal Grid Lines & Y-Axis Reference Guides (50, 40, 30, 20, 10, 0) */}
+                    {[50, 40, 30, 20, 10, 0].map((val) => {
+                      const y = chartBaselineY - (val / 50) * plotHeight;
                       return (
-                        <g 
-                          key={`pt-${pt.month}`}
-                          className="cursor-pointer"
-                          onMouseEnter={(e) => {
-                            e.stopPropagation();
-                            setHoveredIndex(i);
-                          }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setHoveredIndex((prev) => (prev === i ? null : i));
-                            if (onShowToast) {
-                              onShowToast(`${pt.month} Velocity: ${pt.fulfilled} orders ($${pt.fulfilledValUSD.toLocaleString()} / ¥${pt.fulfilledValRMB.toLocaleString()} RMB)`);
-                            }
-                          }}
-                        >
-                          {/* Invisible larger hover hit area */}
-                          <rect
-                            x={pt.x - 22}
-                            y={paddingTop}
-                            width="44"
-                            height={plotHeight + 40}
-                            fill="transparent"
+                        <g key={`y-grid-${val}`}>
+                          <line
+                            x1={paddingLeft}
+                            y1={y}
+                            x2={chartWidth - paddingRight + 12}
+                            y2={y}
+                            stroke="#E2E8F0"
+                            strokeWidth="1"
                           />
-
-                          {/* Outer Pulsing Aura Ring on Active/Hovered Point */}
-                          {isHovered && (
-                            <circle
-                              cx={pt.x}
-                              cy={pt.y}
-                              r="10"
-                              fill="#10B981"
-                              fillOpacity="0.25"
-                              className="animate-pulse"
-                            />
-                          )}
-
-                          {/* White Outer Halo Ring */}
-                          <circle
-                            cx={pt.x}
-                            cy={pt.y}
-                            r={isHovered ? 6 : 4.5}
-                            fill="#ffffff"
-                            stroke="#10B981"
-                            strokeWidth={isHovered ? 3 : 2}
-                          />
-
-                          {/* Center Solid Core Dot */}
-                          <circle
-                            cx={pt.x}
-                            cy={pt.y}
-                            r={isHovered ? 2.8 : 2}
-                            fill="#10B981"
-                          />
+                          <text
+                            x={paddingLeft - 8}
+                            y={y + 3.5}
+                            textAnchor="end"
+                            fill="#94A3B8"
+                            fontSize="11"
+                            fontWeight="500"
+                            fontFamily="system-ui, sans-serif"
+                          >
+                            {val}
+                          </text>
                         </g>
                       );
                     })}
 
-                    {/* Synchronized X-Axis Month Markers & Interactive Labels inside SVG */}
-                    <g className="x-axis-month-markers">
-                      {pointsFulfilled.map((pt, i) => {
-                        const isHovered = hoveredIndex === i;
-                        return (
-                          <g
-                            key={`axis-month-${pt.month}`}
-                            className="cursor-pointer select-none group"
-                            onMouseEnter={(e) => {
-                              e.stopPropagation();
-                              setHoveredIndex(i);
-                            }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setHoveredIndex((prev) => (prev === i ? null : i));
-                              if (onShowToast) {
-                                onShowToast(`${pt.month} Sourcing: ${pt.fulfilled} orders fulfilled ($${pt.fulfilledValUSD.toLocaleString()} / ¥${pt.fulfilledValRMB.toLocaleString()} RMB)`);
-                              }
-                            }}
+                    {/* Vertical Grid Lines aligned with each X-axis data column */}
+                    {pointsFulfilled.map((pt, i) => (
+                      <line
+                        key={`x-grid-${pt.label}-${i}`}
+                        x1={pt.x}
+                        y1={paddingTop}
+                        x2={pt.x}
+                        y2={chartBaselineY}
+                        stroke="#E2E8F0"
+                        strokeWidth="1"
+                      />
+                    ))}
+
+                    {/* Subtle Gradient Area Fills underneath both curves */}
+                    <path d={areaCancel} fill="url(#greenAreaGrad)" />
+                    <path d={areaFulfilled} fill="url(#blueAreaGrad)" />
+
+                    {/* Green Series Polyline (QC Returns & Reimbursed) */}
+                    <path
+                      d={pathCancel}
+                      fill="none"
+                      stroke="#10B981"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+
+                    {/* Blue Series Polyline (Procurement & Fulfilled Orders) */}
+                    <path
+                      d={pathFulfilled}
+                      fill="none"
+                      stroke="#2563EB"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+
+                    {/* Right Milestone Boundary (Vertical dashed line with label matching image) */}
+                    {pointsFulfilled.length > 0 && (
+                      <g>
+                        <line
+                          x1={pointsFulfilled[pointsFulfilled.length - 1].x + 14}
+                          y1={paddingTop}
+                          x2={pointsFulfilled[pointsFulfilled.length - 1].x + 14}
+                          y2={chartBaselineY}
+                          stroke="#CBD5E1"
+                          strokeWidth="1.2"
+                          strokeDasharray="3 3"
+                        />
+                        <text
+                          x={pointsFulfilled[pointsFulfilled.length - 1].x + 26}
+                          y={(paddingTop + chartBaselineY) / 2}
+                          transform={`rotate(-90 ${pointsFulfilled[pointsFulfilled.length - 1].x + 26} ${(paddingTop + chartBaselineY) / 2})`}
+                          textAnchor="middle"
+                          fill="#94A3B8"
+                          fontSize="9"
+                          fontWeight="600"
+                          letterSpacing="0.1em"
+                        >
+                          PROJECT START
+                        </text>
+                      </g>
+                    )}
+
+                    {/* Green Series Circular Data Nodes */}
+                    {pointsCancel.map((pt, i) => (
+                      <circle
+                        key={`green-node-${pt.label}-${i}`}
+                        cx={pt.x}
+                        cy={pt.y}
+                        r={safeHoveredIndex === i ? 4.8 : 3.5}
+                        fill="#FFFFFF"
+                        stroke="#10B981"
+                        strokeWidth={safeHoveredIndex === i ? 2.4 : 1.8}
+                      />
+                    ))}
+
+                    {/* Blue Series Circular Data Nodes */}
+                    {pointsFulfilled.map((pt, i) => (
+                      <circle
+                        key={`blue-node-${pt.label}-${i}`}
+                        cx={pt.x}
+                        cy={pt.y}
+                        r={safeHoveredIndex === i ? 4.8 : 3.5}
+                        fill="#FFFFFF"
+                        stroke="#2563EB"
+                        strokeWidth={safeHoveredIndex === i ? 2.4 : 1.8}
+                      />
+                    ))}
+
+                    {/* Active Vertical Crosshair & Mouse Cursor Pointer (matching reference screenshot) */}
+                    {safeHoveredIndex !== null && pointsFulfilled[safeHoveredIndex] && (
+                      <g>
+                        <line
+                          x1={pointsFulfilled[safeHoveredIndex].x}
+                          y1={paddingTop}
+                          x2={pointsFulfilled[safeHoveredIndex].x}
+                          y2={chartBaselineY}
+                          stroke="#1E3A8A"
+                          strokeWidth="2"
+                          opacity="0.95"
+                        />
+                        {/* Mouse cursor pointer icon positioned at intersection on green line */}
+                        <g transform={`translate(${pointsFulfilled[safeHoveredIndex].x - 1}, ${pointsCancel[safeHoveredIndex].y - 2})`}>
+                          <path
+                            d="M0,0 L0,13 L3,10 L5.5,15 L7.5,14 L5,9 L9.5,9 Z"
+                            fill="#FFFFFF"
+                            stroke="#1E293B"
+                            strokeWidth="1.2"
+                            strokeLinejoin="round"
+                          />
+                        </g>
+                      </g>
+                    )}
+
+                    {/* X-Axis Ticks & Date Labels at bottom */}
+                    {pointsFulfilled.map((pt, i) => {
+                      const isHovered = safeHoveredIndex === i;
+                      return (
+                        <g key={`x-tick-${pt.label}-${i}`}>
+                          <line
+                            x1={pt.x}
+                            y1={chartBaselineY}
+                            x2={pt.x}
+                            y2={chartBaselineY + 4}
+                            stroke="#CBD5E1"
+                            strokeWidth="1"
+                          />
+                          <text
+                            x={pt.x}
+                            y={chartBaselineY + 18}
+                            textAnchor="middle"
+                            fill={isHovered ? '#0F172A' : '#64748B'}
+                            fontSize="11"
+                            fontWeight={isHovered ? '700' : '500'}
+                            fontFamily="system-ui, sans-serif"
                           >
-                            {/* Tick mark directly below point */}
-                            <line
-                              x1={pt.x}
-                              y1={chartBaselineY}
-                              x2={pt.x}
-                              y2={chartBaselineY + 5}
-                              stroke={isHovered ? '#0f172a' : '#94a3b8'}
-                              strokeWidth={isHovered ? '2' : '1'}
-                            />
+                            {pt.label}
+                          </text>
+                        </g>
+                      );
+                    })}
 
-                            {/* Active selection background capsule pill */}
-                            {isHovered && (
-                              <rect
-                                x={pt.x - 20}
-                                y={chartBaselineY + 8}
-                                width="40"
-                                height="22"
-                                rx="11"
-                                fill="#0f172a"
-                              />
-                            )}
-
-                            {/* Crisp Scalable Month Label text */}
-                            <text
-                              x={pt.x}
-                              y={chartBaselineY + 23}
-                              textAnchor="middle"
-                              fill={isHovered ? '#ffffff' : '#64748b'}
-                              fontSize="12"
-                              fontWeight={isHovered ? '700' : '500'}
-                              fontFamily="system-ui, -apple-system, sans-serif"
-                            >
-                              {pt.month}
-                            </text>
-                          </g>
-                        );
-                      })}
-                    </g>
+                    {/* Interactive Column Hover Hit Areas */}
+                    {pointsFulfilled.map((pt, i) => {
+                      const colWidth = plotWidth / Math.max(1, currentData.length - 1);
+                      return (
+                        <rect
+                          key={`hit-${pt.label}-${i}`}
+                          x={pt.x - colWidth / 2}
+                          y={paddingTop}
+                          width={colWidth}
+                          height={plotHeight + 32}
+                          fill="transparent"
+                          className="cursor-pointer"
+                          onMouseEnter={() => setHoveredIndex(i)}
+                          onClick={() => {
+                            setHoveredIndex(i);
+                            if (onShowToast) {
+                              onShowToast(`${pt.label} Sourcing Velocity: ${pt.dealsBlue} deals (${pt.fulfilledValUSD.toLocaleString()} USD) • QC Claims: ${pt.dealsGreen} deals`);
+                            }
+                          }}
+                        />
+                      );
+                    })}
                   </svg>
                 ) : (
-                  /* Volume Bar Chart View */
-                  <div className="w-full h-full flex items-end justify-between px-2 sm:px-8 pb-1 pt-2">
-                    {MONTHLY_DATA.map((d, i) => {
-                      const isHovered = hoveredIndex === i;
-                      const fulfilledHeightPercent = (d.fulfilledValUSD / maxVal) * 100;
-                      const cancelHeightPercent = (d.cancelValUSD / maxVal) * 100;
+                  /* Volume Bar Chart View (Synchronized with Blue & Green Palette) */
+                  <div className="w-full h-full flex items-end justify-between px-2 sm:px-6 pb-1 pt-2">
+                    {currentData.map((d, i) => {
+                      const isHovered = safeHoveredIndex === i;
+                      const fulfilledHeightPercent = (d.fulfilled / maxY) * 100;
+                      const cancelHeightPercent = (d.cancel / maxY) * 100;
                       return (
                         <div
-                          key={`bar-${d.month}`}
+                          key={`bar-${d.label}-${i}`}
                           onMouseEnter={(e) => {
                             e.stopPropagation();
                             setHoveredIndex(i);
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            setHoveredIndex((prev) => (prev === i ? null : i));
+                            setHoveredIndex(i);
                             if (onShowToast) {
-                              onShowToast(`${d.month} Volume: ${d.fulfilled} orders fulfilled ($${d.fulfilledValUSD.toLocaleString()} / ¥${d.fulfilledValRMB.toLocaleString()} RMB)`);
+                              onShowToast(`${d.label} Deals: ${d.dealsBlue} fulfilled / ${d.dealsGreen} QC claims`);
                             }
                           }}
-                          className="flex flex-col items-center gap-1.5 h-full justify-end group cursor-pointer flex-1 max-w-[64px]"
+                          className="flex flex-col items-center gap-1.5 h-full justify-end group cursor-pointer flex-1 max-w-[56px]"
                         >
                           <div className="flex items-end justify-center gap-1 sm:gap-1.5 h-[160px] sm:h-[190px] w-full">
-                            {/* Fulfilled Bar (Green) */}
+                            {/* Fulfilled Bar (Blue) */}
                             <div
                               style={{ height: `${Math.max(fulfilledHeightPercent, 6)}%` }}
-                              className={`w-3.5 sm:w-5 rounded-t-lg transition-all ${
-                                isHovered ? 'bg-emerald-500 shadow-md scale-y-[1.02]' : 'bg-emerald-500/85 group-hover:bg-emerald-500'
+                              className={`w-3 sm:w-4 rounded-t transition-all ${
+                                isHovered ? 'bg-blue-600 shadow-md scale-y-[1.02]' : 'bg-blue-600/85 group-hover:bg-blue-600'
                               }`}
                             />
-                            {/* Cancel / QC Bar (Red) */}
+                            {/* Cancel / QC Bar (Green) */}
                             <div
                               style={{ height: `${Math.max(cancelHeightPercent, 4)}%` }}
-                              className={`w-2.5 sm:w-3.5 rounded-t-lg transition-all ${
-                                isHovered ? 'bg-rose-500 shadow-xs' : 'bg-rose-400/75 group-hover:bg-rose-500'
+                              className={`w-2.5 sm:w-3 rounded-t transition-all ${
+                                isHovered ? 'bg-emerald-500 shadow-xs' : 'bg-emerald-500/75 group-hover:bg-emerald-500'
                               }`}
                             />
                           </div>
 
-                          {/* Integrated Month Label directly under Bar */}
-                          <div className={`px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-semibold font-mono transition-all ${
+                          {/* Label directly under Bar */}
+                          <div className={`px-1.5 py-0.5 rounded text-[10px] sm:text-[11px] font-semibold font-mono transition-all ${
                             isHovered ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-500 group-hover:text-slate-800'
                           }`}>
-                            {d.month}
+                            {d.label}
                           </div>
                         </div>
                       );
@@ -859,608 +869,558 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   </div>
                 )}
 
-                  {/* Floating Tooltip Card with Hover Entrance & Exit Animation */}
-                  <AnimatePresence>
-                    {hoveredIndex !== null && activeMonth && (
-                      <motion.div 
-                        key={`tooltip-${hoveredIndex}`}
-                        initial={{ opacity: 0, scale: 0.94, y: 6 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.94, y: 4 }}
-                        transition={{ duration: 0.15, ease: 'easeOut' }}
-                        style={{
-                          left: hoveredIndex === 0 ? '22%' : hoveredIndex === MONTHLY_DATA.length - 1 ? '78%' : `${((hoveredIndex) / (MONTHLY_DATA.length - 1)) * 62 + 19}%`,
-                          top: '8%',
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setHoveredIndex(null);
-                        }}
-                        className="absolute z-20 bg-slate-950/95 text-white border border-white/15 rounded-2xl p-3 shadow-2xl pointer-events-auto cursor-pointer -translate-x-1/2 min-w-[170px] max-w-[230px] backdrop-blur-md"
-                      >
-                        <div className="text-xs font-bold text-white mb-2 border-b border-white/10 pb-1.5 flex items-center justify-between">
-                          <span>{activeMonth.month} 2026</span>
-                          <span className="text-[10px] font-mono text-emerald-400 font-bold">● Active</span>
-                        </div>
-                        <div className="space-y-1.5 text-xs font-mono">
-                          <div className="flex items-center justify-between gap-3 text-slate-200">
-                            <span className="flex items-center gap-1.5 font-sans text-[11px] text-slate-300">
-                              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                              <span>Fulfilled</span>
-                            </span>
-                            <span className="font-extrabold text-emerald-400">
-                              ${activeMonth.fulfilledValUSD.toLocaleString()}
-                            </span>
+                {/* Floating Tooltip Card (Styled matching reference image) */}
+                <AnimatePresence>
+                  {safeHoveredIndex !== null && activePoint && (
+                    <motion.div 
+                      key={`tooltip-${safeHoveredIndex}`}
+                      initial={{ opacity: 0, scale: 0.95, y: 4 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: 4 }}
+                      transition={{ duration: 0.12 }}
+                      style={{
+                        left: safeHoveredIndex <= 3
+                          ? `${(pointsFulfilled[safeHoveredIndex].x / chartWidth) * 100 + 2.5}%`
+                          : `${(pointsFulfilled[safeHoveredIndex].x / chartWidth) * 100 - 2}%`,
+                        transform: safeHoveredIndex <= 3 ? 'none' : 'translateX(-100%)',
+                        top: '6%',
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setHoveredIndex(null);
+                      }}
+                      className="absolute z-30 bg-white text-slate-900 border border-slate-200/90 rounded-xl p-3 shadow-xl shadow-slate-900/10 pointer-events-auto cursor-pointer min-w-[195px] max-w-[245px]"
+                    >
+                      <div className="text-[10px] font-bold text-slate-700 tracking-wider uppercase mb-2 pb-1.5 border-b border-slate-100 flex items-center justify-between">
+                        <span>{safeHoveredIndex === 9 ? '5 DAYS BEFORE START' : `${activePoint.label} • SOURCING CYCLE`}</span>
+                        <span className="text-[9px] font-mono font-semibold text-emerald-600 bg-emerald-50 px-1 py-0.5 rounded">● ACTIVE</span>
+                      </div>
+
+                      <div className="space-y-2.5">
+                        {/* Series 1 (Blue) */}
+                        <div>
+                          <div className="text-[11px] font-bold text-slate-900 leading-tight">
+                            {language === 'zh' ? '采购订单 (1688/工厂直采)' : 'Procurement Sourcing'}
                           </div>
-                          <div className="text-[10px] text-right text-slate-400 leading-tight">
-                            ¥{activeMonth.fulfilledValRMB.toLocaleString()} RMB ({activeMonth.fulfilled} POs)
+                          <div className="text-[10px] text-slate-500 font-mono">
+                            {activePoint.label}.2026 • SF Express
                           </div>
-                          <div className="flex items-center justify-between gap-3 text-slate-300 pt-1 border-t border-white/10">
-                            <span className="flex items-center gap-1.5 font-sans text-[11px] text-slate-400">
-                              <span className="w-2 h-2 rounded-full bg-rose-500" />
-                              <span>Cancel / QC</span>
-                            </span>
-                            <span className="font-bold text-rose-400">
-                              ${activeMonth.cancelValUSD.toLocaleString()}
+                          <div className="flex items-center gap-1.5 mt-1 text-xs text-slate-800">
+                            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0" />
+                            <span className="font-semibold text-slate-900">Deals: {activePoint.dealsBlue}</span>
+                            <span className="text-[10px] text-slate-500 font-mono ml-auto">
+                              ${activePoint.fulfilledValUSD.toLocaleString()}
                             </span>
                           </div>
                         </div>
-                        <div className="mt-2 pt-1.5 border-t border-white/10 text-[9px] text-slate-400 text-center font-sans">
-                          Tap to dismiss
+
+                        {/* Series 2 (Green) */}
+                        <div className="pt-2 border-t border-slate-100">
+                          <div className="text-[11px] font-bold text-slate-900 leading-tight">
+                            {language === 'zh' ? '质检核验与退款' : 'QC Verified & Reimbursed'}
+                          </div>
+                          <div className="text-[10px] text-slate-500 font-mono">
+                            {activePoint.label}.2026 • China Hubs
+                          </div>
+                          <div className="flex items-center gap-1.5 mt-1 text-xs text-slate-800">
+                            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                            <span className="font-semibold text-slate-900">Deals: {activePoint.dealsGreen}</span>
+                            <span className="text-[10px] text-slate-500 font-mono ml-auto">
+                              ${activePoint.cancelValUSD.toLocaleString()}
+                            </span>
+                          </div>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT SECTION: TRACK ORDERS / SHIPMENT CARD */}
+        <div className="w-full xl:w-[360px] shrink-0 bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col gap-3.5 overflow-hidden">
+          
+          {/* Card Header */}
+          <div className="flex items-center justify-between relative pb-2.5 border-b border-slate-100">
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-xl border border-orange-200/70 flex items-center justify-center text-[#E35D3B] bg-orange-50/50">
+                <Navigation className="w-3.5 h-3.5 text-[#E35D3B]" />
+              </div>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-slate-900 tracking-tight">
+                    {language === 'zh' ? '在途运单跟踪' : 'Track Orders'}
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
+                <div className="text-[10px] text-slate-400 font-mono">
+                  {currentShipment.internalId}
                 </div>
               </div>
             </div>
-          </div>
 
-      </div>
+            {/* Quick Switch Dropdown / All Shipments Drawer Trigger */}
+            <div className="flex items-center gap-1">
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowShipmentMenu(!showShipmentMenu)}
+                  className="px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-mono font-medium text-slate-700 flex items-center gap-1 transition-colors"
+                  title="Switch Shipment"
+                >
+                  <span>{currentShipment.id.slice(0, 10)}...</span>
+                  <ChevronDown className="w-3 h-3 text-slate-400" />
+                </button>
 
-      {/* RIGHT SECTION: TRACK NEW SHIPMENT CARD */}
-      <div className="w-full xl:w-[360px] shrink-0 bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col gap-3.5 overflow-hidden">
-        
-        {/* Card Header */}
-        <div className="flex items-center justify-between relative pb-2.5 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-xl border border-orange-200/70 flex items-center justify-center text-[#E35D3B] bg-orange-50/50">
-              <Navigation className="w-3.5 h-3.5 text-[#E35D3B]" />
-            </div>
-            <div>
-              <h3 className="text-xs font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
-                {t.trackNewShipment}
-                <span className="text-[10px] font-mono text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded font-semibold">LIVE</span>
-              </h3>
-            </div>
-            <Tooltip 
-              title={t.trackNewShipment}
-              content={language === 'zh' ? '顺丰国内速运及美森海运/空运特快专线的实时 GPS 轨迹回传。' : "Live GPS telemetry for domestic SF Express pickups and international Air Express/Ocean freight."}
-              position="bottom"
-            >
-              <div 
-                className="text-slate-400 hover:text-slate-600 p-0.5 rounded cursor-pointer"
-                aria-label="Live GPS telemetry"
-              >
-                <Info className="w-3.5 h-3.5" />
+                {showShipmentMenu && (
+                  <div className="absolute right-0 top-full mt-1 w-60 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 z-30 flex flex-col gap-1">
+                    <div className="text-[10px] font-semibold text-slate-400 px-2 py-1 uppercase tracking-wider">
+                      {language === 'zh' ? '切换运单' : 'Select Shipment'}
+                    </div>
+                    {activeShipments.map((s, idx) => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => {
+                          setActiveShipmentIndex(idx);
+                          setShowShipmentMenu(false);
+                        }}
+                        className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex flex-col gap-0.5 transition-colors ${
+                          idx === activeShipmentIndex 
+                            ? 'bg-orange-50 text-[#E35D3B] font-medium' 
+                            : 'hover:bg-slate-50 text-slate-700'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[11px] font-semibold">{s.id}</span>
+                          <span className={`text-[10px] ${idx === activeShipmentIndex ? 'text-[#E35D3B]' : 'text-slate-400'}`}>
+                            {s.carrierShort}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-500 truncate">{s.title}</span>
+                      </button>
+                    ))}
+                    <div className="border-t border-slate-100 pt-1 mt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowShipmentMenu(false);
+                          setShowShipmentsDrawer(true);
+                        }}
+                        className="w-full text-center py-1 text-[11px] font-medium text-[#E35D3B] hover:bg-orange-50/60 rounded-md transition-colors flex items-center justify-center gap-1"
+                      >
+                        <Layers className="w-3 h-3" />
+                        {language === 'zh' ? '管理全部运单 (3)' : 'View All Shipments (3)'}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            </Tooltip>
+
+              <button
+                type="button"
+                onClick={() => setShowShipmentsDrawer(true)}
+                className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                title="Open Logistics Drawer"
+              >
+                <Layers className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
-          {/* Action buttons in header */}
-          <div className="flex items-center gap-1">
+          {/* Interactive Route Map Graphic */}
+          <div className="bg-slate-950 rounded-2xl p-3 border border-slate-800 relative overflow-hidden h-[125px] flex flex-col justify-between group">
+            {/* Background grid texture */}
+            <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px] pointer-events-none" />
+            
+            {/* Map Mode Toggle & ETA Badge */}
+            <div className="relative z-10 flex items-center justify-between">
+              <div className="flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-slate-800 backdrop-blur-xs">
+                <button
+                  type="button"
+                  onClick={() => setMapMode('map')}
+                  className={`px-2 py-0.5 text-[9px] font-medium rounded-md transition-all ${
+                    mapMode === 'map' ? 'bg-[#E35D3B] text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Map
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMapMode('satellite')}
+                  className={`px-2 py-0.5 text-[9px] font-medium rounded-md transition-all ${
+                    mapMode === 'satellite' ? 'bg-[#E35D3B] text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  Satellite
+                </button>
+              </div>
+
+              <div className="px-2 py-0.5 bg-emerald-950/80 border border-emerald-700/60 rounded-full text-[10px] font-mono text-emerald-300 flex items-center gap-1.5 shadow-xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>ETA: {currentShipment.eta}</span>
+              </div>
+            </div>
+
+            {/* Simulated Geographic Flight / Cargo Curve */}
+            <div className="relative z-10 my-auto py-1">
+              <svg viewBox="0 0 300 45" className="w-full h-11 overflow-visible">
+                <defs>
+                  <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#E35D3B" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.9" />
+                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.8" />
+                  </linearGradient>
+                </defs>
+                {/* Background arc */}
+                <path
+                  d="M 30 35 Q 150 -5 270 35"
+                  fill="none"
+                  stroke="#334155"
+                  strokeWidth="2"
+                  strokeDasharray="4 4"
+                />
+                {/* Active progress arc */}
+                <path
+                  d="M 30 35 Q 120 5 190 20"
+                  fill="none"
+                  stroke="url(#routeGradient)"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                />
+                {/* Origin Pin */}
+                <circle cx="30" cy="35" r="4" fill="#E35D3B" />
+                <circle cx="30" cy="35" r="8" fill="#E35D3B" fillOpacity="0.2" className="animate-ping" />
+                
+                {/* Mid-Transit Plane / Ship Marker */}
+                <g transform="translate(190, 20)">
+                  <circle cx="0" cy="0" r="5" fill="#f59e0b" />
+                  <circle cx="0" cy="0" r="9" fill="#f59e0b" fillOpacity="0.25" />
+                </g>
+
+                {/* Destination Pin */}
+                <circle cx="270" cy="35" r="4" fill="#10b981" />
+              </svg>
+            </div>
+
+            {/* Origin & Destination Labels */}
+            <div className="relative z-10 flex items-center justify-between text-[10px] font-mono text-slate-300">
+              <div className="flex items-center gap-1">
+                <MapPin className="w-3 h-3 text-[#E35D3B]" />
+                <span className="truncate max-w-[120px]">{currentShipment.origin.split(' ')[0]}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-slate-500">➔</span>
+                <span className="truncate max-w-[120px] text-right">{currentShipment.destination.split(' ')[0]}</span>
+                <MapPin className="w-3 h-3 text-emerald-400" />
+              </div>
+            </div>
+          </div>
+
+          {/* Current Shipment Details Pill & Carrier */}
+          <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-100 flex flex-col gap-2">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-slate-900 truncate">
+                  {currentShipment.title}
+                </div>
+                <div className="text-[10px] text-slate-500 font-mono mt-0.5 flex items-center gap-1.5">
+                  <span>{currentShipment.carrier}</span>
+                  <span>•</span>
+                  <span>{currentShipment.cartons}</span>
+                </div>
+              </div>
+
+              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide shrink-0 ${
+                currentShipment.statusColor === 'text-emerald-600'
+                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
+                  : 'bg-orange-50 text-[#E35D3B] border border-orange-200/80'
+              }`}>
+                {currentShipment.status}
+              </span>
+            </div>
+
+            {/* Quick Specs Grid */}
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/60 text-[10px]">
+              <div>
+                <span className="text-slate-400 block">{language === 'zh' ? '重量 / 体积' : 'Weight / Vol'}</span>
+                <span className="font-mono font-medium text-slate-800">{currentShipment.weight} • {currentShipment.volume}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 block">{language === 'zh' ? '报关 / 包装' : 'Customs / Packaging'}</span>
+                <span className="font-medium text-slate-800 truncate block" title={currentShipment.customsStatus}>
+                  {currentShipment.customsStatus.split(' ')[0]}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Milestone Delivery Timeline */}
+          <div className="flex flex-col gap-2 pt-1">
+            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              {language === 'zh' ? '运输节点时效' : 'Delivery Progress'}
+            </div>
+
+            <div className="flex flex-col gap-2.5 relative pl-4 border-l border-slate-200 ml-2">
+              {currentShipment.timeline.map((step, sIdx) => {
+                const isFirst = sIdx === 0;
+                return (
+                  <div key={sIdx} className="relative flex items-start justify-between text-xs group">
+                    {/* Node Dot */}
+                    <div className={`absolute -left-[21px] top-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${
+                      step.completed 
+                        ? 'bg-emerald-500 border-white text-white shadow-xs' 
+                        : isFirst 
+                          ? 'bg-orange-500 border-white text-white animate-pulse' 
+                          : 'bg-slate-100 border-slate-300 text-transparent'
+                    }`}>
+                      {step.completed && <Check className="w-2 h-2" />}
+                    </div>
+
+                    <div className="min-w-0 pr-2">
+                      <div className={`text-xs leading-tight font-medium ${
+                        step.completed ? 'text-slate-800' : isFirst ? 'text-[#E35D3B] font-semibold' : 'text-slate-400'
+                      }`}>
+                        {step.label}
+                      </div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">
+                        {step.subtext}
+                      </div>
+                    </div>
+
+                    <div className="text-[10px] font-mono text-slate-400 shrink-0">
+                      {step.time}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-2 pt-2 border-t border-slate-100 mt-auto">
             <button
               type="button"
               onClick={() => {
-                setActiveShipmentIndex((activeShipmentIndex + 1) % activeShipments.length);
-                if (onShowToast) onShowToast(language === 'zh' ? '已切换至当前跟踪运单' : 'Switched to active freight waybill');
+                navigator.clipboard?.writeText(currentShipment.id);
+                onShowToast?.(language === 'zh' ? `已复制单号: ${currentShipment.id}` : `Copied tracking ID: ${currentShipment.id}`);
               }}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
-              title={t.switchActiveParcel}
-              aria-label="Switch active shipment"
+              className="flex-1 py-1.5 px-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 flex items-center justify-center gap-1.5 transition-colors"
             >
-              <RefreshCw className="w-3.5 h-3.5" />
+              <Copy className="w-3.5 h-3.5 text-slate-500" />
+              <span>{language === 'zh' ? '复制单号' : 'Copy Tracking'}</span>
             </button>
 
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setShowShipmentMenu(!showShipmentMenu)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
-                aria-label="Shipment options"
-              >
-                <MoreVertical className="w-4 h-4" />
-              </button>
-
-              {showShipmentMenu && (
-                <div className="absolute right-0 top-full mt-1 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 z-40 animate-in fade-in duration-100 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setActiveShipmentIndex((activeShipmentIndex + 1) % activeShipments.length);
-                      setShowShipmentMenu(false);
-                      if (onShowToast) onShowToast(language === 'zh' ? '已切换至当前跟踪运单' : 'Switched to active freight waybill');
-                    }}
-                    className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-50 flex items-center gap-2 text-slate-700 cursor-pointer"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5 text-slate-400" /> {t.switchActiveParcel}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowShipmentMenu(false);
-                      navigator.clipboard.writeText(currentShipment.id);
-                      if (onShowToast) onShowToast(language === 'zh' ? `已复制国际运单号: ${currentShipment.id}` : `Copied tracking number: ${currentShipment.id}`);
-                    }}
-                    className="w-full text-left px-2.5 py-1.5 rounded-xl hover:bg-slate-50 flex items-center gap-2 text-slate-700 cursor-pointer"
-                  >
-                    <Copy className="w-3.5 h-3.5 text-slate-400" /> {t.copyWaybillId}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Interactive Map Visualizer Container */}
-        <div className="relative rounded-2xl overflow-hidden border border-slate-200/90 bg-slate-900 h-40 shadow-inner">
-          <svg className="w-full h-full absolute inset-0 opacity-40" xmlns="http://www.w3.org/2000/svg">
-            <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="1" />
-            </pattern>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
-
-          {/* Map Route Graphics */}
-          <svg className="w-full h-full absolute inset-0 overflow-visible" viewBox="0 0 320 160">
-            <path
-              d="M 40,110 Q 140,25 270,65"
-              fill="none"
-              stroke="#475569"
-              strokeWidth="2"
-              strokeDasharray="4 4"
-            />
-            <path
-              d="M 40,110 Q 110,55 170,45"
-              fill="none"
-              stroke="#E35D3B"
-              strokeWidth="3"
-            />
-
-            <g transform="translate(40, 110)">
-              <circle r="5" fill="#10b981" />
-              <circle r="9" fill="none" stroke="#10b981" strokeWidth="1.5" className="animate-ping opacity-60" />
-            </g>
-
-            <g transform="translate(170, 45)">
-              <circle r="6" fill="#E35D3B" />
-              <circle r="11" fill="none" stroke="#E35D3B" strokeWidth="2" className="animate-ping" />
-            </g>
-
-            <g transform="translate(270, 65)">
-              <circle r="5" fill="#ffffff" />
-            </g>
-          </svg>
-
-          <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-950/80 backdrop-blur-xs border border-white/10 text-[10px] font-mono text-white">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#E35D3B] animate-pulse" />
-            <span>{currentShipment.carrier.toUpperCase()}</span>
-          </div>
-
-          <div className="absolute top-2.5 right-2.5 flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-950/80 backdrop-blur-xs border border-emerald-500/30 text-[10px] font-mono text-emerald-300">
-            <span>ETA: {currentShipment.eta}</span>
-          </div>
-
-          <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono text-slate-300 bg-slate-950/85 backdrop-blur-xs px-3 py-1.5 rounded-xl border border-white/10">
-            <span className="truncate max-w-[100px]">{currentShipment.origin.split(',')[0]}</span>
-            <span className="text-[#E35D3B] font-bold">● {t.inTransitBadge}</span>
-            <span className="truncate max-w-[100px] text-right">{currentShipment.destination.split(',')[0]}</span>
-          </div>
-        </div>
-
-        {/* Tracking ID & Telemetry Summary Bar */}
-        <div className="p-2.5 bg-slate-50 rounded-2xl border border-slate-200/70 flex items-center justify-between">
-          <div className="min-w-0 pr-2">
-            <div className="flex items-center gap-2">
-              <span className="text-[10px] text-slate-400 font-semibold leading-tight">{t.currentConsignment}</span>
-              <span className="text-[9px] bg-slate-200 text-slate-700 px-1 py-0.2 rounded font-mono font-medium">42.8 kg</span>
-            </div>
-            <p className="text-xs font-mono font-bold text-slate-950 leading-snug mt-0.5 truncate">
-              {currentShipment.id}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              navigator.clipboard.writeText(currentShipment.id);
-              if (onShowToast) onShowToast(language === 'zh' ? `已复制国际运单号: ${currentShipment.id}` : `Copied tracking number: ${currentShipment.id}`);
-            }}
-            className="p-1.5 text-slate-500 hover:text-slate-900 bg-white hover:bg-slate-100 rounded-xl border border-slate-200/80 shadow-2xs transition-all cursor-pointer shrink-0"
-            title={t.copyWaybillId}
-          >
-            <Copy className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        {/* Stepper Timeline with Checkboxes */}
-        <div className="space-y-2 pt-0.5 relative">
-          <div className="absolute left-[7px] top-2 bottom-2 w-0.5 bg-slate-200 -z-0" />
-
-          {currentShipment.timeline.map((step) => (
-            <div 
-              key={step.label}
-              className="flex items-start justify-between gap-2 relative z-10 text-xs"
-            >
-              {/* Checkbox indicator */}
-              <div className="flex items-start gap-2.5 min-w-0">
-                <div 
-                  className={`w-4 h-4 rounded-md flex items-center justify-center shrink-0 mt-0.5 ${
-                    step.completed
-                      ? 'bg-[#E35D3B] text-white shadow-2xs'
-                      : 'bg-white border-2 border-slate-300'
-                  }`}
-                >
-                  {step.completed && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                </div>
-
-                <div className="min-w-0">
-                  <p className={`font-semibold leading-tight text-xs ${step.completed ? 'text-slate-900' : 'text-slate-500'}`}>
-                    {step.label}
-                  </p>
-                  <p className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5 truncate">
-                    {step.subtext}
-                  </p>
-                </div>
-              </div>
-
-              {/* Timestamp on right */}
-              <span className="text-[10px] font-mono text-slate-400 shrink-0 font-medium pt-0.5">
-                {step.time}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* OTHER TRACKED SHIPMENTS (Limited to 1 preview with sidebar expand trigger) */}
-        <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <span className="text-[11px] font-bold text-slate-800 flex items-center gap-1.5">
-              <Truck className="w-3.5 h-3.5 text-slate-600" />
-              {language === 'zh' ? '其他在途跟踪运单' : 'Other Tracked Shipment'}
-            </span>
             <button
               type="button"
               onClick={() => setShowShipmentsDrawer(true)}
-              className="text-[11px] font-semibold text-[#E35D3B] hover:text-[#c4492a] flex items-center gap-0.5 cursor-pointer transition-colors"
+              className="py-1.5 px-3 bg-[#E35D3B] hover:bg-[#d04f2f] text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-xs"
             >
-              <span>{language === 'zh' ? `查看全部 (${activeShipments.length})` : `View all (${activeShipments.length})`}</span>
-              <ChevronRight className="w-3 h-3" />
+              <Layers className="w-3.5 h-3.5" />
+              <span>{language === 'zh' ? '查看全部' : 'View All'}</span>
             </button>
           </div>
 
-          {/* Single preview shipment */}
-          {(() => {
-            const previewIndex = (activeShipmentIndex + 1) % activeShipments.length;
-            const previewShipment = activeShipments[previewIndex];
-            return (
-              <div
-                onClick={() => {
-                  setActiveShipmentIndex(previewIndex);
-                  if (onShowToast) {
-                    onShowToast(language === 'zh' ? `已切换至跟踪运单: ${previewShipment.id}` : `Tracking shipment: ${previewShipment.id}`);
-                  }
-                }}
-                className="w-full text-left p-2.5 rounded-2xl border border-slate-200/80 bg-slate-50 hover:bg-slate-100/90 text-slate-700 transition-all cursor-pointer flex items-center justify-between gap-2 shadow-2xs hover:border-slate-300"
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200 text-slate-700">
-                      {previewShipment.carrierShort}
-                    </span>
-                    <span className="text-xs font-mono font-semibold text-slate-900 truncate">
-                      {previewShipment.id}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-slate-500 truncate mt-0.5">
-                    {previewShipment.title}
-                  </p>
-                  <div className="flex items-center gap-1.5 text-[9px] font-mono text-slate-400 mt-1">
-                    <span>{previewShipment.origin.split(' ')[0]}</span>
-                    <span>→</span>
-                    <span className="truncate">{previewShipment.destination.split(',')[0]}</span>
-                  </div>
-                </div>
+        </div> {/* Closes RIGHT SECTION */}
+      </div> {/* Closes OUTER ROW */}
 
-                <div className="shrink-0 text-right flex flex-col items-end justify-between self-stretch">
-                  <span className="text-[9px] font-mono font-semibold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">
-                    {previewShipment.status}
-                  </span>
-                  <span className="text-[9px] font-mono text-slate-400">
-                    ETA: {previewShipment.eta}
-                  </span>
-                </div>
-              </div>
-            );
-          })()}
-        </div>
-
-      </div>
-
-      {/* RIGHT SLIDE-OVER SIDEBAR DRAWER FOR ALL SHIPMENTS */}
+      {/* SLIDE-OVER SHIPMENTS DRAWER */}
       <AnimatePresence>
         {showShipmentsDrawer && (
-          <div className="fixed inset-0 z-50 overflow-hidden flex justify-end">
-            {/* Backdrop */}
-            <motion.div
+          <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 backdrop-blur-xs">
+            <motion.div 
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowShipmentsDrawer(false)}
-              className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs transition-opacity"
+              className="absolute inset-0"
             />
-
-            {/* Sidebar Slide-over Panel */}
+            
             <motion.div
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 260 }}
               className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col z-10 border-l border-slate-200"
             >
               {/* Drawer Header */}
-              <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-[#E35D3B]">
-                    <Truck className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h2 className="text-sm font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                      {language === 'zh' ? '在途运单与国际物流监控' : 'All Active Consignments & Tracking'}
-                      <span className="text-[10px] font-mono bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
-                        {activeShipments.length} LIVE
-                      </span>
-                    </h2>
-                    <p className="text-[11px] text-slate-500">
-                      {language === 'zh' ? '顺丰空运、美森快船与特快专递实时轨迹回传' : 'Real-time GPS telemetry and freight checkpoints'}
-                    </p>
-                  </div>
+              <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">
+                    {language === 'zh' ? '在途采购运单库' : 'Tracked Sourced Shipments'}
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    {language === 'zh' ? '共 3 笔跨国在途物流运单已同步' : '3 international freight shipments active'}
+                  </p>
                 </div>
-
                 <button
                   type="button"
                   onClick={() => setShowShipmentsDrawer(false)}
-                  className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-xl transition-all cursor-pointer"
-                  aria-label="Close sidebar"
+                  className="w-8 h-8 rounded-xl border border-slate-200 hover:bg-slate-100 flex items-center justify-center text-slate-500 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
-              {/* Drawer Search & Filter Chips */}
-              <div className="p-4 border-b border-slate-100 space-y-2.5 bg-white">
+              {/* Filter Tabs & Search */}
+              <div className="p-4 border-b border-slate-100 flex flex-col gap-3 bg-slate-50/50">
                 <div className="relative">
-                  <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
                     value={drawerSearch}
                     onChange={(e) => setDrawerSearch(e.target.value)}
-                    placeholder={language === 'zh' ? '搜索运单号、品名或目的地...' : 'Search by waybill #, cargo title, or destination...'}
-                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#E35D3B]/20 focus:border-[#E35D3B] transition-all"
+                    placeholder={language === 'zh' ? '搜索运单号、品名或承运商...' : 'Search by ID, product or carrier...'}
+                    className="w-full pl-8 pr-3 py-1.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#E35D3B] text-slate-800 placeholder-slate-400"
                   />
-                  {drawerSearch && (
-                    <button
-                      type="button"
-                      onClick={() => setDrawerSearch('')}
-                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  )}
                 </div>
 
-                <div className="flex items-center gap-1.5 text-xs">
+                <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => setDrawerFilter('all')}
-                    className={`px-2.5 py-1 rounded-lg font-medium text-[11px] transition-all cursor-pointer ${
-                      drawerFilter === 'all'
-                        ? 'bg-slate-900 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+                    className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                      drawerFilter === 'all' 
+                        ? 'bg-slate-900 text-white' 
+                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
                     }`}
                   >
-                    {language === 'zh' ? '全部专线' : 'All Freight'} ({activeShipments.length})
+                    {language === 'zh' ? '全部 (3)' : 'All (3)'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setDrawerFilter('air')}
-                    className={`px-2.5 py-1 rounded-lg font-medium text-[11px] transition-all cursor-pointer ${
-                      drawerFilter === 'air'
-                        ? 'bg-slate-900 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+                    className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 ${
+                      drawerFilter === 'air' 
+                        ? 'bg-slate-900 text-white' 
+                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
                     }`}
                   >
-                    {language === 'zh' ? '空运特快' : 'Air Express'} (2)
+                    <Plane className="w-3 h-3" />
+                    {language === 'zh' ? '国际空运 (2)' : 'Air Freight (2)'}
                   </button>
                   <button
                     type="button"
                     onClick={() => setDrawerFilter('sea')}
-                    className={`px-2.5 py-1 rounded-lg font-medium text-[11px] transition-all cursor-pointer ${
-                      drawerFilter === 'sea'
-                        ? 'bg-slate-900 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200/70'
+                    className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 ${
+                      drawerFilter === 'sea' 
+                        ? 'bg-slate-900 text-white' 
+                        : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-100'
                     }`}
                   >
-                    {language === 'zh' ? '海运快船' : 'Sea Freight'} (1)
+                    <Anchor className="w-3 h-3" />
+                    {language === 'zh' ? '快船海运 (1)' : 'Ocean Freight (1)'}
                   </button>
                 </div>
               </div>
 
-              {/* Drawer Content: Shipment Cards List */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {/* Shipments List */}
+              <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
                 {activeShipments
-                  .filter((s) => {
-                    if (drawerFilter === 'air' && !s.carrier.includes('Air') && !s.carrier.includes('空运') && !s.carrier.includes('DHL')) return false;
-                    if (drawerFilter === 'sea' && !s.carrier.includes('Sea') && !s.carrier.includes('海运')) return false;
-                    if (drawerSearch) {
+                  .filter(s => {
+                    if (drawerFilter !== 'all' && s.type !== drawerFilter) return false;
+                    if (drawerSearch.trim()) {
                       const query = drawerSearch.toLowerCase();
-                      return (
-                        s.id.toLowerCase().includes(query) ||
-                        s.title.toLowerCase().includes(query) ||
-                        s.destination.toLowerCase().includes(query) ||
-                        s.carrier.toLowerCase().includes(query)
-                      );
+                      return s.id.toLowerCase().includes(query) || 
+                             s.title.toLowerCase().includes(query) || 
+                             s.carrier.toLowerCase().includes(query);
                     }
                     return true;
                   })
                   .map((shipment) => {
-                    const origIndex = activeShipments.findIndex((x) => x.id === shipment.id);
-                    const isSelected = origIndex === activeShipmentIndex;
+                    const originalIndex = activeShipments.findIndex(s => s.id === shipment.id);
+                    const isSelected = originalIndex === activeShipmentIndex;
                     return (
                       <div
                         key={shipment.id}
-                        className={`rounded-2xl border p-3.5 transition-all space-y-3 ${
-                          isSelected
-                            ? 'bg-orange-50/40 border-orange-300 ring-1 ring-[#E35D3B]/20 shadow-xs'
-                            : 'bg-white border-slate-200/80 hover:border-slate-300 shadow-2xs'
+                        className={`p-4 rounded-2xl border transition-all ${
+                          isSelected 
+                            ? 'bg-orange-50/40 border-orange-200 shadow-xs' 
+                            : 'bg-white border-slate-200 hover:border-slate-300'
                         }`}
                       >
-                        {/* Top info */}
                         <div className="flex items-start justify-between gap-2">
                           <div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-900 text-white">
-                                {shipment.carrierShort}
+                            <div className="flex items-center gap-2">
+                              <span className="font-mono text-xs font-bold text-slate-900">{shipment.id}</span>
+                              <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${
+                                shipment.statusColor === 'text-emerald-600'
+                                  ? 'bg-emerald-100 text-emerald-800'
+                                  : 'bg-orange-100 text-[#E35D3B]'
+                              }`}>
+                                {shipment.status}
                               </span>
-                              <span className="text-xs font-mono font-bold text-slate-900">
-                                {shipment.id}
-                              </span>
-                              {isSelected && (
-                                <span className="text-[10px] font-bold text-[#E35D3B] bg-orange-100/80 px-1.5 py-0.2 rounded">
-                                  {language === 'zh' ? '主图跟踪中' : 'Active on Map'}
-                                </span>
-                              )}
                             </div>
-                            <h4 className="text-xs font-semibold text-slate-800 mt-1 leading-snug">
-                              {shipment.title}
-                            </h4>
+                            <h4 className="text-xs font-bold text-slate-800 mt-1">{shipment.title}</h4>
                           </div>
 
-                          <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">
-                            {shipment.status}
+                          <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
+                            {shipment.internalId}
                           </span>
                         </div>
 
-                        {/* Route & ETA */}
-                        <div className="bg-slate-50 rounded-xl p-2.5 border border-slate-100 flex items-center justify-between text-[11px]">
-                          <div className="min-w-0 pr-2">
-                            <span className="text-[10px] text-slate-400 block font-medium">
-                              {language === 'zh' ? '始发与目的口岸' : 'Origin → Destination'}
-                            </span>
-                            <span className="font-semibold text-slate-700 truncate block mt-0.5">
-                              {shipment.origin.split(' ')[0]} → {shipment.destination.split(',')[0]}
+                        <div className="mt-2.5 text-xs text-slate-600 flex flex-col gap-1 bg-slate-50 p-2.5 rounded-xl">
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="text-slate-400">{language === 'zh' ? '起运 -> 目的仓' : 'Route'}:</span>
+                            <span className="font-medium text-slate-800 truncate max-w-[200px]">
+                              {shipment.origin.split(' ')[0]} ➔ {shipment.destination.split(' ')[0]}
                             </span>
                           </div>
-
-                          <div className="shrink-0 text-right">
-                            <span className="text-[10px] text-slate-400 block font-medium">
-                              {language === 'zh' ? '预计送达' : 'Estimated ETA'}
-                            </span>
-                            <span className="font-mono font-bold text-slate-900 mt-0.5 block">
-                              {shipment.eta}
-                            </span>
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="text-slate-400">{language === 'zh' ? '承运渠道' : 'Carrier'}:</span>
+                            <span className="font-medium text-slate-800">{shipment.carrier}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="text-slate-400">{language === 'zh' ? '预计送达' : 'Estimated ETA'}:</span>
+                            <span className="font-mono font-semibold text-emerald-600">{shipment.eta}</span>
+                          </div>
+                          <div className="flex items-center justify-between text-[11px]">
+                            <span className="text-slate-400">{language === 'zh' ? '货重与体积' : 'Cargo Specs'}:</span>
+                            <span className="font-mono text-slate-700">{shipment.weight} • {shipment.volume} • {shipment.cartons}</span>
                           </div>
                         </div>
 
-                        {/* Cargo specs */}
-                        <div className="grid grid-cols-3 gap-1.5 text-[10px]">
-                          <div className="bg-white p-1.5 rounded-lg border border-slate-100">
-                            <span className="text-slate-400 block">{language === 'zh' ? '毛重/体积' : 'Weight/Vol'}</span>
-                            <span className="font-mono font-semibold text-slate-800 mt-0.5 block truncate">{shipment.weight}</span>
-                          </div>
-                          <div className="bg-white p-1.5 rounded-lg border border-slate-100">
-                            <span className="text-slate-400 block">{language === 'zh' ? '库区库位' : 'Hub Bay'}</span>
-                            <span className="font-semibold text-slate-800 mt-0.5 block truncate">{shipment.hubBay.split(' ')[1] || shipment.hubBay}</span>
-                          </div>
-                          <div className="bg-white p-1.5 rounded-lg border border-slate-100">
-                            <span className="text-slate-400 block">{language === 'zh' ? '包装规格' : 'Cartons'}</span>
-                            <span className="font-semibold text-slate-800 mt-0.5 block truncate">{shipment.cartons.split('(')[0]}</span>
-                          </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex items-center gap-2 pt-1 border-t border-slate-100">
+                        <div className="mt-3 flex items-center justify-between pt-2 border-t border-slate-100">
                           <button
                             type="button"
                             onClick={() => {
-                              setActiveShipmentIndex(origIndex);
-                              setShowShipmentsDrawer(false);
-                              if (onShowToast) {
-                                onShowToast(language === 'zh' ? `已切换为主图实时跟踪: ${shipment.id}` : `Loaded live GPS telemetry on main map for ${shipment.id}`);
-                              }
+                              navigator.clipboard?.writeText(shipment.id);
+                              onShowToast?.(`Copied ${shipment.id}`);
                             }}
-                            className={`flex-1 py-1.5 px-2.5 rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1 transition-all cursor-pointer ${
+                            className="text-[11px] text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium"
+                          >
+                            <Copy className="w-3 h-3" />
+                            <span>{language === 'zh' ? '复制单号' : 'Copy ID'}</span>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setActiveShipmentIndex(originalIndex);
+                              setShowShipmentsDrawer(false);
+                              onShowToast?.(language === 'zh' ? `已切换至运单 ${shipment.id}` : `Viewing shipment ${shipment.id}`);
+                            }}
+                            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-colors flex items-center gap-1 ${
                               isSelected
-                                ? 'bg-slate-900 text-white hover:bg-slate-800 shadow-2xs'
-                                : 'bg-[#E35D3B] text-white hover:bg-[#c84d2e] shadow-2xs'
+                                ? 'bg-orange-100 text-[#E35D3B]'
+                                : 'bg-[#E35D3B] hover:bg-[#d04f2f] text-white'
                             }`}
                           >
-                            <Navigation className="w-3 h-3" />
-                            <span>{isSelected ? (language === 'zh' ? '正在主图跟踪中' : 'Tracking on Map') : (language === 'zh' ? '切换为主图跟踪' : 'Track on Map')}</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              navigator.clipboard.writeText(shipment.id);
-                              if (onShowToast) {
-                                onShowToast(language === 'zh' ? `已复制国际运单号: ${shipment.id}` : `Copied tracking number: ${shipment.id}`);
-                              }
-                            }}
-                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all cursor-pointer"
-                            title={t.copyWaybillId}
-                          >
-                            <Copy className="w-3.5 h-3.5" />
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const matchingOrder = orders.find(
-                                (o) => o.orderId === shipment.internalId || (o.trackingNumber && o.trackingNumber.includes(shipment.id))
-                              ) || orders[0];
-                              if (onOpenOrderDetail && matchingOrder) {
-                                setShowShipmentsDrawer(false);
-                                onOpenOrderDetail(matchingOrder);
-                              } else if (onShowToast) {
-                                onShowToast(language === 'zh' ? `正在调取 ${shipment.id} 实时品控与清关档案...` : `Opening QC dossier for ${shipment.id}...`);
-                              }
-                            }}
-                            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition-all cursor-pointer"
-                            title={language === 'zh' ? '查看质检档案' : 'Inspect QC'}
-                          >
-                            <FileText className="w-3.5 h-3.5" />
+                            {isSelected ? (language === 'zh' ? '正在查看' : 'Viewing') : (language === 'zh' ? '查看此单' : 'Track Order')}
+                            <ChevronRight className="w-3 h-3" />
                           </button>
                         </div>
                       </div>
                     );
                   })}
               </div>
-
-              {/* Drawer Footer Trust Banner */}
-              <div className="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1.5 text-slate-600 font-medium text-[11px]">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                  {language === 'zh' ? '全额代管担保与货运一切险已生效' : '100% Escrow & Freight Cargo Protection'}
-                </span>
-                <span className="text-[10px] font-mono text-emerald-700 bg-emerald-100 font-semibold px-2 py-0.5 rounded">
-                  SLA: 99.4%
-                </span>
-              </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 };
-
