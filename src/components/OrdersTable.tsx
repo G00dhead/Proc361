@@ -275,7 +275,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
   ];
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden">
+    <div id="orders-table" className="bg-white rounded-3xl border border-slate-200/90 shadow-2xs overflow-hidden scroll-mt-20">
       {/* Top Controls & Filter Navigation Bar */}
       <div className="p-3 sm:p-4 border-b border-slate-200/80 bg-slate-50/60 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         {/* Navigation Filter Tabs - Segmented Controller with Dedicated Status Badges */}

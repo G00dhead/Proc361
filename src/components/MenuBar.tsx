@@ -70,14 +70,32 @@ export const MenuBar: React.FC<MenuBarProps> = ({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [localSearch, setLocalSearch] = useState(searchQuery);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
 
   const accountRef = useRef<HTMLDivElement>(null);
   const helpRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLocalSearch(searchQuery);
   }, [searchQuery]);
+
+  // Global shortcut ⌘K / Ctrl+K to quickly focus order search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        setIsSearchFocused(true);
+      } else if (e.key === 'Escape') {
+        setIsSearchFocused(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -103,6 +121,9 @@ export const MenuBar: React.FC<MenuBarProps> = ({
       if (langRef.current && !langRef.current.contains(event.target as Node)) {
         setIsLangMenuOpen(false);
       }
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsSearchFocused(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -113,10 +134,21 @@ export const MenuBar: React.FC<MenuBarProps> = ({
     if (onSearchChange) {
       onSearchChange(localSearch);
     }
-    if (onShowToast && localSearch) {
-      onShowToast(language === 'zh' ? `正在搜索订单: "${localSearch}"...` : `Searching orders for "${localSearch}"...`);
+    if (onShowToast) {
+      if (localSearch.trim()) {
+        onShowToast(language === 'zh' ? `已定位筛选包含 "${localSearch}" 的订单` : `Filtered orders for "${localSearch}"`);
+      } else {
+        onShowToast(language === 'zh' ? '显示全部采购订单' : 'Showing all orders');
+      }
     }
     setIsMobileSearchOpen(false);
+    setIsSearchFocused(false);
+
+    // Smoothly scroll down to the orders table so the results are immediately visible
+    const tableEl = document.getElementById('orders-table');
+    if (tableEl) {
+      tableEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const navMenuItems = [
@@ -209,50 +241,108 @@ export const MenuBar: React.FC<MenuBarProps> = ({
         </div>
 
         {/* Center Section: Wide Search Bar for Desktop/Tablet */}
-        <form 
-          onSubmit={handleSearchSubmit}
-          className="hidden md:flex flex-1 max-w-2xl min-w-[140px]"
-        >
-          <div className="flex items-center w-full h-9 sm:h-10 border border-slate-300 rounded-md bg-white focus-within:border-[#f68b1e] focus-within:ring-1 focus-within:ring-[#f68b1e] transition-all overflow-hidden shadow-2xs">
-            {/* Search Icon */}
-            <div className="pl-3 pr-1.5 text-slate-400 flex items-center justify-center">
-              <Search className="w-4 h-4 stroke-[2]" />
-            </div>
+        <div ref={searchContainerRef} className="hidden md:flex flex-1 max-w-2xl min-w-[160px] relative">
+          <form 
+            onSubmit={handleSearchSubmit}
+            className="w-full"
+          >
+            <div className="flex items-center w-full h-10 border border-slate-300/90 rounded-xl bg-white focus-within:border-[#f68b1e] focus-within:ring-2 focus-within:ring-orange-100 transition-all shadow-xs overflow-hidden">
+              {/* Search Icon */}
+              <div className="pl-3 pr-2 text-slate-400 flex items-center justify-center shrink-0">
+                <Search className="w-4 h-4 text-slate-400 stroke-[2.2]" />
+              </div>
 
-            {/* Search Input for Orders */}
-            <input
-              type="text"
-              value={localSearch}
-              onChange={(e) => {
-                setLocalSearch(e.target.value);
-                if (onSearchChange) onSearchChange(e.target.value);
-              }}
-              placeholder={t('searchPlaceholder')}
-              className="w-full h-full text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 bg-transparent focus:outline-none"
-            />
-
-            {localSearch && (
-              <button
-                type="button"
-                onClick={() => {
-                  setLocalSearch('');
-                  if (onSearchChange) onSearchChange('');
+              {/* Search Input for Orders */}
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={localSearch}
+                onFocus={() => setIsSearchFocused(true)}
+                onChange={(e) => {
+                  setLocalSearch(e.target.value);
+                  if (onSearchChange) onSearchChange(e.target.value);
                 }}
-                className="px-2 text-slate-400 hover:text-slate-600 text-xs font-bold cursor-pointer h-full flex items-center justify-center min-w-[32px]"
-              >
-                ✕
-              </button>
-            )}
+                placeholder={t('searchPlaceholder')}
+                className="w-full h-full text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 bg-transparent focus:outline-none"
+              />
 
-            {/* Attached Orange Search Button */}
-            <button
-              type="submit"
-              className="h-full bg-[#f68b1e] hover:bg-[#e07d17] active:bg-[#c96f14] text-white font-bold text-xs sm:text-sm px-3 sm:px-5 transition-colors uppercase tracking-wide shrink-0 cursor-pointer flex items-center justify-center shadow-inner min-h-[36px]"
+              {/* Shortcut badge when empty */}
+              {!localSearch && (
+                <div className="hidden lg:flex items-center pr-2 shrink-0 select-none">
+                  <kbd className="inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-medium text-slate-400 bg-slate-100 rounded border border-slate-200">
+                    ⌘K
+                  </kbd>
+                </div>
+              )}
+
+              {/* Clear button when input has text */}
+              {localSearch && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLocalSearch('');
+                    if (onSearchChange) onSearchChange('');
+                    searchInputRef.current?.focus();
+                  }}
+                  title={language === 'zh' ? '清空搜索' : 'Clear search'}
+                  className="px-2.5 text-slate-400 hover:text-slate-700 text-xs font-bold cursor-pointer h-full flex items-center justify-center shrink-0 transition-colors"
+                >
+                  ✕
+                </button>
+              )}
+
+              {/* Optimized High-Contrast Search Button */}
+              <button
+                type="submit"
+                aria-label={language === 'zh' ? '搜索采购订单' : 'Search procurement orders'}
+                className="h-full bg-gradient-to-r from-[#f68b1e] to-[#e67a0d] hover:from-[#e07d17] hover:to-[#d46d04] active:scale-[0.98] text-white font-bold text-xs sm:text-sm px-4 sm:px-5 transition-all uppercase tracking-wider shrink-0 cursor-pointer flex items-center justify-center gap-1.5 shadow-xs select-none min-h-[40px]"
+              >
+                <Search className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>{t('searchBtn')}</span>
+              </button>
+            </div>
+          </form>
+
+          {/* Quick Search Suggestions Popover when focused */}
+          {isSearchFocused && (
+            <div 
+              className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-slate-200 rounded-2xl shadow-xl p-3 z-50 text-xs animate-in fade-in zoom-in-95 duration-100"
+              onMouseDown={(e) => e.preventDefault()}
             >
-              {t('searchBtn')}
-            </button>
-          </div>
-        </form>
+              <div className="flex items-center justify-between text-[11px] font-semibold text-slate-400 mb-2 uppercase tracking-wider">
+                <span>{language === 'zh' ? '快捷筛选词' : 'Quick Search Filters'}</span>
+                <span className="font-mono text-[10px] text-slate-400">ESC {language === 'zh' ? '关闭' : 'to close'}</span>
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {[
+                  { label: '1688', query: '1688' },
+                  { label: 'Taobao', query: 'Taobao' },
+                  { label: language === 'zh' ? '待付款' : 'Payment Pending', query: 'Payment' },
+                  { label: language === 'zh' ? '待质检' : 'In QC', query: 'QC' },
+                  { label: language === 'zh' ? '转运中' : 'In Transit', query: 'Transit' },
+                  { label: language === 'zh' ? '东莞仓' : 'Dongguan', query: 'Dongguan' },
+                ].map((item) => (
+                  <button
+                    key={item.query}
+                    type="button"
+                    onClick={() => {
+                      setLocalSearch(item.query);
+                      if (onSearchChange) onSearchChange(item.query);
+                      setIsSearchFocused(false);
+                      const tableEl = document.getElementById('orders-table');
+                      if (tableEl) {
+                        tableEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }
+                    }}
+                    className="px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-orange-50 hover:text-[#f68b1e] hover:border-orange-200 border border-slate-200 text-slate-700 font-medium text-xs transition-colors cursor-pointer flex items-center gap-1"
+                  >
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* DESKTOP Right Section: Language + Focus View + Account + Help */}
         <div className="hidden md:flex items-center gap-1.5 sm:gap-2.5 shrink-0">
@@ -587,9 +677,11 @@ export const MenuBar: React.FC<MenuBarProps> = ({
               </div>
               <button
                 type="submit"
-                className="h-10 px-4 bg-[#f68b1e] active:bg-[#e07d17] text-white font-bold text-xs rounded-xl shadow-xs shrink-0 cursor-pointer"
+                aria-label={language === 'zh' ? '搜索采购订单' : 'Search procurement orders'}
+                className="h-10 px-4 bg-gradient-to-r from-[#f68b1e] to-[#e67a0d] active:from-[#e07d17] active:to-[#d46d04] text-white font-bold text-xs rounded-xl shadow-xs shrink-0 cursor-pointer flex items-center justify-center gap-1.5"
               >
-                {t('searchBtn')}
+                <Search className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>{t('searchBtn')}</span>
               </button>
             </form>
           </motion.div>
