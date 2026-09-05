@@ -334,11 +334,9 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
 
   return (
     <>
-      <div className="w-full flex flex-col xl:flex-row items-stretch gap-4 sm:gap-5">
-        {/* LEFT SECTION: 3 STAT CARDS + ORDER ANALYSIS CHART */}
-        <div className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-5">
-          {/* TOP ROW: 3 STAT CARDS */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+      <div className="w-full flex flex-col gap-4 sm:gap-5">
+        {/* TOP ROW: 3 STAT CARDS */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
           
           {/* Card 1: Total Orders */}
           <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
@@ -512,11 +510,12 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
             </div>
 
           </div>
-
         </div>
 
-        {/* BOTTOM ROW: ORDER ANALYSIS CHART */}
-        <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs relative flex flex-col gap-3">
+        {/* ROW: ORDER ANALYSIS GRAPH (LEFT) + TRACK ORDERS (RIGHT) */}
+        <div className="w-full flex flex-col lg:flex-row items-stretch gap-4 sm:gap-5">
+          {/* LEFT: ORDER ANALYSIS CHART (THE GRAPH) */}
+          <div className="flex-1 min-w-0 bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs relative flex flex-col justify-between gap-3">
           {/* Header Controls: Responsive Flex Wrap Row */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100/90">
             {/* Title & Legend Pill */}
@@ -606,7 +605,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
           </div>
 
           {/* Chart Content Area */}
-          <div className="pt-0">
+          <div className="pt-0 flex-1 flex flex-col justify-between">
             {/* Chart Legend Indicators */}
             <div className="flex items-center justify-between gap-3 text-xs font-medium text-slate-600 mb-2.5 flex-wrap">
               <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
@@ -627,7 +626,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
             {/* Custom SVG Visualization Container */}
             <div 
               ref={chartContainerRef}
-              className="relative w-full bg-white rounded-2xl p-2 sm:p-3.5 border border-slate-200/80 select-none shadow-2xs"
+              className="relative w-full flex-1 bg-white rounded-2xl p-2 sm:p-3.5 border border-slate-200/80 select-none shadow-2xs flex flex-col justify-center"
               onClick={() => {
                 // Clicking on the container background clears the tooltip
                 setHoveredIndex(null);
@@ -650,7 +649,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                 ref={chartScrollRef}
                 className="relative w-full overflow-x-auto overflow-y-visible scrollbar-none sm:overflow-visible -mx-0.5 px-0.5 touch-pan-x"
               >
-                <div className="min-w-[620px] sm:min-w-full relative h-[215px] xs:h-[235px] sm:h-[270px] md:h-[290px]">
+                <div className="min-w-[620px] sm:min-w-full relative h-[230px] xs:h-[250px] sm:h-[285px] md:h-[310px] lg:h-[330px]">
                 {chartType === 'line' ? (
                   <svg 
                     className="w-full h-full block cursor-pointer" 
@@ -1026,11 +1025,45 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               </div>
             </div>
             </div>
+
+            {/* Bottom Sourcing Intelligence Strip: fills vertical space and surfaces core operational KPIs */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 pt-2.5 sm:pt-3 border-t border-slate-100 mt-1 text-xs">
+              <div className="bg-slate-50/90 rounded-xl p-2 sm:p-2.5 border border-slate-100/90 flex flex-col justify-between">
+                <span className="text-[10px] text-slate-500 font-medium">{language === 'zh' ? '质检一次合格率' : '1st-Pass QC Rate'}</span>
+                <div className="flex items-baseline gap-1 mt-0.5 sm:mt-1">
+                  <span className="text-xs sm:text-sm font-bold text-emerald-600 font-mono">98.4%</span>
+                  <span className="text-[9.5px] text-emerald-600 font-medium">↑1.2%</span>
+                </div>
+              </div>
+
+              <div className="bg-slate-50/90 rounded-xl p-2 sm:p-2.5 border border-slate-100/90 flex flex-col justify-between">
+                <span className="text-[10px] text-slate-500 font-medium">{language === 'zh' ? '供应商平均入库' : 'Avg Hub Inbound'}</span>
+                <div className="flex items-baseline gap-1 mt-0.5 sm:mt-1">
+                  <span className="text-xs sm:text-sm font-bold text-slate-900 font-mono">2.4 {language === 'zh' ? '天' : 'Days'}</span>
+                  <span className="text-[9.5px] text-emerald-600 font-medium">-0.4d</span>
+                </div>
+              </div>
+
+              <div className="bg-slate-50/90 rounded-xl p-2 sm:p-2.5 border border-slate-100/90 flex flex-col justify-between">
+                <span className="text-[10px] text-slate-500 font-medium">{language === 'zh' ? '已追回返利/折损' : 'Reclaimed Rebates'}</span>
+                <div className="flex items-baseline gap-1 mt-0.5 sm:mt-1">
+                  <span className="text-xs sm:text-sm font-bold text-slate-900 font-mono">¥48,250</span>
+                  <span className="text-[9.5px] text-slate-400 font-mono hidden xl:inline">($6.7k)</span>
+                </div>
+              </div>
+
+              <div className="bg-slate-50/90 rounded-xl p-2 sm:p-2.5 border border-slate-100/90 flex flex-col justify-between">
+                <span className="text-[10px] text-slate-500 font-medium">{language === 'zh' ? '流速复合环比' : 'Sourcing Velocity'}</span>
+                <div className="flex items-baseline gap-1 mt-0.5 sm:mt-1">
+                  <span className="text-xs sm:text-sm font-bold text-blue-600 font-mono">+16.8%</span>
+                  <span className="text-[9.5px] text-blue-600 font-medium">MoM</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
 
         {/* RIGHT SECTION: TRACK ORDERS / SHIPMENT CARD */}
-        <div className="w-full xl:w-[360px] shrink-0 bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col gap-3.5 overflow-hidden">
+        <div className="w-full lg:w-[350px] xl:w-[370px] shrink-0 bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col gap-3.5 overflow-hidden">
           
           {/* Card Header */}
           <div className="flex items-center justify-between relative pb-2.5 border-b border-slate-100">
@@ -1317,7 +1350,8 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
           </div>
 
         </div> {/* Closes RIGHT SECTION */}
-      </div> {/* Closes OUTER ROW */}
+      </div> {/* Closes ROW WITH GRAPH + TRACK ORDERS */}
+      </div> {/* Closes OUTER CONTAINER */}
 
       {/* SLIDE-OVER SHIPMENTS DRAWER */}
       <AnimatePresence>

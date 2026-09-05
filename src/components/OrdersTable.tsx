@@ -431,29 +431,21 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
               </th>
               <th className="py-2.5 px-2.5 font-medium">{t.productSupplier}</th>
               <th 
-                className="py-2.5 px-2 font-medium cursor-pointer hover:text-slate-700"
+                className="py-2.5 px-3 font-medium cursor-pointer hover:text-slate-700 text-right"
                 onClick={() => handleSetSort('price', sortDirection === 'asc' ? 'desc' : 'asc', t.amountRmb)}
               >
                 <Tooltip title={t.amountRmb} content={language === 'zh' ? '采购总额（人民币及折算美元）' : "Total wholesale procurement cost in RMB & converted USD"} position="top" width="w-56">
-                  <div className="flex items-center gap-1">
+                  <div className="flex items-center justify-end gap-1">
                     <span>{t.amountRmb}</span>
                     {sortField === 'price' && (sortDirection === 'asc' ? <ArrowUp className="w-3 h-3" /> : <ArrowDown className="w-3 h-3" />)}
                   </div>
                 </Tooltip>
               </th>
-              <th className="py-2.5 px-2 font-medium">
-                <Tooltip title={t.pickup} content={language === 'zh' ? '国内供应商工厂与发货城市' : "Vendor factory & dispatch location in China"} position="top" width="w-52">
-                  <span>{t.pickup}</span>
-                </Tooltip>
-              </th>
-              <th className="py-2.5 px-2 font-medium">
-                <Tooltip title={t.delivery} content={language === 'zh' ? '集运中转仓（东莞/义乌/深圳）或海外目的港' : "Hub warehouse (Dongguan/Yiwu) or overseas destination"} position="top" width="w-56">
-                  <span>{t.delivery}</span>
-                </Tooltip>
-              </th>
-              <th className="py-2.5 px-2 font-medium">
-                <Tooltip title={t.estDelivery} content={language === 'zh' ? '基于承运商遥测的预计送达时间' : "Target transit date based on carrier telemetry"} position="top" width="w-52">
-                  <span>{t.estDelivery}</span>
+              <th className="py-2.5 px-3 font-medium">
+                <Tooltip title={language === 'zh' ? '国内中转路线与预计时效' : "Transit Route & Target ETA"} content={language === 'zh' ? '供应商发货地至集运中转仓（东莞/义乌/深圳）以及预计送达日期' : "Origin factory in China to hub warehouse and carrier estimated delivery date"} position="top" width="w-56">
+                  <div className="flex items-center gap-1">
+                    <span>{language === 'zh' ? '运输路线 / 枢纽' : 'Route / Hub & ETA'}</span>
+                  </div>
                 </Tooltip>
               </th>
               <th className="py-2.5 px-2 font-medium">
@@ -473,13 +465,14 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
             transition={{ duration: 0.18, ease: 'easeOut' }}
             className="divide-y divide-slate-100"
           >
-            {displayedOrders.map((order) => {
+            {displayedOrders.map((order, idx) => {
               const isSelected = selectedOrderIds.includes(order.id);
               const origin = getOriginInfo(order);
               const destination = getDestinationInfo(order);
               const estDelivery = getEstDelivery(order);
               const status = getStatusBadge(order);
               const isNeedsAction = order.zone === 'NEEDS_ACTION';
+              const isEven = idx % 2 === 0;
 
               // Check if order was recently updated for subtle highlight/fade-in animation
               const isRecentlyUpdated = recentlyUpdatedOrderIds && 
@@ -492,12 +485,16 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                   onClick={() => onOpenOrderDetail(order)}
                   className={`group cursor-pointer transition-colors duration-150 ${
                     isRecentlyUpdated
-                      ? 'animate-row-update bg-amber-50/80 ring-1 ring-orange-400/70 border-l-4 border-l-[#E35D3B]'
+                      ? 'animate-row-update bg-amber-50/90 ring-1 ring-orange-400/70 border-l-4 border-l-[#E35D3B]'
                       : isSelected
-                      ? 'bg-slate-50/90 ring-1 ring-inset ring-slate-200'
+                      ? 'bg-slate-100/90 ring-1 ring-inset ring-slate-300/80'
                       : isNeedsAction
-                      ? 'hover:bg-amber-50/40 bg-amber-50/10'
-                      : 'hover:bg-slate-50/80'
+                      ? isEven
+                        ? 'bg-amber-50/40 hover:bg-amber-100/50'
+                        : 'bg-amber-50/15 hover:bg-amber-100/35'
+                      : isEven
+                      ? 'bg-white hover:bg-slate-100/60'
+                      : 'bg-slate-50/80 hover:bg-slate-100/80'
                   }`}
                 >
                   {/* Checkbox */}
@@ -523,7 +520,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                   </td>
 
                   {/* Product & Supplier (Avatar / Title) */}
-                  <td className="py-2.5 px-2.5 max-w-[220px] lg:max-w-xs">
+                  <td className="py-2.5 px-2.5 min-w-0 max-w-[170px] sm:max-w-[200px] xl:max-w-[240px]">
                     <div className="flex items-center gap-2.5">
                       <div className="relative shrink-0">
                         <img
@@ -570,34 +567,28 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                   </td>
 
                   {/* Amount (RMB) Primary */}
-                  <td className="py-2.5 px-2 whitespace-nowrap">
-                    <div className="font-mono font-bold text-slate-900 text-xs">
+                  <td className="py-2.5 px-3 whitespace-nowrap text-right">
+                    <div className="font-mono font-bold text-slate-900 text-xs text-right">
                       ¥{order.priceRMB.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
-                    <div className="text-[10px] font-mono text-slate-400">
+                    <div className="text-[10px] font-mono text-slate-400 text-right">
                       ${order.priceUSD.toFixed(2)} • {order.weightKg.toFixed(1)}kg
                     </div>
                   </td>
 
-                  {/* Pickup Address / Origin */}
-                  <td className="py-2.5 px-2 whitespace-nowrap">
-                    <div className="flex items-center gap-1">
+                  {/* Route, Hub & Target Delivery ETA Combined */}
+                  <td className="py-2.5 px-3 whitespace-nowrap">
+                    <div className="flex items-center gap-1 text-xs">
                       <span className="text-xs leading-none">{origin.flag}</span>
-                      <span className="font-medium text-slate-700 text-xs">{origin.city}</span>
-                    </div>
-                  </td>
-
-                  {/* Delivery Address / Hub */}
-                  <td className="py-2.5 px-2 whitespace-nowrap">
-                    <div className="flex items-center gap-1">
+                      <span className="font-medium text-slate-800">{origin.city}</span>
+                      <span className="text-slate-400 text-[10px] mx-0.5">➔</span>
                       <span className="text-xs leading-none">{destination.flag}</span>
-                      <span className="font-medium text-slate-700 text-xs">{destination.city}</span>
+                      <span className="font-medium text-slate-800">{destination.city}</span>
                     </div>
-                  </td>
-
-                  {/* Est. Delivery */}
-                  <td className="py-2.5 px-2 text-xs font-medium text-slate-600 whitespace-nowrap">
-                    {estDelivery}
+                    <div className="text-[10px] text-slate-400 font-mono mt-0.5 flex items-center gap-1">
+                      <span>{language === 'zh' ? '预计送达' : 'Est'}:</span>
+                      <span className="text-slate-600 font-medium">{estDelivery}</span>
+                    </div>
                   </td>
 
                   {/* Status with Dot + Updated Pill */}
