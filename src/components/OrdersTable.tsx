@@ -400,7 +400,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
         <table className="w-full text-left text-xs border-collapse">
           <thead>
             <tr className="border-b border-slate-100 text-[11px] font-medium text-slate-400 tracking-wider select-none bg-slate-50/50">
-              <th className="py-2.5 px-3 sm:px-4 w-9">
+              <th className="py-2.5 px-2 sm:px-4 w-7 sm:w-9">
                 <input
                   type="checkbox"
                   aria-label="Select all ready to consolidate items"
@@ -419,7 +419,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                 />
               </th>
               <th 
-                className="py-2.5 px-2 font-medium cursor-pointer hover:text-slate-700"
+                className="hidden sm:table-cell py-2.5 px-2 font-medium cursor-pointer hover:text-slate-700"
                 onClick={() => handleSetSort('orderNumber', sortDirection === 'asc' ? 'desc' : 'asc', t.orderId)}
               >
                 <Tooltip title={t.orderId} content={language === 'zh' ? 'Proc360 采购单唯一跟踪编码' : "Proc360 unique purchase order tracking identifier"} position="top" width="w-52">
@@ -429,9 +429,9 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                   </div>
                 </Tooltip>
               </th>
-              <th className="py-2.5 px-2.5 font-medium">{t.productSupplier}</th>
+              <th className="py-2.5 px-2 sm:px-2.5 font-medium sticky left-7 sm:static bg-slate-50/95 sm:bg-transparent z-10">{t.productSupplier}</th>
               <th 
-                className="py-2.5 px-3 font-medium cursor-pointer hover:text-slate-700 text-right"
+                className="py-2.5 px-2 sm:px-3 font-medium cursor-pointer hover:text-slate-700 text-right whitespace-nowrap"
                 onClick={() => handleSetSort('price', sortDirection === 'asc' ? 'desc' : 'asc', t.amountRmb)}
               >
                 <Tooltip title={t.amountRmb} content={language === 'zh' ? '采购总额（人民币及折算美元）' : "Total wholesale procurement cost in RMB & converted USD"} position="top" width="w-56">
@@ -441,20 +441,20 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                   </div>
                 </Tooltip>
               </th>
-              <th className="py-2.5 px-3 font-medium">
+              <th className="hidden md:table-cell py-2.5 px-3 font-medium">
                 <Tooltip title={language === 'zh' ? '国内中转路线与预计时效' : "Transit Route & Target ETA"} content={language === 'zh' ? '供应商发货地至集运中转仓（东莞/义乌/深圳）以及预计送达日期' : "Origin factory in China to hub warehouse and carrier estimated delivery date"} position="top" width="w-56">
                   <div className="flex items-center gap-1">
                     <span>{language === 'zh' ? '运输路线 / 枢纽' : 'Route / Hub & ETA'}</span>
                   </div>
                 </Tooltip>
               </th>
-              <th className="py-2.5 px-2 font-medium">
+              <th className="py-2.5 px-1.5 sm:px-2 font-medium">
                 <Tooltip title={t.status} content={language === 'zh' ? '采购、质检与跨境转运实时状态' : "Real-time procurement, inspection, and shipping status"} position="top" width="w-56">
                   <span>{t.status}</span>
                 </Tooltip>
               </th>
-              <th className="py-2.5 px-2 text-right font-medium">{t.action}</th>
-              <th className="py-2.5 px-2 sm:px-3 w-8 text-right"></th>
+              <th className="hidden md:table-cell py-2.5 px-2 text-right font-medium">{t.action}</th>
+              <th className="py-2.5 px-1 sm:px-3 w-8 text-right"></th>
             </tr>
           </thead>
 
@@ -499,7 +499,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                 >
                   {/* Checkbox */}
                   <td
-                    className="py-2.5 px-3 sm:px-4"
+                    className="py-2.5 px-2 sm:px-4 w-7 sm:w-9"
                     onClick={(e) => {
                       e.stopPropagation();
                       onToggleSelect(order.id);
@@ -514,14 +514,14 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                     />
                   </td>
 
-                  {/* Order ID */}
-                  <td className="py-2.5 px-2 text-xs font-mono font-bold text-slate-900 whitespace-nowrap">
+                  {/* Order ID: Desktop/tablet only */}
+                  <td className="hidden sm:table-cell py-2.5 px-2 text-xs font-mono font-bold text-slate-900 whitespace-nowrap">
                     #{order.orderNumber.replace('P360-', '')}
                   </td>
 
-                  {/* Product & Supplier (Avatar / Title) */}
-                  <td className="py-2.5 px-2.5 min-w-0 max-w-[170px] sm:max-w-[200px] xl:max-w-[240px]">
-                    <div className="flex items-center gap-2.5">
+                  {/* Product & Supplier (Avatar / Title) - Pinned on mobile */}
+                  <td className="py-2.5 px-2 sm:px-2.5 min-w-0 max-w-[140px] sm:max-w-[200px] xl:max-w-[240px] sticky left-7 sm:static bg-inherit z-10">
+                    <div className="flex items-center gap-2 sm:gap-2.5">
                       <div className="relative shrink-0">
                         <img
                           src={order.thumbnail}
@@ -534,7 +534,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                               target.src = 'https://images.unsplash.com/photo-1577937927133-66ef06acdf18?w=160&auto=format&fit=crop&q=80';
                             }
                           }}
-                          className="w-9 h-9 rounded-xl object-cover border border-slate-200/80 bg-slate-100"
+                          className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl object-cover border border-slate-200/80 bg-slate-100"
                         />
                         {order.qcPhotos && order.qcPhotos.length > 0 && (
                           <button
@@ -552,32 +552,40 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                           </button>
                         )}
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="font-semibold text-slate-900 truncate group-hover:text-slate-950 text-xs">
                           {translateOrderText(order.title)}
                         </p>
-                        <div className="flex items-center gap-1.5 text-[10px] mt-0.5 text-slate-400 truncate">
+                        <div className="flex items-center gap-1 sm:gap-1.5 text-[10px] mt-0.5 text-slate-400 truncate">
                           <span className="px-1.5 py-0.2 rounded bg-slate-100 text-slate-700 font-semibold text-[9px] font-mono">
                             {order.supplierPlatform}
                           </span>
-                          <span className="truncate">{translateOrderText(order.supplierName)}</span>
+                          <span className="sm:hidden font-mono font-bold text-[9px] text-slate-600">
+                            #{order.orderNumber.replace('P360-', '')}
+                          </span>
+                          <span className="truncate hidden sm:inline">{translateOrderText(order.supplierName)}</span>
+                        </div>
+                        {/* Mobile route line */}
+                        <div className="md:hidden text-[9px] text-slate-400 truncate mt-0.5">
+                          {origin.city} ➔ {destination.city}
                         </div>
                       </div>
                     </div>
                   </td>
 
-                  {/* Amount (RMB) Primary */}
-                  <td className="py-2.5 px-3 whitespace-nowrap text-right">
+                  {/* Amount (RMB) Primary - Pinned */}
+                  <td className="py-2.5 px-2 sm:px-3 whitespace-nowrap text-right shrink-0">
                     <div className="font-mono font-bold text-slate-900 text-xs text-right">
                       ¥{order.priceRMB.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
                     <div className="text-[10px] font-mono text-slate-400 text-right">
-                      ${order.priceUSD.toFixed(2)} • {order.weightKg.toFixed(1)}kg
+                      ${order.priceUSD.toFixed(2)}
+                      <span className="hidden sm:inline"> • {order.weightKg.toFixed(1)}kg</span>
                     </div>
                   </td>
 
-                  {/* Route, Hub & Target Delivery ETA Combined */}
-                  <td className="py-2.5 px-3 whitespace-nowrap">
+                  {/* Route, Hub & Target Delivery ETA Combined - Hidden on mobile */}
+                  <td className="hidden md:table-cell py-2.5 px-3 whitespace-nowrap">
                     <div className="flex items-center gap-1 text-xs">
                       <span className="text-xs leading-none">{origin.flag}</span>
                       <span className="font-medium text-slate-800">{origin.city}</span>
@@ -591,23 +599,23 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                     </div>
                   </td>
 
-                  {/* Status with Dot + Updated Pill */}
-                  <td className="py-2.5 px-2 whitespace-nowrap">
-                    <div className="flex items-center gap-1.5">
+                  {/* Status with Dot + Updated Pill - Responsive */}
+                  <td className="py-2.5 px-1.5 sm:px-2 whitespace-nowrap">
+                    <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
                       <span className={`w-2 h-2 rounded-full shrink-0 ${status.dotColor}`} />
-                      <span className={`font-semibold capitalize text-xs ${status.textColor}`}>
+                      <span className={`font-semibold capitalize text-xs truncate max-w-[70px] sm:max-w-none ${status.textColor}`}>
                         {status.label}
                       </span>
                       {isRecentlyUpdated && (
-                        <span className="px-1.5 py-0.2 rounded bg-[#E35D3B]/15 text-[#E35D3B] text-[9.5px] font-bold font-mono animate-pulse">
+                        <span className="hidden sm:inline-block px-1.5 py-0.2 rounded bg-[#E35D3B]/15 text-[#E35D3B] text-[9.5px] font-bold font-mono animate-pulse">
                           ⚡ {t.updatedPill}
                         </span>
                       )}
                     </div>
                   </td>
 
-                  {/* Action Button */}
-                  <td className="py-2.5 px-2 text-right whitespace-nowrap">
+                  {/* Action Button - Hidden on mobile */}
+                  <td className="hidden md:table-cell py-2.5 px-2 text-right whitespace-nowrap">
                     {order.actionType === 'PAYMENT_PENDING' ? (
                       <button
                         type="button"
@@ -669,9 +677,9 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                     )}
                   </td>
 
-                  {/* Context More Menu with real actionable items */}
+                  {/* Context More Menu with real actionable items - Pinned */}
                   <td
-                    className="py-2.5 px-2 sm:px-3 text-right relative"
+                    className="py-2.5 px-1 sm:px-3 text-right relative shrink-0"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <button
@@ -680,7 +688,7 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                       onClick={() =>
                         setActiveMenuId(activeMenuId === order.id ? null : order.id)
                       }
-                      className="p-1 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
+                      className="p-1 sm:p-1.5 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors cursor-pointer"
                     >
                       <MoreHorizontal className="w-4 h-4" />
                     </button>
@@ -688,9 +696,68 @@ Authorized Procurement Agent: Goodhead Boma (Merchant) (Proc360 Logistics OS)
                     {/* Popover Action Menu */}
                     {activeMenuId === order.id && (
                       <div 
-                        className="absolute right-6 top-10 w-60 bg-white rounded-2xl shadow-xl border border-slate-200 p-1.5 z-40 text-left animate-in fade-in zoom-in-95 duration-150"
+                        className="absolute right-2 sm:right-6 top-10 w-56 sm:w-60 bg-white rounded-2xl shadow-xl border border-slate-200 p-1.5 z-40 text-left animate-in fade-in zoom-in-95 duration-150"
                         onMouseLeave={() => setActiveMenuId(null)}
                       >
+                        {/* Mobile Primary Action Button inside More Options */}
+                        <div className="md:hidden mb-1">
+                          {order.actionType === 'PAYMENT_PENDING' && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveMenuId(null);
+                                onOpenActionModal(order);
+                              }}
+                              className="w-full px-3 py-2 text-xs rounded-xl bg-yellow-400 hover:bg-yellow-300 text-yellow-950 font-bold shadow-2xs transition-colors flex items-center gap-2 cursor-pointer mb-1"
+                            >
+                              <CreditCard className="w-3.5 h-3.5" />
+                              <span>{t.authorizePo}</span>
+                            </button>
+                          )}
+                          {order.actionType === 'CUSTOMIZATION_CONFIRMATION' && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveMenuId(null);
+                                onOpenActionModal(order);
+                              }}
+                              className="w-full px-3 py-2 text-xs rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-semibold shadow-2xs transition-colors flex items-center gap-2 cursor-pointer mb-1"
+                            >
+                              <Camera className="w-3.5 h-3.5" />
+                              <span>{t.reviewProof}</span>
+                            </button>
+                          )}
+                          {order.actionType === 'READY_TO_CONSOLIDATE' && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveMenuId(null);
+                                if (!selectedOrderIds.includes(order.id)) {
+                                  onToggleSelect(order.id);
+                                }
+                                onConsolidateSelected();
+                              }}
+                              className="w-full px-3 py-2 text-xs rounded-xl bg-[#0e1118] hover:bg-slate-800 text-white font-semibold shadow-2xs transition-colors flex items-center gap-2 cursor-pointer mb-1"
+                            >
+                              <Layers className="w-3.5 h-3.5 text-[#E35D3B]" />
+                              <span>{t.consolidate}</span>
+                            </button>
+                          )}
+                          {order.actionType === 'ADDRESS_ISSUE' && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setActiveMenuId(null);
+                                onOpenActionModal(order);
+                              }}
+                              className="w-full px-3 py-2 text-xs rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-semibold shadow-2xs transition-colors flex items-center gap-2 cursor-pointer mb-1"
+                            >
+                              <ShieldAlert className="w-3.5 h-3.5" />
+                              <span>{t.fixAddress}</span>
+                            </button>
+                          )}
+                        </div>
+
                         {/* Quick Advance Status Trigger */}
                         {onAdvanceOrderStatus && (
                           <button
