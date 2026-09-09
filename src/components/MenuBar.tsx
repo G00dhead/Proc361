@@ -294,8 +294,10 @@ export const MenuBar: React.FC<MenuBarProps> = ({
               {/* Optimized High-Contrast Search Button */}
               <button
                 type="submit"
+                id="header-search-submit-btn"
+                onClick={handleSearchSubmit}
                 aria-label={language === 'zh' ? '搜索采购订单' : 'Search procurement orders'}
-                className="h-full bg-gradient-to-r from-[#f68b1e] to-[#e67a0d] hover:from-[#e07d17] hover:to-[#d46d04] active:scale-[0.98] text-white font-bold text-xs sm:text-sm px-4 sm:px-5 transition-all uppercase tracking-wider shrink-0 cursor-pointer flex items-center justify-center gap-1.5 shadow-xs select-none min-h-[40px]"
+                className="h-full bg-[#f68b1e] hover:bg-[#e07d17] active:bg-[#d46d04] text-white font-bold text-xs sm:text-sm px-4 sm:px-5 transition-colors uppercase tracking-wider shrink-0 cursor-pointer flex items-center justify-center gap-1.5 shadow-none select-none min-h-[40px] focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-1"
               >
                 <Search className="w-3.5 h-3.5 stroke-[2.5]" />
                 <span>{t('searchBtn')}</span>

@@ -343,12 +343,12 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-100/90">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl border border-slate-200 flex items-center justify-center text-slate-700 bg-slate-50/80">
-                  <Package className="w-4 h-4 text-slate-700" />
+                <div className="w-8 h-8 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 bg-slate-50/80">
+                  <Package className="w-4 h-4 text-slate-500" />
                 </div>
                 <div>
-                  <span className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">{t.totalOrders}</span>
-                  <span className="ml-2 px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 font-mono text-[10px] font-semibold">
+                  <span className="text-xs sm:text-sm font-medium text-slate-400 tracking-tight">{t.totalOrders}</span>
+                  <span className="ml-2 px-2 py-0.5 rounded-md bg-slate-100 text-slate-400 font-mono text-[10px] font-medium">
                     {t.all1688FactoryPos}
                   </span>
                 </div>
@@ -427,10 +427,10 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               {/* Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg border border-rose-200/60 flex items-center justify-center text-rose-600 bg-rose-50/50">
-                    <RotateCcw className="w-3 h-3 text-rose-600" />
+                  <div className="w-6 h-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 bg-slate-50/50">
+                    <RotateCcw className="w-3 h-3 text-slate-400" />
                   </div>
-                  <span className="text-xs font-bold text-slate-800 tracking-tight">{t.returnsOrders}</span>
+                  <span className="text-xs font-medium text-slate-400 tracking-tight">{t.returnsOrders}</span>
                 </div>
                 <Tooltip 
                   title={t.returnsOrders}
@@ -482,10 +482,10 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               {/* Header */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg border border-emerald-200/60 flex items-center justify-center text-emerald-600 bg-emerald-50/50">
-                    <CheckCircle className="w-3 h-3 text-emerald-600" />
+                  <div className="w-6 h-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 bg-slate-50/50">
+                    <CheckCircle className="w-3 h-3 text-slate-400" />
                   </div>
-                  <span className="text-xs font-bold text-slate-800 tracking-tight">{t.fulfilledOrders}</span>
+                  <span className="text-xs font-medium text-slate-400 tracking-tight">{t.fulfilledOrders}</span>
                 </div>
                 <Tooltip 
                   title={t.fulfilledOrders}
