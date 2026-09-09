@@ -335,178 +335,203 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
   return (
     <>
       <div className="w-full flex flex-col gap-4 sm:gap-5">
-        {/* TOP ROW: 3 STAT CARDS */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-4">
+        {/* TOP STATS WITH CLEAR HIERARCHY: Primary Total Orders at top, Secondary smaller cards below */}
+        <div className="flex flex-col gap-3 sm:gap-3.5">
           
-          {/* Card 1: Total Orders */}
-          <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
-            {/* Header with Box Icon & Info */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-xl border border-slate-200 flex items-center justify-center text-slate-700 bg-slate-50/50">
-                  <Package className="w-3.5 h-3.5 text-slate-700" />
+          {/* Top / Primary Hero Card: Total Orders */}
+          <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs relative hover:border-slate-300 transition-all">
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100/90">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl border border-slate-200 flex items-center justify-center text-slate-700 bg-slate-50/80">
+                  <Package className="w-4 h-4 text-slate-700" />
                 </div>
-                <span className="text-xs font-bold text-slate-900 tracking-tight">{t.totalOrders}</span>
+                <div>
+                  <span className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">{t.totalOrders}</span>
+                  <span className="ml-2 px-2 py-0.5 rounded-md bg-slate-100 text-slate-500 font-mono text-[10px] font-semibold">
+                    {t.all1688FactoryPos}
+                  </span>
+                </div>
               </div>
-              <Tooltip 
-                title={t.totalOrders}
-                content={language === 'zh' ? '通过 1688、淘宝及工厂直采的所有采购单累计汇总。' : "Cumulative count of all Purchase Orders routed through 1688, Taobao, and OEM factories."}
-                position="bottom"
-              >
-                <div 
-                  className="text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
-                  aria-label="Total orders explanation"
+              <div className="flex items-center gap-2">
+                <span className="hidden sm:inline-block text-[11px] text-slate-400 font-medium">
+                  {t.activeStatus}
+                </span>
+                <Tooltip 
+                  title={t.totalOrders}
+                  content={language === 'zh' ? '通过 1688、淘宝及工厂直采的所有采购单累计汇总。' : "Cumulative count of all Purchase Orders routed through 1688, Taobao, and OEM factories."}
+                  position="bottom"
                 >
-                  <Info className="w-3.5 h-3.5" />
-                </div>
-              </Tooltip>
+                  <div 
+                    className="text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
+                    aria-label="Total orders explanation"
+                  >
+                    <Info className="w-3.5 h-3.5" />
+                  </div>
+                </Tooltip>
+              </div>
             </div>
 
-            {/* Metric & Mini Sparkline */}
-            <div className="flex items-center justify-between mt-3">
-              <div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-slate-950 font-mono tracking-tight leading-none">
+            {/* Main Metrics Row */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3.5">
+              {/* Primary Count & Dulled-out Delta */}
+              <div className="flex items-baseline sm:items-center gap-3 sm:gap-4 flex-wrap">
+                <div className="text-3xl sm:text-4xl font-extrabold text-slate-950 font-mono tracking-tight leading-none">
                   3,484
                 </div>
-                <div className="flex items-center gap-1 mt-2 text-xs font-bold text-emerald-600 font-mono">
-                  <span>+1.1%</span>
-                  <span className="text-slate-400 font-normal font-sans text-[11px]">{t.vsLastWeek}</span>
+                {/* Dulled out color badge matching user selection */}
+                <div className="flex items-center gap-1.5">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200/80 text-xs font-mono font-medium">
+                    +1.1%
+                  </span>
+                  <span className="text-slate-400 font-normal font-sans text-xs">{t.vsLastWeek}</span>
                 </div>
               </div>
 
-              {/* Sparkline Visualizer with +$12,180 badge */}
-              <div className="flex flex-col items-end">
-                <span className="text-[10px] font-mono font-bold text-slate-700 mb-0.5">
-                  +¥12,180
+              {/* Volume Velocity & Soft Sparkline */}
+              <div className="flex items-center gap-4 sm:gap-6 justify-between sm:justify-end">
+                <div className="flex flex-col items-start sm:items-end">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] text-slate-400 font-medium">{language === 'zh' ? '周度流速' : 'Weekly Velocity'}</span>
+                    <span className="text-xs font-mono font-bold text-slate-800 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200/60">
+                      +¥12,180
+                    </span>
+                  </div>
+                  <div className="text-[11px] font-mono text-slate-400 mt-0.5">
+                    ¥{totalSourcedRMB.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} <span className="text-slate-300">|</span> ${totalSourcedUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </div>
+                </div>
+
+                {/* Refined Muted Sparkline */}
+                <div className="shrink-0">
+                  <svg className="w-24 sm:w-28 h-8 overflow-visible" viewBox="0 0 100 30">
+                    <path
+                      d="M 0,20 Q 20,22 35,12 T 65,18 T 100,6"
+                      fill="none"
+                      stroke="#94a3b8"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                    <circle cx="100" cy="6" r="2.5" fill="#64748b" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Secondary Row: Returns & Fulfilled Cards (Smaller & Compact) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
+            
+            {/* Card 2: Returns / QC Issues Orders (Smaller) */}
+            <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-lg border border-rose-200/60 flex items-center justify-center text-rose-600 bg-rose-50/50">
+                    <RotateCcw className="w-3 h-3 text-rose-600" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-800 tracking-tight">{t.returnsOrders}</span>
+                </div>
+                <Tooltip 
+                  title={t.returnsOrders}
+                  content={language === 'zh' ? '在中转仓 5 项品控中未达标并由采购专员退回 1688/工厂全额退款的人民币订单。' : "Items that failed 5-point QC at China hubs and were returned to 1688/factories for full RMB refunds before international dispatch."}
+                  position="bottom"
+                >
+                  <div 
+                    className="text-slate-400 hover:text-slate-700 transition-colors p-0.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+                    aria-label="Returns order explanation"
+                  >
+                    <Info className="w-3.5 h-3.5 text-slate-400" />
+                  </div>
+                </Tooltip>
+              </div>
+
+              {/* Metric & Mini Columns */}
+              <div className="flex items-center justify-between mt-2.5">
+                <div>
+                  <div className="text-xl sm:text-2xl font-extrabold text-slate-900 font-mono tracking-tight leading-none">
+                    978
+                  </div>
+                  <div className="flex items-center gap-1 mt-1 text-[11px] font-medium text-slate-500 font-mono">
+                    <span className="text-rose-600 font-bold">-3.3%</span>
+                    <span className="text-slate-400 font-normal font-sans text-[10px]">{t.vsLastWeek}</span>
+                  </div>
+                </div>
+
+                {/* Mini Column Array */}
+                <div className="flex items-end gap-1 h-6 pr-1">
+                  <div className="w-2 h-4 rounded-xs bg-slate-100" />
+                  <div className="w-2 h-5 rounded-xs bg-slate-100" />
+                  <div className="w-2 h-6 rounded-xs bg-slate-300" />
+                  <div className="w-2 h-5 rounded-xs bg-slate-100" />
+                  <div className="w-2 h-4 rounded-xs bg-slate-100" />
+                </div>
+              </div>
+
+              {/* Helper Bar */}
+              <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10.5px] text-slate-500">
+                <span className="truncate pr-1">
+                  {t.returnsOrdersDesc}
                 </span>
-                <svg className="w-20 sm:w-24 h-8 overflow-visible" viewBox="0 0 100 30">
-                  <path
-                    d="M 0,20 Q 20,22 35,12 T 65,18 T 100,5"
-                    fill="none"
-                    stroke="#E35D3B"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                  />
-                  <circle cx="100" cy="5" r="2.5" fill="#E35D3B" />
-                </svg>
+                <span className="text-emerald-700/90 font-medium text-[9.5px] shrink-0">{t.escrow100}</span>
               </div>
             </div>
 
-            {/* Helper Bar */}
-            <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-              <span>{t.all1688FactoryPos}</span>
-              <span className="text-slate-400 text-[10px]">{t.activeStatus}</span>
-            </div>
-          </div>
-
-          {/* Card 2: Returns / QC Issues Orders */}
-          <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
-            {/* Header with Rotate Icon & Info */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-xl border border-rose-200/70 flex items-center justify-center text-rose-600 bg-rose-50/50">
-                  <RotateCcw className="w-3.5 h-3.5 text-rose-600" />
+            {/* Card 3: Fulfilled Orders & QC Satisfaction (Smaller) */}
+            <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
+              {/* Header */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-lg border border-emerald-200/60 flex items-center justify-center text-emerald-600 bg-emerald-50/50">
+                    <CheckCircle className="w-3 h-3 text-emerald-600" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-800 tracking-tight">{t.fulfilledOrders}</span>
                 </div>
-                <span className="text-xs font-bold text-slate-900 tracking-tight">{t.returnsOrders}</span>
-              </div>
-              <Tooltip 
-                title={t.returnsOrders}
-                content={language === 'zh' ? '在中转仓 5 项品控中未达标并由采购专员退回 1688/工厂全额退款的人民币订单。' : "Items that failed 5-point QC at China hubs and were returned to 1688/factories for full RMB refunds before international dispatch."}
-                position="bottom"
-              >
-                <div 
-                  className="text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
-                  aria-label="Returns order explanation"
+                <Tooltip 
+                  title={t.fulfilledOrders}
+                  content={language === 'zh' ? '302 笔订单已完成 5 项品控并打包入库；184 笔正在中转仓进行实物核验。' : "302 orders verified via 5-point QC inspection and packed for export; 184 in active inspection."}
+                  position="bottom"
                 >
-                  <Info className="w-3.5 h-3.5 text-[#E35D3B]" />
-                </div>
-              </Tooltip>
-            </div>
+                  <div 
+                    className="text-slate-400 hover:text-slate-700 transition-colors p-0.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+                    aria-label="Fulfilled orders explanation"
+                  >
+                    <Info className="w-3.5 h-3.5" />
+                  </div>
+                </Tooltip>
+              </div>
 
-            {/* Metric & Mini Columns */}
-            <div className="flex items-center justify-between mt-3">
-              <div>
-                <div className="text-2xl sm:text-3xl font-extrabold text-slate-950 font-mono tracking-tight leading-none">
-                  978
+              {/* Split Progress Columns with Clear Contextual Labels */}
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {/* Passed QC */}
+                <div className="bg-slate-50/70 p-2 rounded-xl border border-slate-200/60">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-slate-700 font-semibold">{t.passedQc}</span>
+                    <span className="text-[9.5px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded">62%</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-extrabold text-slate-900 font-mono leading-none mt-1">
+                    302 <span className="text-[10px] font-sans font-normal text-slate-400">{t.poUnit}</span>
+                  </div>
+                  <div className="w-full h-1 rounded-full bg-slate-200 mt-1.5 overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded-full w-[62%]" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 mt-2 text-xs font-bold text-[#E35D3B] font-mono">
-                  <span>-3.3%</span>
-                  <span className="text-slate-400 font-normal font-sans text-[11px]">{t.vsLastWeek}</span>
+
+                {/* In Inspection / Pending */}
+                <div className="bg-slate-50/70 p-2 rounded-xl border border-slate-200/60">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-slate-700 font-semibold">{t.inQcQueue}</span>
+                    <span className="text-[9.5px] font-mono font-bold text-amber-700 bg-amber-50 px-1 py-0.2 rounded">38%</span>
+                  </div>
+                  <div className="text-base sm:text-lg font-extrabold text-slate-900 font-mono leading-none mt-1">
+                    184 <span className="text-[10px] font-sans font-normal text-slate-400">{t.poUnit}</span>
+                  </div>
+                  <div className="w-full h-1 rounded-full bg-slate-200 mt-1.5 overflow-hidden">
+                    <div className="h-full bg-amber-500 rounded-full w-[38%]" />
+                  </div>
                 </div>
               </div>
 
-              {/* Mini Column Array */}
-              <div className="flex items-end gap-1.5 h-8 pr-1">
-                <div className="w-2.5 h-6 rounded-xs bg-slate-100" />
-                <div className="w-2.5 h-7 rounded-xs bg-slate-100" />
-                <div className="w-2.5 h-8 rounded-xs bg-[#E35D3B]" />
-                <div className="w-2.5 h-7 rounded-xs bg-slate-100" />
-                <div className="w-2.5 h-6 rounded-xs bg-slate-100" />
-              </div>
-            </div>
-
-            {/* Helper Bar */}
-            <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
-              <span className="truncate pr-1">
-                {t.returnsOrdersDesc}
-              </span>
-              <span className="text-emerald-600 font-semibold text-[10px]">{t.escrow100}</span>
-            </div>
-          </div>
-
-          {/* Card 3: Fulfilled Orders & QC Satisfaction */}
-          <div className="bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
-            {/* Header with Checkmark Icon & Info */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-xl border border-emerald-200/70 flex items-center justify-center text-emerald-600 bg-emerald-50/50">
-                  <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                </div>
-                <span className="text-xs font-bold text-slate-900 tracking-tight">{t.fulfilledOrders}</span>
-              </div>
-              <Tooltip 
-                title={t.fulfilledOrders}
-                content={language === 'zh' ? '302 笔订单已完成 5 项品控并打包入库；184 笔正在中转仓进行实物核验。' : "302 orders verified via 5-point QC inspection and packed for export; 184 in active inspection."}
-                position="bottom"
-              >
-                <div 
-                  className="text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
-                  aria-label="Fulfilled orders explanation"
-                >
-                  <Info className="w-3.5 h-3.5" />
-                </div>
-              </Tooltip>
-            </div>
-
-            {/* Split Progress Columns with Clear Contextual Labels */}
-            <div className="grid grid-cols-2 gap-3 mt-3">
-              {/* Passed QC / Satisfied (Green) */}
-              <div className="bg-emerald-50/50 p-2.5 rounded-2xl border border-emerald-100/80">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-emerald-800 font-bold">{t.passedQc}</span>
-                  <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded-md">62%</span>
-                </div>
-                <div className="text-xl sm:text-2xl font-extrabold text-emerald-950 font-mono leading-none mt-1.5">
-                  302 <span className="text-[11px] font-sans font-normal text-emerald-700">{t.poUnit}</span>
-                </div>
-                <div className="w-full h-1.5 rounded-full bg-emerald-200 mt-2 overflow-hidden">
-                  <div className="h-full bg-emerald-500 rounded-full w-[62%]" />
-                </div>
-              </div>
-
-              {/* In Inspection / Pending (Amber/Yellow) */}
-              <div className="bg-amber-50/50 p-2.5 rounded-2xl border border-amber-100/80">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-amber-800 font-bold">{t.inQcQueue}</span>
-                  <span className="text-[10px] font-mono font-bold text-amber-700 bg-amber-100/70 px-1.5 py-0.5 rounded-md">38%</span>
-                </div>
-                <div className="text-xl sm:text-2xl font-extrabold text-amber-950 font-mono leading-none mt-1.5">
-                  184 <span className="text-[11px] font-sans font-normal text-amber-700">{t.poUnit}</span>
-                </div>
-                <div className="w-full h-1.5 rounded-full bg-amber-200 mt-2 overflow-hidden">
-                  <div className="h-full bg-amber-500 rounded-full w-[38%]" />
-                </div>
-              </div>
             </div>
 
           </div>
