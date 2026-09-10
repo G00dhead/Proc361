@@ -336,27 +336,27 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
     <>
       <div className="w-full flex flex-col gap-4 sm:gap-5">
         {/* ROW 1: TOP STATS CARDS (LEFT) + TRACK ORDERS (RIGHT) */}
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-3.5 sm:gap-4 items-stretch">
           
-          {/* LEFT: HIERARCHICAL STATS CARDS (7 cols) */}
-          <div className="lg:col-span-7 xl:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
+          {/* LEFT: HIERARCHICAL STATS CARDS (5 cols) - Snug & dense, eliminating empty whitespace */}
+          <div className="lg:col-span-5 xl:col-span-5 flex flex-col justify-between gap-3">
             {/* Card 1: Total Orders (Hero / Biggest Card in the Hierarchy) */}
-            <div className="sm:col-span-2 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all">
+            <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all">
               {/* Header */}
-              <div className="flex items-center justify-between pb-3 border-b border-slate-100/90">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 bg-slate-50/80 shrink-0">
-                    <Package className="w-4 h-4 text-slate-600" />
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100/90">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-500 bg-slate-50/80 shrink-0">
+                    <Package className="w-3.5 h-3.5 text-slate-600" />
                   </div>
-                  <div>
-                    <span className="text-xs sm:text-sm font-semibold text-slate-700 tracking-tight">{t.totalOrders}</span>
-                    <span className="ml-2 px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono text-[10px] font-medium">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-xs font-bold text-slate-800 tracking-tight">{t.totalOrders}</span>
+                    <span className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono text-[9.5px] font-medium">
                       {t.all1688FactoryPos}
                     </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="hidden sm:inline-block text-[11px] text-slate-400 font-medium">
+                <div className="flex items-center gap-1.5">
+                  <span className="hidden sm:inline-block text-[10px] text-slate-400 font-medium">
                     {t.activeStatus}
                   </span>
                   <Tooltip 
@@ -365,7 +365,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                     position="bottom"
                   >
                     <div 
-                      className="text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-100 cursor-pointer shrink-0"
+                      className="text-slate-400 hover:text-slate-700 transition-colors p-0.5 rounded-lg hover:bg-slate-100 cursor-pointer shrink-0"
                       aria-label="Total orders explanation"
                     >
                       <Info className="w-3.5 h-3.5" />
@@ -374,30 +374,29 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                 </div>
               </div>
 
-              {/* Metric Section: Largest Typography & Sparkline */}
-              <div className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              {/* Metric & Velocity Row */}
+              <div className="py-2 flex items-center justify-between gap-2">
                 <div>
-                  <div className="text-3xl sm:text-4xl font-extrabold text-slate-950 font-mono tracking-tight leading-none">
-                    3,484
-                  </div>
-                  <div className="flex items-center gap-1.5 mt-2">
-                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/70 text-[11px] font-mono font-semibold">
+                  <div className="flex items-baseline gap-2">
+                    <div className="text-2xl sm:text-3xl font-extrabold text-slate-950 font-mono tracking-tight leading-none">
+                      3,484
+                    </div>
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/70 text-[10px] font-mono font-semibold">
                       +1.1%
                     </span>
-                    <span className="text-slate-400 font-normal font-sans text-xs">{t.vsLastWeek}</span>
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-sans mt-1">
+                    {t.vsLastWeek} • <span className="text-slate-700 font-medium font-mono">¥{totalSourcedRMB.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span> <span className="text-slate-300">/</span> <span className="text-slate-500 font-mono">${totalSourcedUSD.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                   </div>
                 </div>
 
-                {/* Volume Velocity & Mini Sparkline */}
-                <div className="flex flex-col items-start sm:items-end">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[11px] text-slate-400 font-medium">{language === 'zh' ? '周度流速' : 'Weekly Velocity'}</span>
-                    <span className="text-xs font-mono font-bold text-slate-800 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200/70">
-                      +¥12,180
-                    </span>
+                {/* Sparkline & Velocity Pill */}
+                <div className="flex flex-col items-end shrink-0">
+                  <div className="text-[9.5px] font-mono font-semibold text-slate-700 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200/70">
+                    +¥12,180/wk
                   </div>
-                  <div className="mt-1.5 shrink-0">
-                    <svg className="w-24 sm:w-28 h-7 overflow-visible" viewBox="0 0 100 30">
+                  <div className="mt-1">
+                    <svg className="w-20 sm:w-24 h-5 overflow-visible" viewBox="0 0 100 30">
                       <path
                         d="M 0,20 Q 20,22 35,12 T 65,18 T 100,6"
                         fill="none"
@@ -411,122 +410,139 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                 </div>
               </div>
 
-              {/* Bottom Footer Strip */}
-              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-mono">
-                <div>
-                  <span className="text-slate-700 font-semibold">¥{totalSourcedRMB.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
-                  <span className="mx-1 text-slate-300">/</span>
-                  <span>${totalSourcedUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+              {/* Pipeline Status Progress (Eliminates vacant vertical space with purposeful status) */}
+              <div className="pt-2 border-t border-slate-100 flex flex-col gap-1">
+                <div className="flex items-center justify-between text-[10px] font-mono">
+                  <span className="text-slate-400">{language === 'zh' ? '采购流转分布' : 'Pipeline Distribution'}</span>
+                  <div className="flex items-center gap-2 text-[9.5px]">
+                    <span className="text-slate-700 font-semibold">1,842 {language === 'zh' ? '在途' : 'Transit'}</span>
+                    <span className="text-slate-300">•</span>
+                    <span className="text-blue-600 font-semibold">1,156 {language === 'zh' ? '入库质检' : 'Hub QC'}</span>
+                    <span className="text-slate-300">•</span>
+                    <span className="text-emerald-700 font-semibold">486 {language === 'zh' ? '待发' : 'Ready'}</span>
+                  </div>
                 </div>
-                <span className="text-[10.5px] font-sans text-slate-400">{t.escrow100}</span>
+                <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden flex">
+                  <div className="h-full bg-slate-800 w-[53%]" title="In Transit 53%" />
+                  <div className="h-full bg-blue-500 w-[33%]" title="Hub QC 33%" />
+                  <div className="h-full bg-emerald-500 w-[14%]" title="Ready for Export 14%" />
+                </div>
               </div>
             </div>
 
-            {/* Card 2: Returns / QC Issues Orders (Secondary Compact Card) */}
-            <div className="sm:col-span-1 bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
-              {/* Header */}
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100/90">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 bg-slate-50/50 shrink-0">
-                    <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
+            {/* Sub-cards Row: Returns & Fulfilled side-by-side */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
+              {/* Card 2: Returns / QC Issues Orders (Secondary Compact Card) */}
+              <div className="bg-white rounded-2xl p-3 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-100/90">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded-md border border-slate-200 flex items-center justify-center text-slate-400 bg-slate-50/50 shrink-0">
+                      <RotateCcw className="w-3 h-3 text-slate-400" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-700 tracking-tight truncate">{t.returnsOrders}</span>
                   </div>
-                  <span className="text-xs font-semibold text-slate-600 tracking-tight truncate">{t.returnsOrders}</span>
-                </div>
-                <Tooltip 
-                  title={t.returnsOrders}
-                  content={language === 'zh' ? '在中转仓 5 项品控中未达标并由采购专员退回 1688/工厂全额退款的人民币订单。' : "Items that failed 5-point QC at China hubs and were returned to 1688/factories for full RMB refunds before international dispatch."}
-                  position="bottom"
-                >
-                  <div 
-                    className="text-slate-400 hover:text-slate-700 transition-colors p-0.5 rounded-lg hover:bg-slate-100 cursor-pointer shrink-0"
-                    aria-label="Returns order explanation"
+                  <Tooltip 
+                    title={t.returnsOrders}
+                    content={language === 'zh' ? '在中转仓 5 项品控中未达标并由采购专员退回 1688/工厂全额退款的人民币订单。' : "Items that failed 5-point QC at China hubs and were returned to 1688/factories for full RMB refunds before international dispatch."}
+                    position="bottom"
                   >
-                    <Info className="w-3 h-3 text-slate-400" />
-                  </div>
-                </Tooltip>
-              </div>
+                    <div 
+                      className="text-slate-400 hover:text-slate-700 transition-colors p-0.5 rounded hover:bg-slate-100 cursor-pointer shrink-0"
+                      aria-label="Returns order explanation"
+                    >
+                      <Info className="w-3 h-3 text-slate-400" />
+                    </div>
+                  </Tooltip>
+                </div>
 
-              {/* Metric Section */}
-              <div className="py-2">
-                <div className="flex items-baseline justify-between gap-1.5">
-                  <div className="text-2xl font-extrabold text-slate-900 font-mono tracking-tight leading-none">
-                    978
+                {/* Metric Section */}
+                <div className="py-1.5">
+                  <div className="flex items-baseline justify-between gap-1">
+                    <div className="text-2xl font-extrabold text-slate-900 font-mono tracking-tight leading-none">
+                      978
+                    </div>
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-600 border border-rose-200/70 text-[10px] font-mono font-semibold shrink-0">
+                      -3.3%
+                    </span>
                   </div>
-                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-600 border border-rose-200/70 text-[10px] font-mono font-semibold shrink-0">
-                    -3.3%
+                  <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1 font-sans">
+                    <span>{t.vsLastWeek}</span>
+                    <span className="font-mono text-emerald-700 font-semibold bg-emerald-50 px-1 py-0.2 rounded border border-emerald-200/50">
+                      ¥48,250 {language === 'zh' ? '已退' : 'Ref.'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Helper Bar */}
+                <div className="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
+                  <span className="truncate pr-1 text-slate-600">
+                    {language === 'zh' ? '次品拦截' : 'QC Catch'} <strong className="font-mono text-slate-800">99.4%</strong>
                   </span>
-                </div>
-                <div className="text-[10px] text-slate-400 mt-1 font-sans">
-                  {t.vsLastWeek}
+                  <span className="text-emerald-700 font-medium text-[9.5px] shrink-0 font-mono">{t.escrow100}</span>
                 </div>
               </div>
 
-              {/* Helper Bar */}
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
-                <span className="truncate pr-1">
-                  {t.returnsOrdersDesc}
-                </span>
-                <span className="text-emerald-700/90 font-medium text-[9.5px] shrink-0">{t.escrow100}</span>
-              </div>
-            </div>
-
-            {/* Card 3: Fulfilled Orders & QC Satisfaction (Secondary Compact Card) */}
-            <div className="sm:col-span-1 bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
-              {/* Header */}
-              <div className="flex items-center justify-between pb-2 border-b border-slate-100/90">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 bg-slate-50/50 shrink-0">
-                    <CheckCircle className="w-3.5 h-3.5 text-slate-400" />
+              {/* Card 3: Fulfilled Orders & QC Satisfaction (Secondary Compact Card) */}
+              <div className="bg-white rounded-2xl p-3 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
+                {/* Header */}
+                <div className="flex items-center justify-between pb-1.5 border-b border-slate-100/90">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded-md border border-slate-200 flex items-center justify-center text-slate-400 bg-slate-50/50 shrink-0">
+                      <CheckCircle className="w-3 h-3 text-slate-400" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-700 tracking-tight truncate">{t.fulfilledOrders}</span>
                   </div>
-                  <span className="text-xs font-semibold text-slate-600 tracking-tight truncate">{t.fulfilledOrders}</span>
-                </div>
-                <Tooltip 
-                  title={t.fulfilledOrders}
-                  content={language === 'zh' ? '302 笔订单已完成 5 项品控并打包入库；184 笔正在中转仓进行实物核验。' : "302 orders verified via 5-point QC inspection and packed for export; 184 in active inspection."}
-                  position="bottom"
-                >
-                  <div 
-                    className="text-slate-400 hover:text-slate-700 transition-colors p-0.5 rounded-lg hover:bg-slate-100 cursor-pointer shrink-0"
-                    aria-label="Fulfilled orders explanation"
+                  <Tooltip 
+                    title={t.fulfilledOrders}
+                    content={language === 'zh' ? '302 笔订单已完成 5 项品控并打包入库；184 笔正在中转仓进行实物核验。' : "302 orders verified via 5-point QC inspection and packed for export; 184 in active inspection."}
+                    position="bottom"
                   >
-                    <Info className="w-3 h-3 text-slate-400" />
-                  </div>
-                </Tooltip>
-              </div>
-
-              {/* Metric Section */}
-              <div className="py-2">
-                <div className="flex items-baseline justify-between gap-1.5">
-                  <div className="text-2xl font-extrabold text-slate-900 font-mono tracking-tight leading-none">
-                    486 <span className="text-xs font-sans font-normal text-slate-400">{t.poUnit}</span>
-                  </div>
-                  <span className="text-[9.5px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200/60">
-                    62% QC OK
-                  </span>
+                    <div 
+                      className="text-slate-400 hover:text-slate-700 transition-colors p-0.5 rounded hover:bg-slate-100 cursor-pointer shrink-0"
+                      aria-label="Fulfilled orders explanation"
+                    >
+                      <Info className="w-3 h-3 text-slate-400" />
+                    </div>
+                  </Tooltip>
                 </div>
-                <div className="w-full h-1.5 rounded-full bg-slate-100 mt-2 overflow-hidden flex">
-                  <div className="h-full bg-emerald-500 w-[62%]" title="Passed QC 62%" />
-                  <div className="h-full bg-amber-400 w-[38%]" title="In QC Queue 38%" />
-                </div>
-              </div>
 
-              {/* Split Counts */}
-              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-500">
-                <span className="text-emerald-700 font-semibold">302 {t.passedQc}</span>
-                <span className="text-slate-300">•</span>
-                <span className="text-amber-700 font-semibold">184 {t.inQcQueue}</span>
+                {/* Metric Section */}
+                <div className="py-1.5">
+                  <div className="flex items-baseline justify-between gap-1">
+                    <div className="text-2xl font-extrabold text-slate-900 font-mono tracking-tight leading-none">
+                      486 <span className="text-xs font-sans font-normal text-slate-400">{t.poUnit}</span>
+                    </div>
+                    <span className="text-[9.5px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200/60">
+                      62% QC OK
+                    </span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full bg-slate-100 mt-1.5 overflow-hidden flex">
+                    <div className="h-full bg-emerald-500 w-[62%]" title="Passed QC 62%" />
+                    <div className="h-full bg-amber-400 w-[38%]" title="In QC Queue 38%" />
+                  </div>
+                </div>
+
+                {/* Split Counts */}
+                <div className="pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-500">
+                  <span className="text-emerald-700 font-semibold">302 {t.passedQc}</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="text-amber-700 font-semibold">184 {t.inQcQueue}</span>
+                  <span className="text-slate-300">•</span>
+                  <span className="text-slate-500 font-medium">4.2h {language === 'zh' ? '均效' : 'avg'}</span>
+                </div>
               </div>
             </div>
 
           </div>
 
-          {/* RIGHT: TRACK ORDERS (5 cols) - Fills the space beside the cards */}
-          <div className="lg:col-span-5 xl:col-span-5 bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between gap-3.5 overflow-hidden">
+          {/* RIGHT: TRACK ORDERS (7 cols) - Balanced horizontal layout matching card height */}
+          <div className="lg:col-span-7 xl:col-span-7 bg-white rounded-3xl p-3.5 sm:p-4 border border-slate-200/90 shadow-2xs flex flex-col justify-between gap-3 overflow-hidden">
             
             {/* Card Header */}
-            <div className="flex items-center justify-between relative pb-2.5 border-b border-slate-100">
+            <div className="flex items-center justify-between relative pb-2 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-xl border border-orange-200/70 flex items-center justify-center text-[#E35D3B] bg-orange-50/50">
+                <div className="w-6 h-6 rounded-lg border border-orange-200/70 flex items-center justify-center text-[#E35D3B] bg-orange-50/50">
                   <Navigation className="w-3.5 h-3.5 text-[#E35D3B]" />
                 </div>
                 <div>
@@ -535,9 +551,9 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                       {language === 'zh' ? '在途运单跟踪' : 'Track Orders'}
                     </span>
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  </div>
-                  <div className="text-[10px] text-slate-400 font-mono">
-                    {currentShipment.internalId}
+                    <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">
+                      ({currentShipment.internalId})
+                    </span>
                   </div>
                 </div>
               </div>
@@ -548,7 +564,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   <button
                     type="button"
                     onClick={() => setShowShipmentMenu(!showShipmentMenu)}
-                    className="px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-mono font-medium text-slate-700 flex items-center gap-1 transition-colors"
+                    className="px-2 py-0.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-mono font-medium text-slate-700 flex items-center gap-1 transition-colors"
                     title="Switch Shipment"
                   >
                     <span>{currentShipment.id.slice(0, 10)}...</span>
@@ -611,200 +627,201 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               </div>
             </div>
 
-            {/* Interactive Route Map Graphic */}
-            <div className="bg-slate-950 rounded-2xl p-3 border border-slate-800 relative overflow-hidden h-[125px] flex flex-col justify-between group">
-              {/* Background grid texture */}
-              <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px] pointer-events-none" />
+            {/* Internal 2-Column Body on md+: Map & Details (Left) + Timeline & Action (Right) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-stretch flex-1">
               
-              {/* Map Mode Toggle & ETA Badge */}
-              <div className="relative z-10 flex items-center justify-between">
-                <div className="flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-slate-800 backdrop-blur-xs">
-                  <button
-                    type="button"
-                    onClick={() => setMapMode('map')}
-                    className={`px-2 py-0.5 text-[9px] font-medium rounded-md transition-all ${
-                      mapMode === 'map' ? 'bg-[#E35D3B] text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
-                    }`}
-                  >
-                    Map
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setMapMode('satellite')}
-                    className={`px-2 py-0.5 text-[9px] font-medium rounded-md transition-all ${
-                      mapMode === 'satellite' ? 'bg-[#E35D3B] text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
-                    }`}
-                  >
-                    Satellite
-                  </button>
-                </div>
-
-                <div className="px-2 py-0.5 bg-emerald-950/80 border border-emerald-700/60 rounded-full text-[10px] font-mono text-emerald-300 flex items-center gap-1.5 shadow-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>ETA: {currentShipment.eta}</span>
-                </div>
-              </div>
-
-              {/* Simulated Geographic Flight / Cargo Curve */}
-              <div className="relative z-10 my-auto py-1">
-                <svg viewBox="0 0 300 45" className="w-full h-11 overflow-visible">
-                  <defs>
-                    <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#E35D3B" stopOpacity="0.8" />
-                      <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.9" />
-                      <stop offset="100%" stopColor="#10b981" stopOpacity="0.8" />
-                    </linearGradient>
-                  </defs>
-                  {/* Background arc */}
-                  <path
-                    d="M 30 35 Q 150 -5 270 35"
-                    fill="none"
-                    stroke="#334155"
-                    strokeWidth="2"
-                    strokeDasharray="4 4"
-                  />
-                  {/* Active progress arc */}
-                  <path
-                    d="M 30 35 Q 120 5 190 20"
-                    fill="none"
-                    stroke="url(#routeGradient)"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                  />
-                  {/* Origin Pin */}
-                  <circle cx="30" cy="35" r="4" fill="#E35D3B" />
-                  <circle cx="30" cy="35" r="8" fill="#E35D3B" fillOpacity="0.2" className="animate-ping" />
+              {/* Left Sub-column: Route Map & Current Specs */}
+              <div className="flex flex-col justify-between gap-2">
+                {/* Interactive Route Map Graphic */}
+                <div className="bg-slate-950 rounded-2xl p-2.5 border border-slate-800 relative overflow-hidden h-[100px] flex flex-col justify-between group">
+                  {/* Background grid texture */}
+                  <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px] pointer-events-none" />
                   
-                  {/* Mid-Transit Plane / Ship Marker */}
-                  <g transform="translate(190, 20)">
-                    <circle cx="0" cy="0" r="5" fill="#f59e0b" />
-                    <circle cx="0" cy="0" r="9" fill="#f59e0b" fillOpacity="0.25" />
-                  </g>
+                  {/* Map Mode Toggle & ETA Badge */}
+                  <div className="relative z-10 flex items-center justify-between">
+                    <div className="flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-slate-800 backdrop-blur-xs">
+                      <button
+                        type="button"
+                        onClick={() => setMapMode('map')}
+                        className={`px-1.5 py-0.5 text-[8.5px] font-medium rounded transition-all ${
+                          mapMode === 'map' ? 'bg-[#E35D3B] text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        Map
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMapMode('satellite')}
+                        className={`px-1.5 py-0.5 text-[8.5px] font-medium rounded transition-all ${
+                          mapMode === 'satellite' ? 'bg-[#E35D3B] text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                        }`}
+                      >
+                        Satellite
+                      </button>
+                    </div>
 
-                  {/* Destination Pin */}
-                  <circle cx="270" cy="35" r="4" fill="#10b981" />
-                </svg>
-              </div>
-
-              {/* Origin & Destination Labels */}
-              <div className="relative z-10 flex items-center justify-between text-[10px] font-mono text-slate-300">
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-3 h-3 text-[#E35D3B]" />
-                  <span className="truncate max-w-[120px]">{currentShipment.origin.split(' ')[0]}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="text-slate-500">➔</span>
-                  <span className="truncate max-w-[120px] text-right">{currentShipment.destination.split(' ')[0]}</span>
-                  <MapPin className="w-3 h-3 text-emerald-400" />
-                </div>
-              </div>
-            </div>
-
-            {/* Current Shipment Details Pill & Carrier */}
-            <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-100 flex flex-col gap-2">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <div className="text-xs font-bold text-slate-900 truncate">
-                    {currentShipment.title}
+                    <div className="px-2 py-0.5 bg-emerald-950/80 border border-emerald-700/60 rounded-full text-[9.5px] font-mono text-emerald-300 flex items-center gap-1 shadow-xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>ETA: {currentShipment.eta}</span>
+                    </div>
                   </div>
-                  <div className="text-[10px] text-slate-500 font-mono mt-0.5 flex items-center gap-1.5">
-                    <span>{currentShipment.carrier}</span>
-                    <span>•</span>
-                    <span>{currentShipment.cartons}</span>
+
+                  {/* Simulated Geographic Flight / Cargo Curve */}
+                  <div className="relative z-10 my-auto py-0.5">
+                    <svg viewBox="0 0 300 40" className="w-full h-8 overflow-visible">
+                      <defs>
+                        <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                          <stop offset="0%" stopColor="#E35D3B" stopOpacity="0.8" />
+                          <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.9" />
+                          <stop offset="100%" stopColor="#10b981" stopOpacity="0.8" />
+                        </linearGradient>
+                      </defs>
+                      <path
+                        d="M 30 30 Q 150 -5 270 30"
+                        fill="none"
+                        stroke="#334155"
+                        strokeWidth="1.5"
+                        strokeDasharray="4 4"
+                      />
+                      <path
+                        d="M 30 30 Q 120 5 190 18"
+                        fill="none"
+                        stroke="url(#routeGradient)"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                      <circle cx="30" cy="30" r="3.5" fill="#E35D3B" />
+                      <circle cx="30" cy="30" r="7" fill="#E35D3B" fillOpacity="0.2" className="animate-ping" />
+                      <g transform="translate(190, 18)">
+                        <circle cx="0" cy="0" r="4" fill="#f59e0b" />
+                        <circle cx="0" cy="0" r="8" fill="#f59e0b" fillOpacity="0.25" />
+                      </g>
+                      <circle cx="270" cy="30" r="3.5" fill="#10b981" />
+                    </svg>
+                  </div>
+
+                  {/* Origin & Destination Labels */}
+                  <div className="relative z-10 flex items-center justify-between text-[9px] font-mono text-slate-300">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-2.5 h-2.5 text-[#E35D3B]" />
+                      <span className="truncate max-w-[100px]">{currentShipment.origin.split(' ')[0]}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-slate-500">➔</span>
+                      <span className="truncate max-w-[100px] text-right">{currentShipment.destination.split(' ')[0]}</span>
+                      <MapPin className="w-2.5 h-2.5 text-emerald-400" />
+                    </div>
                   </div>
                 </div>
 
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide shrink-0 ${
-                  currentShipment.statusColor === 'text-emerald-600'
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
-                    : 'bg-orange-50 text-[#E35D3B] border border-orange-200/80'
-                }`}>
-                  {currentShipment.status}
-                </span>
-              </div>
-
-              {/* Quick Specs Grid */}
-              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/60 text-[10px]">
-                <div>
-                  <span className="text-slate-400 block">{language === 'zh' ? '重量 / 体积' : 'Weight / Vol'}</span>
-                  <span className="font-mono font-medium text-slate-800">{currentShipment.weight} • {currentShipment.volume}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">{language === 'zh' ? '报关 / 包装' : 'Customs / Packaging'}</span>
-                  <span className="font-medium text-slate-800 truncate block" title={currentShipment.customsStatus}>
-                    {currentShipment.customsStatus.split(' ')[0]}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Milestone Delivery Timeline */}
-            <div className="flex flex-col gap-2 pt-1">
-              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                {language === 'zh' ? '运输节点时效' : 'Delivery Progress'}
-              </div>
-
-              <div className="relative flex flex-col gap-2.5 ml-1">
-                {/* Vertical connecting line - perfectly centered with circles */}
-                <div className="absolute left-[7px] top-2 bottom-2 w-[2px] -translate-x-1/2 bg-slate-200" />
-
-                {currentShipment.timeline.map((step, sIdx) => {
-                  const isFirst = sIdx === 0;
-                  return (
-                    <div key={sIdx} className="relative flex items-start justify-between text-xs group pl-6">
-                      {/* Node Dot - anchored to exact same center as the vertical line */}
-                      <div className={`absolute left-[7px] -translate-x-1/2 top-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${
-                        step.completed 
-                          ? 'bg-emerald-500 border-white text-white shadow-xs' 
-                          : isFirst 
-                            ? 'bg-orange-500 border-white text-white animate-pulse' 
-                            : 'bg-slate-100 border-slate-300 text-transparent'
-                      }`}>
-                        {step.completed && <Check className="w-2 h-2" />}
+                {/* Current Shipment Details Pill */}
+                <div className="bg-slate-50/80 rounded-xl p-2 border border-slate-100 flex flex-col gap-1.5">
+                  <div className="flex items-start justify-between gap-1.5">
+                    <div className="min-w-0">
+                      <div className="text-[11px] font-bold text-slate-900 truncate">
+                        {currentShipment.title}
                       </div>
-
-                      <div className="min-w-0 pr-2">
-                        <div className={`text-xs leading-tight font-medium ${
-                          step.completed ? 'text-slate-800' : isFirst ? 'text-[#E35D3B] font-semibold' : 'text-slate-400'
-                        }`}>
-                          {step.label}
-                        </div>
-                        <div className="text-[10px] text-slate-400 mt-0.5">
-                          {step.subtext}
-                        </div>
-                      </div>
-
-                      <div className="text-[10px] font-mono text-slate-400 shrink-0">
-                        {step.time}
+                      <div className="text-[9.5px] text-slate-500 font-mono flex items-center gap-1">
+                        <span>{currentShipment.carrier}</span>
+                        <span>•</span>
+                        <span>{currentShipment.cartons}</span>
                       </div>
                     </div>
-                  );
-                })}
+
+                    <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-semibold tracking-wide shrink-0 ${
+                      currentShipment.statusColor === 'text-emerald-600'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
+                        : 'bg-orange-50 text-[#E35D3B] border border-orange-200/80'
+                    }`}>
+                      {currentShipment.status}
+                    </span>
+                  </div>
+
+                  {/* Quick Specs Grid */}
+                  <div className="grid grid-cols-2 gap-1.5 pt-1.5 border-t border-slate-200/60 text-[9px]">
+                    <div>
+                      <span className="text-slate-400 block">{language === 'zh' ? '重量 / 体积' : 'Weight / Vol'}</span>
+                      <span className="font-mono font-medium text-slate-800">{currentShipment.weight} • {currentShipment.volume}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block">{language === 'zh' ? '清关状态' : 'Customs'}</span>
+                      <span className="font-medium text-slate-800 truncate block" title={currentShipment.customsStatus}>
+                        {currentShipment.customsStatus.split(' ')[0]}
+                      </span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2 pt-2 border-t border-slate-100 mt-auto">
-              <button
-                type="button"
-                onClick={() => {
-                  navigator.clipboard?.writeText(currentShipment.id);
-                  onShowToast?.(language === 'zh' ? `已复制单号: ${currentShipment.id}` : `Copied tracking ID: ${currentShipment.id}`);
-                }}
-                className="flex-1 py-1.5 px-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <Copy className="w-3.5 h-3.5 text-slate-500" />
-                <span>{language === 'zh' ? '复制单号' : 'Copy Tracking'}</span>
-              </button>
+              {/* Right Sub-column: Milestone Progress & Actions */}
+              <div className="flex flex-col justify-between gap-2 border-t md:border-t-0 md:border-l border-slate-100 pt-2 md:pt-0 md:pl-3">
+                <div className="flex flex-col gap-1.5">
+                  <div className="text-[9.5px] font-bold text-slate-400 uppercase tracking-wider">
+                    {language === 'zh' ? '运输节点时效' : 'Delivery Progress'}
+                  </div>
 
-              <button
-                type="button"
-                onClick={() => setShowShipmentsDrawer(true)}
-                className="py-1.5 px-3 bg-[#E35D3B] hover:bg-[#d04f2f] text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-xs"
-              >
-                <Layers className="w-3.5 h-3.5" />
-                <span>{language === 'zh' ? '查看全部' : 'View All'}</span>
-              </button>
+                  <div className="relative flex flex-col gap-2 ml-0.5">
+                    <div className="absolute left-[6px] top-1.5 bottom-1.5 w-[2px] -translate-x-1/2 bg-slate-200" />
+
+                    {currentShipment.timeline.map((step, sIdx) => {
+                      const isFirst = sIdx === 0;
+                      return (
+                        <div key={sIdx} className="relative flex items-start justify-between text-xs group pl-5">
+                          <div className={`absolute left-[6px] -translate-x-1/2 top-0.5 w-3 h-3 rounded-full border-2 flex items-center justify-center ${
+                            step.completed 
+                              ? 'bg-emerald-500 border-white text-white shadow-xs' 
+                              : isFirst 
+                                ? 'bg-orange-500 border-white text-white animate-pulse' 
+                                : 'bg-slate-100 border-slate-300 text-transparent'
+                          }`}>
+                            {step.completed && <Check className="w-1.5 h-1.5" />}
+                          </div>
+
+                          <div className="min-w-0 pr-1">
+                            <div className={`text-[11px] leading-tight font-medium ${
+                              step.completed ? 'text-slate-800' : isFirst ? 'text-[#E35D3B] font-semibold' : 'text-slate-400'
+                            }`}>
+                              {step.label}
+                            </div>
+                            <div className="text-[9px] text-slate-400">
+                              {step.subtext}
+                            </div>
+                          </div>
+
+                          <div className="text-[9px] font-mono text-slate-400 shrink-0">
+                            {step.time}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 mt-auto">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(currentShipment.id);
+                      onShowToast?.(language === 'zh' ? `已复制单号: ${currentShipment.id}` : `Copied tracking ID: ${currentShipment.id}`);
+                    }}
+                    className="flex-1 py-1.5 px-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-[11px] font-medium text-slate-700 flex items-center justify-center gap-1 transition-colors"
+                  >
+                    <Copy className="w-3 h-3 text-slate-500" />
+                    <span>{language === 'zh' ? '复制单号' : 'Copy Tracking'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowShipmentsDrawer(true)}
+                    className="py-1.5 px-2.5 bg-[#E35D3B] hover:bg-[#d04f2f] text-white rounded-xl text-[11px] font-semibold flex items-center justify-center gap-1 transition-colors shadow-xs"
+                  >
+                    <Layers className="w-3 h-3" />
+                    <span>{language === 'zh' ? '运单库' : 'View All'}</span>
+                  </button>
+                </div>
+              </div>
+
             </div>
 
           </div>
