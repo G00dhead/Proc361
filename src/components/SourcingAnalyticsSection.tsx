@@ -335,102 +335,102 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
   return (
     <>
       <div className="w-full flex flex-col gap-4 sm:gap-5">
-        {/* TOP STATS WITH CLEAR HIERARCHY: Primary Total Orders at top, Secondary smaller cards below */}
-        <div className="flex flex-col gap-3 sm:gap-3.5">
+        {/* ROW 1: TOP STATS CARDS (LEFT) + TRACK ORDERS (RIGHT) */}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
           
-          {/* Top / Primary Hero Card: Total Orders */}
-          <div className="bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs relative hover:border-slate-300 transition-all">
-            {/* Header */}
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100/90">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 bg-slate-50/80">
-                  <Package className="w-4 h-4 text-slate-500" />
-                </div>
-                <div>
-                  <span className="text-xs sm:text-sm font-medium text-slate-400 tracking-tight">{t.totalOrders}</span>
-                  <span className="ml-2 px-2 py-0.5 rounded-md bg-slate-100 text-slate-400 font-mono text-[10px] font-medium">
-                    {t.all1688FactoryPos}
-                  </span>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="hidden sm:inline-block text-[11px] text-slate-400 font-medium">
-                  {t.activeStatus}
-                </span>
-                <Tooltip 
-                  title={t.totalOrders}
-                  content={language === 'zh' ? '通过 1688、淘宝及工厂直采的所有采购单累计汇总。' : "Cumulative count of all Purchase Orders routed through 1688, Taobao, and OEM factories."}
-                  position="bottom"
-                >
-                  <div 
-                    className="text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
-                    aria-label="Total orders explanation"
-                  >
-                    <Info className="w-3.5 h-3.5" />
+          {/* LEFT: HIERARCHICAL STATS CARDS (7 cols) */}
+          <div className="lg:col-span-7 xl:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3 items-stretch">
+            {/* Card 1: Total Orders (Hero / Biggest Card in the Hierarchy) */}
+            <div className="sm:col-span-2 bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all">
+              {/* Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100/90">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl border border-slate-200 flex items-center justify-center text-slate-500 bg-slate-50/80 shrink-0">
+                    <Package className="w-4 h-4 text-slate-600" />
                   </div>
-                </Tooltip>
-              </div>
-            </div>
-
-            {/* Main Metrics Row */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3.5">
-              {/* Primary Count & Dulled-out Delta */}
-              <div className="flex items-baseline sm:items-center gap-3 sm:gap-4 flex-wrap">
-                <div className="text-3xl sm:text-4xl font-extrabold text-slate-950 font-mono tracking-tight leading-none">
-                  3,484
+                  <div>
+                    <span className="text-xs sm:text-sm font-semibold text-slate-700 tracking-tight">{t.totalOrders}</span>
+                    <span className="ml-2 px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 font-mono text-[10px] font-medium">
+                      {t.all1688FactoryPos}
+                    </span>
+                  </div>
                 </div>
-                {/* Dulled out color badge matching user selection */}
-                <div className="flex items-center gap-1.5">
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200/80 text-xs font-mono font-medium">
-                    +1.1%
+                <div className="flex items-center gap-2">
+                  <span className="hidden sm:inline-block text-[11px] text-slate-400 font-medium">
+                    {t.activeStatus}
                   </span>
-                  <span className="text-slate-400 font-normal font-sans text-xs">{t.vsLastWeek}</span>
+                  <Tooltip 
+                    title={t.totalOrders}
+                    content={language === 'zh' ? '通过 1688、淘宝及工厂直采的所有采购单累计汇总。' : "Cumulative count of all Purchase Orders routed through 1688, Taobao, and OEM factories."}
+                    position="bottom"
+                  >
+                    <div 
+                      className="text-slate-400 hover:text-slate-700 transition-colors p-1 rounded-lg hover:bg-slate-100 cursor-pointer shrink-0"
+                      aria-label="Total orders explanation"
+                    >
+                      <Info className="w-3.5 h-3.5" />
+                    </div>
+                  </Tooltip>
                 </div>
               </div>
 
-              {/* Volume Velocity & Soft Sparkline */}
-              <div className="flex items-center gap-4 sm:gap-6 justify-between sm:justify-end">
+              {/* Metric Section: Largest Typography & Sparkline */}
+              <div className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <div className="text-3xl sm:text-4xl font-extrabold text-slate-950 font-mono tracking-tight leading-none">
+                    3,484
+                  </div>
+                  <div className="flex items-center gap-1.5 mt-2">
+                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/70 text-[11px] font-mono font-semibold">
+                      +1.1%
+                    </span>
+                    <span className="text-slate-400 font-normal font-sans text-xs">{t.vsLastWeek}</span>
+                  </div>
+                </div>
+
+                {/* Volume Velocity & Mini Sparkline */}
                 <div className="flex flex-col items-start sm:items-end">
                   <div className="flex items-center gap-1.5">
                     <span className="text-[11px] text-slate-400 font-medium">{language === 'zh' ? '周度流速' : 'Weekly Velocity'}</span>
-                    <span className="text-xs font-mono font-bold text-slate-800 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200/60">
+                    <span className="text-xs font-mono font-bold text-slate-800 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-200/70">
                       +¥12,180
                     </span>
                   </div>
-                  <div className="text-[11px] font-mono text-slate-400 mt-0.5">
-                    ¥{totalSourcedRMB.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} <span className="text-slate-300">|</span> ${totalSourcedUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  <div className="mt-1.5 shrink-0">
+                    <svg className="w-24 sm:w-28 h-7 overflow-visible" viewBox="0 0 100 30">
+                      <path
+                        d="M 0,20 Q 20,22 35,12 T 65,18 T 100,6"
+                        fill="none"
+                        stroke="#94a3b8"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                      <circle cx="100" cy="6" r="2.5" fill="#64748b" />
+                    </svg>
                   </div>
-                </div>
-
-                {/* Refined Muted Sparkline */}
-                <div className="shrink-0">
-                  <svg className="w-24 sm:w-28 h-8 overflow-visible" viewBox="0 0 100 30">
-                    <path
-                      d="M 0,20 Q 20,22 35,12 T 65,18 T 100,6"
-                      fill="none"
-                      stroke="#94a3b8"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                    />
-                    <circle cx="100" cy="6" r="2.5" fill="#64748b" />
-                  </svg>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Secondary Row: Returns & Fulfilled Cards (Smaller & Compact) */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
-            
-            {/* Card 2: Returns / QC Issues Orders (Smaller) */}
-            <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
+              {/* Bottom Footer Strip */}
+              <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 font-mono">
+                <div>
+                  <span className="text-slate-700 font-semibold">¥{totalSourcedRMB.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                  <span className="mx-1 text-slate-300">/</span>
+                  <span>${totalSourcedUSD.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}</span>
+                </div>
+                <span className="text-[10.5px] font-sans text-slate-400">{t.escrow100}</span>
+              </div>
+            </div>
+
+            {/* Card 2: Returns / QC Issues Orders (Secondary Compact Card) */}
+            <div className="sm:col-span-1 bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
               {/* Header */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 bg-slate-50/50">
-                    <RotateCcw className="w-3 h-3 text-slate-400" />
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100/90">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-6 h-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 bg-slate-50/50 shrink-0">
+                    <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
                   </div>
-                  <span className="text-xs font-medium text-slate-400 tracking-tight">{t.returnsOrders}</span>
+                  <span className="text-xs font-semibold text-slate-600 tracking-tight truncate">{t.returnsOrders}</span>
                 </div>
                 <Tooltip 
                   title={t.returnsOrders}
@@ -438,38 +438,31 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   position="bottom"
                 >
                   <div 
-                    className="text-slate-400 hover:text-slate-700 transition-colors p-0.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+                    className="text-slate-400 hover:text-slate-700 transition-colors p-0.5 rounded-lg hover:bg-slate-100 cursor-pointer shrink-0"
                     aria-label="Returns order explanation"
                   >
-                    <Info className="w-3.5 h-3.5 text-slate-400" />
+                    <Info className="w-3 h-3 text-slate-400" />
                   </div>
                 </Tooltip>
               </div>
 
-              {/* Metric & Mini Columns */}
-              <div className="flex items-center justify-between mt-2.5">
-                <div>
-                  <div className="text-xl sm:text-2xl font-extrabold text-slate-900 font-mono tracking-tight leading-none">
+              {/* Metric Section */}
+              <div className="py-2">
+                <div className="flex items-baseline justify-between gap-1.5">
+                  <div className="text-2xl font-extrabold text-slate-900 font-mono tracking-tight leading-none">
                     978
                   </div>
-                  <div className="flex items-center gap-1 mt-1 text-[11px] font-medium text-slate-500 font-mono">
-                    <span className="text-rose-600 font-bold">-3.3%</span>
-                    <span className="text-slate-400 font-normal font-sans text-[10px]">{t.vsLastWeek}</span>
-                  </div>
+                  <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md bg-rose-50 text-rose-600 border border-rose-200/70 text-[10px] font-mono font-semibold shrink-0">
+                    -3.3%
+                  </span>
                 </div>
-
-                {/* Mini Column Array */}
-                <div className="flex items-end gap-1 h-6 pr-1">
-                  <div className="w-2 h-4 rounded-xs bg-slate-100" />
-                  <div className="w-2 h-5 rounded-xs bg-slate-100" />
-                  <div className="w-2 h-6 rounded-xs bg-slate-300" />
-                  <div className="w-2 h-5 rounded-xs bg-slate-100" />
-                  <div className="w-2 h-4 rounded-xs bg-slate-100" />
+                <div className="text-[10px] text-slate-400 mt-1 font-sans">
+                  {t.vsLastWeek}
                 </div>
               </div>
 
               {/* Helper Bar */}
-              <div className="mt-2 pt-1.5 border-t border-slate-100 flex items-center justify-between text-[10.5px] text-slate-500">
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-500">
                 <span className="truncate pr-1">
                   {t.returnsOrdersDesc}
                 </span>
@@ -477,15 +470,15 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
               </div>
             </div>
 
-            {/* Card 3: Fulfilled Orders & QC Satisfaction (Smaller) */}
-            <div className="bg-white rounded-2xl p-3 sm:p-4 border border-slate-200/80 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
+            {/* Card 3: Fulfilled Orders & QC Satisfaction (Secondary Compact Card) */}
+            <div className="sm:col-span-1 bg-white rounded-2xl p-3.5 border border-slate-200/90 shadow-2xs flex flex-col justify-between relative hover:border-slate-300 transition-all group">
               {/* Header */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 bg-slate-50/50">
-                    <CheckCircle className="w-3 h-3 text-slate-400" />
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100/90">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-6 h-6 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 bg-slate-50/50 shrink-0">
+                    <CheckCircle className="w-3.5 h-3.5 text-slate-400" />
                   </div>
-                  <span className="text-xs font-medium text-slate-400 tracking-tight">{t.fulfilledOrders}</span>
+                  <span className="text-xs font-semibold text-slate-600 tracking-tight truncate">{t.fulfilledOrders}</span>
                 </div>
                 <Tooltip 
                   title={t.fulfilledOrders}
@@ -493,54 +486,332 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   position="bottom"
                 >
                   <div 
-                    className="text-slate-400 hover:text-slate-700 transition-colors p-0.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+                    className="text-slate-400 hover:text-slate-700 transition-colors p-0.5 rounded-lg hover:bg-slate-100 cursor-pointer shrink-0"
                     aria-label="Fulfilled orders explanation"
                   >
-                    <Info className="w-3.5 h-3.5" />
+                    <Info className="w-3 h-3 text-slate-400" />
                   </div>
                 </Tooltip>
               </div>
 
-              {/* Split Progress Columns with Clear Contextual Labels */}
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {/* Passed QC */}
-                <div className="bg-slate-50/70 p-2 rounded-xl border border-slate-200/60">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-slate-700 font-semibold">{t.passedQc}</span>
-                    <span className="text-[9.5px] font-mono font-bold text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded">62%</span>
+              {/* Metric Section */}
+              <div className="py-2">
+                <div className="flex items-baseline justify-between gap-1.5">
+                  <div className="text-2xl font-extrabold text-slate-900 font-mono tracking-tight leading-none">
+                    486 <span className="text-xs font-sans font-normal text-slate-400">{t.poUnit}</span>
                   </div>
-                  <div className="text-base sm:text-lg font-extrabold text-slate-900 font-mono leading-none mt-1">
-                    302 <span className="text-[10px] font-sans font-normal text-slate-400">{t.poUnit}</span>
-                  </div>
-                  <div className="w-full h-1 rounded-full bg-slate-200 mt-1.5 overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full w-[62%]" />
-                  </div>
+                  <span className="text-[9.5px] font-mono font-semibold text-emerald-700 bg-emerald-50 px-1 py-0.5 rounded border border-emerald-200/60">
+                    62% QC OK
+                  </span>
                 </div>
+                <div className="w-full h-1.5 rounded-full bg-slate-100 mt-2 overflow-hidden flex">
+                  <div className="h-full bg-emerald-500 w-[62%]" title="Passed QC 62%" />
+                  <div className="h-full bg-amber-400 w-[38%]" title="In QC Queue 38%" />
+                </div>
+              </div>
 
-                {/* In Inspection / Pending */}
-                <div className="bg-slate-50/70 p-2 rounded-xl border border-slate-200/60">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] text-slate-700 font-semibold">{t.inQcQueue}</span>
-                    <span className="text-[9.5px] font-mono font-bold text-amber-700 bg-amber-50 px-1 py-0.2 rounded">38%</span>
+              {/* Split Counts */}
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-mono text-slate-500">
+                <span className="text-emerald-700 font-semibold">302 {t.passedQc}</span>
+                <span className="text-slate-300">•</span>
+                <span className="text-amber-700 font-semibold">184 {t.inQcQueue}</span>
+              </div>
+            </div>
+
+          </div>
+
+          {/* RIGHT: TRACK ORDERS (5 cols) - Fills the space beside the cards */}
+          <div className="lg:col-span-5 xl:col-span-5 bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col justify-between gap-3.5 overflow-hidden">
+            
+            {/* Card Header */}
+            <div className="flex items-center justify-between relative pb-2.5 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-xl border border-orange-200/70 flex items-center justify-center text-[#E35D3B] bg-orange-50/50">
+                  <Navigation className="w-3.5 h-3.5 text-[#E35D3B]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-bold text-slate-900 tracking-tight">
+                      {language === 'zh' ? '在途运单跟踪' : 'Track Orders'}
+                    </span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   </div>
-                  <div className="text-base sm:text-lg font-extrabold text-slate-900 font-mono leading-none mt-1">
-                    184 <span className="text-[10px] font-sans font-normal text-slate-400">{t.poUnit}</span>
-                  </div>
-                  <div className="w-full h-1 rounded-full bg-slate-200 mt-1.5 overflow-hidden">
-                    <div className="h-full bg-amber-500 rounded-full w-[38%]" />
+                  <div className="text-[10px] text-slate-400 font-mono">
+                    {currentShipment.internalId}
                   </div>
                 </div>
               </div>
 
+              {/* Quick Switch Dropdown / All Shipments Drawer Trigger */}
+              <div className="flex items-center gap-1">
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowShipmentMenu(!showShipmentMenu)}
+                    className="px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-mono font-medium text-slate-700 flex items-center gap-1 transition-colors"
+                    title="Switch Shipment"
+                  >
+                    <span>{currentShipment.id.slice(0, 10)}...</span>
+                    <ChevronDown className="w-3 h-3 text-slate-400" />
+                  </button>
+
+                  {showShipmentMenu && (
+                    <div className="absolute right-0 top-full mt-1 w-60 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 z-30 flex flex-col gap-1">
+                      <div className="text-[10px] font-semibold text-slate-400 px-2 py-1 uppercase tracking-wider">
+                        {language === 'zh' ? '切换运单' : 'Select Shipment'}
+                      </div>
+                      {activeShipments.map((s, idx) => (
+                        <button
+                          key={s.id}
+                          type="button"
+                          onClick={() => {
+                            setActiveShipmentIndex(idx);
+                            setShowShipmentMenu(false);
+                          }}
+                          className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex flex-col gap-0.5 transition-colors ${
+                            idx === activeShipmentIndex 
+                              ? 'bg-orange-50 text-[#E35D3B] font-medium' 
+                              : 'hover:bg-slate-50 text-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="font-mono text-[11px] font-semibold">{s.id}</span>
+                            <span className={`text-[10px] ${idx === activeShipmentIndex ? 'text-[#E35D3B]' : 'text-slate-400'}`}>
+                              {s.carrierShort}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-slate-500 truncate">{s.title}</span>
+                        </button>
+                      ))}
+                      <div className="border-t border-slate-100 pt-1 mt-0.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowShipmentMenu(false);
+                            setShowShipmentsDrawer(true);
+                          }}
+                          className="w-full text-center py-1 text-[11px] font-medium text-[#E35D3B] hover:bg-orange-50/60 rounded-md transition-colors flex items-center justify-center gap-1"
+                        >
+                          <Layers className="w-3 h-3" />
+                          {language === 'zh' ? '管理全部运单 (3)' : 'View All Shipments (3)'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowShipmentsDrawer(true)}
+                  className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                  title="Open Logistics Drawer"
+                >
+                  <Layers className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Interactive Route Map Graphic */}
+            <div className="bg-slate-950 rounded-2xl p-3 border border-slate-800 relative overflow-hidden h-[125px] flex flex-col justify-between group">
+              {/* Background grid texture */}
+              <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px] pointer-events-none" />
+              
+              {/* Map Mode Toggle & ETA Badge */}
+              <div className="relative z-10 flex items-center justify-between">
+                <div className="flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-slate-800 backdrop-blur-xs">
+                  <button
+                    type="button"
+                    onClick={() => setMapMode('map')}
+                    className={`px-2 py-0.5 text-[9px] font-medium rounded-md transition-all ${
+                      mapMode === 'map' ? 'bg-[#E35D3B] text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Map
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMapMode('satellite')}
+                    className={`px-2 py-0.5 text-[9px] font-medium rounded-md transition-all ${
+                      mapMode === 'satellite' ? 'bg-[#E35D3B] text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Satellite
+                  </button>
+                </div>
+
+                <div className="px-2 py-0.5 bg-emerald-950/80 border border-emerald-700/60 rounded-full text-[10px] font-mono text-emerald-300 flex items-center gap-1.5 shadow-xs">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>ETA: {currentShipment.eta}</span>
+                </div>
+              </div>
+
+              {/* Simulated Geographic Flight / Cargo Curve */}
+              <div className="relative z-10 my-auto py-1">
+                <svg viewBox="0 0 300 45" className="w-full h-11 overflow-visible">
+                  <defs>
+                    <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#E35D3B" stopOpacity="0.8" />
+                      <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.9" />
+                      <stop offset="100%" stopColor="#10b981" stopOpacity="0.8" />
+                    </linearGradient>
+                  </defs>
+                  {/* Background arc */}
+                  <path
+                    d="M 30 35 Q 150 -5 270 35"
+                    fill="none"
+                    stroke="#334155"
+                    strokeWidth="2"
+                    strokeDasharray="4 4"
+                  />
+                  {/* Active progress arc */}
+                  <path
+                    d="M 30 35 Q 120 5 190 20"
+                    fill="none"
+                    stroke="url(#routeGradient)"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                  />
+                  {/* Origin Pin */}
+                  <circle cx="30" cy="35" r="4" fill="#E35D3B" />
+                  <circle cx="30" cy="35" r="8" fill="#E35D3B" fillOpacity="0.2" className="animate-ping" />
+                  
+                  {/* Mid-Transit Plane / Ship Marker */}
+                  <g transform="translate(190, 20)">
+                    <circle cx="0" cy="0" r="5" fill="#f59e0b" />
+                    <circle cx="0" cy="0" r="9" fill="#f59e0b" fillOpacity="0.25" />
+                  </g>
+
+                  {/* Destination Pin */}
+                  <circle cx="270" cy="35" r="4" fill="#10b981" />
+                </svg>
+              </div>
+
+              {/* Origin & Destination Labels */}
+              <div className="relative z-10 flex items-center justify-between text-[10px] font-mono text-slate-300">
+                <div className="flex items-center gap-1">
+                  <MapPin className="w-3 h-3 text-[#E35D3B]" />
+                  <span className="truncate max-w-[120px]">{currentShipment.origin.split(' ')[0]}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-slate-500">➔</span>
+                  <span className="truncate max-w-[120px] text-right">{currentShipment.destination.split(' ')[0]}</span>
+                  <MapPin className="w-3 h-3 text-emerald-400" />
+                </div>
+              </div>
+            </div>
+
+            {/* Current Shipment Details Pill & Carrier */}
+            <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-100 flex flex-col gap-2">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="text-xs font-bold text-slate-900 truncate">
+                    {currentShipment.title}
+                  </div>
+                  <div className="text-[10px] text-slate-500 font-mono mt-0.5 flex items-center gap-1.5">
+                    <span>{currentShipment.carrier}</span>
+                    <span>•</span>
+                    <span>{currentShipment.cartons}</span>
+                  </div>
+                </div>
+
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide shrink-0 ${
+                  currentShipment.statusColor === 'text-emerald-600'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
+                    : 'bg-orange-50 text-[#E35D3B] border border-orange-200/80'
+                }`}>
+                  {currentShipment.status}
+                </span>
+              </div>
+
+              {/* Quick Specs Grid */}
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/60 text-[10px]">
+                <div>
+                  <span className="text-slate-400 block">{language === 'zh' ? '重量 / 体积' : 'Weight / Vol'}</span>
+                  <span className="font-mono font-medium text-slate-800">{currentShipment.weight} • {currentShipment.volume}</span>
+                </div>
+                <div>
+                  <span className="text-slate-400 block">{language === 'zh' ? '报关 / 包装' : 'Customs / Packaging'}</span>
+                  <span className="font-medium text-slate-800 truncate block" title={currentShipment.customsStatus}>
+                    {currentShipment.customsStatus.split(' ')[0]}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Milestone Delivery Timeline */}
+            <div className="flex flex-col gap-2 pt-1">
+              <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                {language === 'zh' ? '运输节点时效' : 'Delivery Progress'}
+              </div>
+
+              <div className="relative flex flex-col gap-2.5 ml-1">
+                {/* Vertical connecting line - perfectly centered with circles */}
+                <div className="absolute left-[7px] top-2 bottom-2 w-[2px] -translate-x-1/2 bg-slate-200" />
+
+                {currentShipment.timeline.map((step, sIdx) => {
+                  const isFirst = sIdx === 0;
+                  return (
+                    <div key={sIdx} className="relative flex items-start justify-between text-xs group pl-6">
+                      {/* Node Dot - anchored to exact same center as the vertical line */}
+                      <div className={`absolute left-[7px] -translate-x-1/2 top-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${
+                        step.completed 
+                          ? 'bg-emerald-500 border-white text-white shadow-xs' 
+                          : isFirst 
+                            ? 'bg-orange-500 border-white text-white animate-pulse' 
+                            : 'bg-slate-100 border-slate-300 text-transparent'
+                      }`}>
+                        {step.completed && <Check className="w-2 h-2" />}
+                      </div>
+
+                      <div className="min-w-0 pr-2">
+                        <div className={`text-xs leading-tight font-medium ${
+                          step.completed ? 'text-slate-800' : isFirst ? 'text-[#E35D3B] font-semibold' : 'text-slate-400'
+                        }`}>
+                          {step.label}
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">
+                          {step.subtext}
+                        </div>
+                      </div>
+
+                      <div className="text-[10px] font-mono text-slate-400 shrink-0">
+                        {step.time}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2 pt-2 border-t border-slate-100 mt-auto">
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard?.writeText(currentShipment.id);
+                  onShowToast?.(language === 'zh' ? `已复制单号: ${currentShipment.id}` : `Copied tracking ID: ${currentShipment.id}`);
+                }}
+                className="flex-1 py-1.5 px-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 flex items-center justify-center gap-1.5 transition-colors"
+              >
+                <Copy className="w-3.5 h-3.5 text-slate-500" />
+                <span>{language === 'zh' ? '复制单号' : 'Copy Tracking'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setShowShipmentsDrawer(true)}
+                className="py-1.5 px-3 bg-[#E35D3B] hover:bg-[#d04f2f] text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-xs"
+              >
+                <Layers className="w-3.5 h-3.5" />
+                <span>{language === 'zh' ? '查看全部' : 'View All'}</span>
+              </button>
             </div>
 
           </div>
         </div>
 
-        {/* ROW: ORDER ANALYSIS GRAPH (LEFT) + TRACK ORDERS (RIGHT) */}
-        <div className="w-full flex flex-col lg:flex-row items-stretch gap-4 sm:gap-5">
-          {/* LEFT: ORDER ANALYSIS CHART (THE GRAPH) */}
-          <div className="flex-1 min-w-0 bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs relative flex flex-col justify-between gap-3">
+        {/* ROW 2: ORDER ANALYSIS GRAPH (FULL WIDTH) */}
+        <div className="w-full bg-white rounded-3xl p-4 sm:p-6 border border-slate-200/90 shadow-2xs relative flex flex-col justify-between gap-3">
           {/* Header Controls: Responsive Flex Wrap Row */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-slate-100/90">
             {/* Title & Legend Pill */}
@@ -639,8 +910,8 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   <span className="font-medium text-slate-800 text-[11px] sm:text-xs">{t.fulfilledOrdersLegend}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
-                  <span className="font-medium text-emerald-700 text-[11px] sm:text-xs">{t.cancelQcReturnedLegend}</span>
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0" />
+                  <span className="font-medium text-red-600 text-[11px] sm:text-xs">{t.cancelQcReturnedLegend}</span>
                 </div>
               </div>
               <div className="text-[10px] sm:text-[11px] font-mono text-slate-400">
@@ -690,11 +961,11 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                         <stop offset="100%" stopColor="#2563EB" stopOpacity="0.0" />
                       </linearGradient>
 
-                      {/* Subtle Green Area Gradient */}
-                      <linearGradient id="greenAreaGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#10B981" stopOpacity="0.12" />
-                        <stop offset="75%" stopColor="#10B981" stopOpacity="0.02" />
-                        <stop offset="100%" stopColor="#10B981" stopOpacity="0.0" />
+                      {/* Subtle Red Area Gradient for Cancelled / QC Returns */}
+                      <linearGradient id="redAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#EF4444" stopOpacity="0.14" />
+                        <stop offset="75%" stopColor="#EF4444" stopOpacity="0.02" />
+                        <stop offset="100%" stopColor="#EF4444" stopOpacity="0.0" />
                       </linearGradient>
                     </defs>
 
@@ -750,14 +1021,14 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                     ))}
 
                     {/* Subtle Gradient Area Fills underneath both curves */}
-                    <path d={areaCancel} fill="url(#greenAreaGrad)" />
+                    <path d={areaCancel} fill="url(#redAreaGrad)" />
                     <path d={areaFulfilled} fill="url(#blueAreaGrad)" />
 
-                    {/* Green Series Polyline (QC Returns & Reimbursed) */}
+                    {/* Red Series Polyline (Cancel / QC Returns) */}
                     <path
                       d={pathCancel}
                       fill="none"
-                      stroke="#10B981"
+                      stroke="#EF4444"
                       strokeWidth="2.2"
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -800,15 +1071,15 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                       </g>
                     )}
 
-                    {/* Green Series Circular Data Nodes */}
+                    {/* Red Series Circular Data Nodes */}
                     {pointsCancel.map((pt, i) => (
                       <circle
-                        key={`green-node-${pt.label}-${i}`}
+                        key={`red-node-${pt.label}-${i}`}
                         cx={pt.x}
                         cy={pt.y}
                         r={safeHoveredIndex === i ? 4.8 : 3.5}
                         fill="#FFFFFF"
-                        stroke="#10B981"
+                        stroke="#EF4444"
                         strokeWidth={safeHoveredIndex === i ? 2.4 : 1.8}
                       />
                     ))}
@@ -896,7 +1167,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                             e.stopPropagation();
                             setHoveredIndex((prev) => (prev === i ? null : i));
                             if (hoveredIndex !== i && onShowToast) {
-                              onShowToast(`${pt.label} Sourcing Velocity: ${pt.dealsBlue} deals (${pt.fulfilledValUSD.toLocaleString()} USD) • QC Claims: ${pt.dealsGreen} deals`);
+                              onShowToast(`${pt.label} Sourcing Velocity: ${pt.dealsBlue} deals (${pt.fulfilledValUSD.toLocaleString()} USD) • Cancelled: ${pt.dealsGreen} deals`);
                             }
                           }}
                         />
@@ -924,7 +1195,7 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                             e.stopPropagation();
                             setHoveredIndex((prev) => (prev === i ? null : i));
                             if (hoveredIndex !== i && onShowToast) {
-                              onShowToast(`${d.label} Deals: ${d.dealsBlue} fulfilled / ${d.dealsGreen} QC claims`);
+                              onShowToast(`${d.label} Deals: ${d.dealsBlue} fulfilled / ${d.dealsGreen} cancelled`);
                             }
                           }}
                           className="flex flex-col items-center gap-1.5 h-full justify-end group cursor-pointer flex-1 max-w-[56px]"
@@ -937,11 +1208,11 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                                 isHovered ? 'bg-blue-600 shadow-md scale-y-[1.02]' : 'bg-blue-600/85 group-hover:bg-blue-600'
                               }`}
                             />
-                            {/* Cancel / QC Bar (Green) */}
+                            {/* Cancel / QC Bar (Red) */}
                             <div
                               style={{ height: `${Math.max(cancelHeightPercent, 4)}%` }}
                               className={`w-2.5 sm:w-3 rounded-t transition-all ${
-                                isHovered ? 'bg-emerald-500 shadow-xs' : 'bg-emerald-500/75 group-hover:bg-emerald-500'
+                                isHovered ? 'bg-red-500 shadow-xs' : 'bg-red-500/75 group-hover:bg-red-500'
                               }`}
                             />
                           </div>
@@ -1020,16 +1291,16 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                             </div>
                           </div>
 
-                          {/* Series 2 (Green) */}
+                          {/* Series 2 (Red) */}
                           <div className="pt-2 border-t border-slate-100">
                             <div className="text-[11px] font-bold text-slate-900 leading-tight">
-                              {language === 'zh' ? '质检核验与退款' : 'QC Verified & Reimbursed'}
+                              {language === 'zh' ? '取消与退款订单' : 'Cancelled & Returned Orders'}
                             </div>
                             <div className="text-[10px] text-slate-500 font-mono">
                               {activePoint.label}.2026 • China Hubs
                             </div>
                             <div className="flex items-center gap-1.5 mt-1 text-xs text-slate-800">
-                              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shrink-0" />
+                              <span className="w-2.5 h-2.5 rounded-full bg-red-500 shrink-0" />
                               <span className="font-semibold text-slate-900">Deals: {activePoint.dealsGreen}</span>
                               <span className="text-[10px] text-slate-500 font-mono ml-auto">
                                 ${activePoint.cancelValUSD.toLocaleString()}
@@ -1085,297 +1356,8 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                 </div>
               </div>
             </div>
-          </div>
+          </div> {/* Closes ORDER ANALYSIS GRAPH (FULL WIDTH) */}
 
-        {/* RIGHT SECTION: TRACK ORDERS / SHIPMENT CARD */}
-        <div className="w-full lg:w-[350px] xl:w-[370px] shrink-0 bg-white rounded-3xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col gap-3.5 overflow-hidden">
-          
-          {/* Card Header */}
-          <div className="flex items-center justify-between relative pb-2.5 border-b border-slate-100">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-xl border border-orange-200/70 flex items-center justify-center text-[#E35D3B] bg-orange-50/50">
-                <Navigation className="w-3.5 h-3.5 text-[#E35D3B]" />
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-slate-900 tracking-tight">
-                    {language === 'zh' ? '在途运单跟踪' : 'Track Orders'}
-                  </span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                </div>
-                <div className="text-[10px] text-slate-400 font-mono">
-                  {currentShipment.internalId}
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Switch Dropdown / All Shipments Drawer Trigger */}
-            <div className="flex items-center gap-1">
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowShipmentMenu(!showShipmentMenu)}
-                  className="px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg text-[10px] font-mono font-medium text-slate-700 flex items-center gap-1 transition-colors"
-                  title="Switch Shipment"
-                >
-                  <span>{currentShipment.id.slice(0, 10)}...</span>
-                  <ChevronDown className="w-3 h-3 text-slate-400" />
-                </button>
-
-                {showShipmentMenu && (
-                  <div className="absolute right-0 top-full mt-1 w-60 bg-white border border-slate-200 rounded-xl shadow-lg p-1.5 z-30 flex flex-col gap-1">
-                    <div className="text-[10px] font-semibold text-slate-400 px-2 py-1 uppercase tracking-wider">
-                      {language === 'zh' ? '切换运单' : 'Select Shipment'}
-                    </div>
-                    {activeShipments.map((s, idx) => (
-                      <button
-                        key={s.id}
-                        type="button"
-                        onClick={() => {
-                          setActiveShipmentIndex(idx);
-                          setShowShipmentMenu(false);
-                        }}
-                        className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex flex-col gap-0.5 transition-colors ${
-                          idx === activeShipmentIndex 
-                            ? 'bg-orange-50 text-[#E35D3B] font-medium' 
-                            : 'hover:bg-slate-50 text-slate-700'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="font-mono text-[11px] font-semibold">{s.id}</span>
-                          <span className={`text-[10px] ${idx === activeShipmentIndex ? 'text-[#E35D3B]' : 'text-slate-400'}`}>
-                            {s.carrierShort}
-                          </span>
-                        </div>
-                        <span className="text-[10px] text-slate-500 truncate">{s.title}</span>
-                      </button>
-                    ))}
-                    <div className="border-t border-slate-100 pt-1 mt-0.5">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowShipmentMenu(false);
-                          setShowShipmentsDrawer(true);
-                        }}
-                        className="w-full text-center py-1 text-[11px] font-medium text-[#E35D3B] hover:bg-orange-50/60 rounded-md transition-colors flex items-center justify-center gap-1"
-                      >
-                        <Layers className="w-3 h-3" />
-                        {language === 'zh' ? '管理全部运单 (3)' : 'View All Shipments (3)'}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setShowShipmentsDrawer(true)}
-                className="w-6 h-6 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-                title="Open Logistics Drawer"
-              >
-                <Layers className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-
-          {/* Interactive Route Map Graphic */}
-          <div className="bg-slate-950 rounded-2xl p-3 border border-slate-800 relative overflow-hidden h-[125px] flex flex-col justify-between group">
-            {/* Background grid texture */}
-            <div className="absolute inset-0 opacity-15 bg-[radial-gradient(#94a3b8_1px,transparent_1px)] [background-size:12px_12px] pointer-events-none" />
-            
-            {/* Map Mode Toggle & ETA Badge */}
-            <div className="relative z-10 flex items-center justify-between">
-              <div className="flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-slate-800 backdrop-blur-xs">
-                <button
-                  type="button"
-                  onClick={() => setMapMode('map')}
-                  className={`px-2 py-0.5 text-[9px] font-medium rounded-md transition-all ${
-                    mapMode === 'map' ? 'bg-[#E35D3B] text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  Map
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMapMode('satellite')}
-                  className={`px-2 py-0.5 text-[9px] font-medium rounded-md transition-all ${
-                    mapMode === 'satellite' ? 'bg-[#E35D3B] text-white shadow-xs' : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  Satellite
-                </button>
-              </div>
-
-              <div className="px-2 py-0.5 bg-emerald-950/80 border border-emerald-700/60 rounded-full text-[10px] font-mono text-emerald-300 flex items-center gap-1.5 shadow-xs">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>ETA: {currentShipment.eta}</span>
-              </div>
-            </div>
-
-            {/* Simulated Geographic Flight / Cargo Curve */}
-            <div className="relative z-10 my-auto py-1">
-              <svg viewBox="0 0 300 45" className="w-full h-11 overflow-visible">
-                <defs>
-                  <linearGradient id="routeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#E35D3B" stopOpacity="0.8" />
-                    <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.9" />
-                    <stop offset="100%" stopColor="#10b981" stopOpacity="0.8" />
-                  </linearGradient>
-                </defs>
-                {/* Background arc */}
-                <path
-                  d="M 30 35 Q 150 -5 270 35"
-                  fill="none"
-                  stroke="#334155"
-                  strokeWidth="2"
-                  strokeDasharray="4 4"
-                />
-                {/* Active progress arc */}
-                <path
-                  d="M 30 35 Q 120 5 190 20"
-                  fill="none"
-                  stroke="url(#routeGradient)"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                />
-                {/* Origin Pin */}
-                <circle cx="30" cy="35" r="4" fill="#E35D3B" />
-                <circle cx="30" cy="35" r="8" fill="#E35D3B" fillOpacity="0.2" className="animate-ping" />
-                
-                {/* Mid-Transit Plane / Ship Marker */}
-                <g transform="translate(190, 20)">
-                  <circle cx="0" cy="0" r="5" fill="#f59e0b" />
-                  <circle cx="0" cy="0" r="9" fill="#f59e0b" fillOpacity="0.25" />
-                </g>
-
-                {/* Destination Pin */}
-                <circle cx="270" cy="35" r="4" fill="#10b981" />
-              </svg>
-            </div>
-
-            {/* Origin & Destination Labels */}
-            <div className="relative z-10 flex items-center justify-between text-[10px] font-mono text-slate-300">
-              <div className="flex items-center gap-1">
-                <MapPin className="w-3 h-3 text-[#E35D3B]" />
-                <span className="truncate max-w-[120px]">{currentShipment.origin.split(' ')[0]}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="text-slate-500">➔</span>
-                <span className="truncate max-w-[120px] text-right">{currentShipment.destination.split(' ')[0]}</span>
-                <MapPin className="w-3 h-3 text-emerald-400" />
-              </div>
-            </div>
-          </div>
-
-          {/* Current Shipment Details Pill & Carrier */}
-          <div className="bg-slate-50/80 rounded-2xl p-3 border border-slate-100 flex flex-col gap-2">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <div className="text-xs font-bold text-slate-900 truncate">
-                  {currentShipment.title}
-                </div>
-                <div className="text-[10px] text-slate-500 font-mono mt-0.5 flex items-center gap-1.5">
-                  <span>{currentShipment.carrier}</span>
-                  <span>•</span>
-                  <span>{currentShipment.cartons}</span>
-                </div>
-              </div>
-
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide shrink-0 ${
-                currentShipment.statusColor === 'text-emerald-600'
-                  ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
-                  : 'bg-orange-50 text-[#E35D3B] border border-orange-200/80'
-              }`}>
-                {currentShipment.status}
-              </span>
-            </div>
-
-            {/* Quick Specs Grid */}
-            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-200/60 text-[10px]">
-              <div>
-                <span className="text-slate-400 block">{language === 'zh' ? '重量 / 体积' : 'Weight / Vol'}</span>
-                <span className="font-mono font-medium text-slate-800">{currentShipment.weight} • {currentShipment.volume}</span>
-              </div>
-              <div>
-                <span className="text-slate-400 block">{language === 'zh' ? '报关 / 包装' : 'Customs / Packaging'}</span>
-                <span className="font-medium text-slate-800 truncate block" title={currentShipment.customsStatus}>
-                  {currentShipment.customsStatus.split(' ')[0]}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Milestone Delivery Timeline */}
-          <div className="flex flex-col gap-2 pt-1">
-            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              {language === 'zh' ? '运输节点时效' : 'Delivery Progress'}
-            </div>
-
-            <div className="relative flex flex-col gap-2.5 ml-1">
-              {/* Vertical connecting line - perfectly centered with circles */}
-              <div className="absolute left-[7px] top-2 bottom-2 w-[2px] -translate-x-1/2 bg-slate-200" />
-
-              {currentShipment.timeline.map((step, sIdx) => {
-                const isFirst = sIdx === 0;
-                return (
-                  <div key={sIdx} className="relative flex items-start justify-between text-xs group pl-6">
-                    {/* Node Dot - anchored to exact same center as the vertical line */}
-                    <div className={`absolute left-[7px] -translate-x-1/2 top-0.5 w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${
-                      step.completed 
-                        ? 'bg-emerald-500 border-white text-white shadow-xs' 
-                        : isFirst 
-                          ? 'bg-orange-500 border-white text-white animate-pulse' 
-                          : 'bg-slate-100 border-slate-300 text-transparent'
-                    }`}>
-                      {step.completed && <Check className="w-2 h-2" />}
-                    </div>
-
-                    <div className="min-w-0 pr-2">
-                      <div className={`text-xs leading-tight font-medium ${
-                        step.completed ? 'text-slate-800' : isFirst ? 'text-[#E35D3B] font-semibold' : 'text-slate-400'
-                      }`}>
-                        {step.label}
-                      </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">
-                        {step.subtext}
-                      </div>
-                    </div>
-
-                    <div className="text-[10px] font-mono text-slate-400 shrink-0">
-                      {step.time}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 pt-2 border-t border-slate-100 mt-auto">
-            <button
-              type="button"
-              onClick={() => {
-                navigator.clipboard?.writeText(currentShipment.id);
-                onShowToast?.(language === 'zh' ? `已复制单号: ${currentShipment.id}` : `Copied tracking ID: ${currentShipment.id}`);
-              }}
-              className="flex-1 py-1.5 px-2.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 flex items-center justify-center gap-1.5 transition-colors"
-            >
-              <Copy className="w-3.5 h-3.5 text-slate-500" />
-              <span>{language === 'zh' ? '复制单号' : 'Copy Tracking'}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setShowShipmentsDrawer(true)}
-              className="py-1.5 px-3 bg-[#E35D3B] hover:bg-[#d04f2f] text-white rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-xs"
-            >
-              <Layers className="w-3.5 h-3.5" />
-              <span>{language === 'zh' ? '查看全部' : 'View All'}</span>
-            </button>
-          </div>
-
-        </div> {/* Closes RIGHT SECTION */}
-      </div> {/* Closes ROW WITH GRAPH + TRACK ORDERS */}
       </div> {/* Closes OUTER CONTAINER */}
 
       {/* SLIDE-OVER SHIPMENTS DRAWER */}
