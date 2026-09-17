@@ -1,4 +1,4 @@
-# Proc360 | China Sourcing, RMB Wallet & Consolidation Console
+# Proc361 | China Sourcing, RMB Wallet & Consolidation Console
 
 An operations dashboard for cross-border China sourcing, direct factory procurement (1688, Taobao, Weidian), multi-currency RMB escrow management, warehouse quality control (QC), and shipping consolidation.
 
@@ -52,6 +52,10 @@ An operations dashboard for cross-border China sourcing, direct factory procurem
 - Instant bilingual localization between **English** and **Chinese (简体中文)**.
 - High-density search, tag filtering, and CSV export of all procurement and tracking data.
 
+### 7. Modern UI & Icon System
+- Clean, high-density visual hierarchy designed for supply-chain operations.
+- **Hugeicons**: Comprehensive, crisp vector iconography across navigation, order status tags, action triage modals, and tracking pipelines.
+
 ---
 
 ## Tech Stack
@@ -60,7 +64,7 @@ An operations dashboard for cross-border China sourcing, direct factory procurem
 - **Build Tool**: [Vite](https://vitejs.dev/)
 - **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
 - **Animation**: [Motion](https://motion.dev/) (Framer Motion)
-- **Icons**: [Lucide React](https://lucide.dev/)
+- **Icons**: [Hugeicons](https://hugeicons.com/)
 - **Typography**: Rethink Sans & JetBrains Mono
 
 ---
