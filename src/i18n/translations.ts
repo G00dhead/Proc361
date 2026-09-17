@@ -327,7 +327,7 @@ export interface TranslationDictionary {
 export const translations: Record<Language, TranslationDictionary> = {
   en: {
     // Navigation & Header
-    appTitle: 'PROC360',
+    appTitle: 'PROC361',
     searchPlaceholder: 'Search orders, tracking #, suppliers, items...',
     searchBtn: 'SEARCH',
     focusView: 'Focus View',
@@ -651,7 +651,7 @@ export const translations: Record<Language, TranslationDictionary> = {
 
   zh: {
     // Navigation & Header
-    appTitle: 'PROC360 跨境采运',
+    appTitle: 'PROC361 跨境采运',
     searchPlaceholder: '搜索订单号、运单号、供应商、品名规格...',
     searchBtn: '搜索',
     focusView: '专注模式',

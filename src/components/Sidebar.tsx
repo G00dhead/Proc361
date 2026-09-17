@@ -134,7 +134,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             {isExpanded && (
               <div className="min-w-0 text-left animate-in fade-in duration-200">
                 <div className="flex items-center gap-1.5">
-                  <h1 className="text-sm font-extrabold text-slate-900 tracking-tight leading-none">Proc360</h1>
+                  <h1 className="text-sm font-extrabold text-slate-900 tracking-tight leading-none">Proc361</h1>
                   <span className="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 text-[9px] font-mono font-bold">OS</span>
                 </div>
                 <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">Sourcing & Freight</p>

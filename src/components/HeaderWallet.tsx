@@ -50,12 +50,12 @@ export const HeaderWallet: React.FC<HeaderWalletProps> = ({
         {/* Brand & Context */}
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-slate-200">
-            <span className="text-xs font-mono font-bold tracking-tight">P360</span>
+            <span className="text-xs font-mono font-bold tracking-tight">P361</span>
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-sm font-bold text-slate-100 tracking-tight">
-                Proc360
+                Proc361
               </h1>
               <span className="text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
                 China Operations

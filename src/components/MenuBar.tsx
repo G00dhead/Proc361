@@ -219,7 +219,7 @@ export const MenuBar: React.FC<MenuBarProps> = ({
             className="flex items-center gap-1.5 cursor-pointer group select-none py-1.5 px-2 -ml-2 rounded-lg hover:bg-slate-50 transition-colors focus:outline-none min-h-[44px]"
           >
             <span className="text-xl sm:text-2xl lg:text-[25px] text-slate-950 font-black tracking-tight leading-none font-sans">
-              PROC360
+              PROC361
             </span>
             {language === 'zh' && (
               <span className="hidden sm:inline-block text-[11px] font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-200">
@@ -714,7 +714,7 @@ export const MenuBar: React.FC<MenuBarProps> = ({
               {/* Drawer Header */}
               <div className="p-4 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-xl font-black text-slate-950 tracking-tight">PROC360</span>
+                  <span className="text-xl font-black text-slate-950 tracking-tight">PROC361</span>
                   <span className="text-[10px] font-bold text-orange-600 bg-orange-100/70 px-1.5 py-0.5 rounded">
                     {language === 'zh' ? '跨境控制台' : 'Console'}
                   </span>

@@ -1,5 +1,5 @@
 {
-  "name": "Proc360 Sourcing & Consolidation",
+  "name": "Proc361 Sourcing & Consolidation",
   "description": "High-density China import operations dashboard with dual-zone action prioritization, RMB wallet management, warehouse tracking, and multi-order consolidation.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
