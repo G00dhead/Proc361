@@ -27,6 +27,7 @@ import {
 import { Tooltip } from './Tooltip';
 import { OrderItem } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { Roll, Count, Badge, Chip } from '../stageshow';
 
 interface SourcingAnalyticsSectionProps {
   orders: OrderItem[];
@@ -331,6 +332,77 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
   const pathCancel = getPolylinePath(pointsCancel);
   const areaFulfilled = `${pathFulfilled} L ${pointsFulfilled[pointsFulfilled.length - 1].x.toFixed(1)},${chartBaselineY} L ${pointsFulfilled[0].x.toFixed(1)},${chartBaselineY} Z`;
   const areaCancel = `${pathCancel} L ${pointsCancel[pointsCancel.length - 1].x.toFixed(1)},${chartBaselineY} L ${pointsCancel[0].x.toFixed(1)},${chartBaselineY} Z`;
+
+  // Stageshow Readout Metrics (Rolling headline per Stageshow chart-scrub craft)
+  const totalDelivered = (currentData || []).reduce((acc, d) => acc + d.dealsBlue, 0);
+  const totalCancelled = (currentData || []).reduce((acc, d) => acc + d.dealsGreen, 0);
+
+  const readoutLabel = activePoint 
+    ? `${activePoint.label} • ${language === 'zh' ? '选定周期' : 'Selected Period'}`
+    : `${language === 'zh' ? '全周期' : 'Full Cycle'} (${currentData.length} ${timeInterval === 'Monthly' ? (language === 'zh' ? '个月' : 'Months') : timeInterval === 'Weekly' ? (language === 'zh' ? '周' : 'Weeks') : (language === 'zh' ? '天' : 'Days')})`;
+
+  const readoutDelivered = activePoint 
+    ? `${activePoint.dealsBlue} ${language === 'zh' ? '单' : 'orders'}` 
+    : `${totalDelivered.toLocaleString()} ${language === 'zh' ? '单' : 'orders'}`;
+
+  const readoutCancelled = activePoint 
+    ? `${activePoint.dealsGreen} ${language === 'zh' ? '单' : 'orders'}` 
+    : `${totalCancelled.toLocaleString()} ${language === 'zh' ? '单' : 'orders'}`;
+
+  const readoutRate = activePoint
+    ? `${((activePoint.dealsBlue / (activePoint.dealsBlue + activePoint.dealsGreen || 1)) * 100).toFixed(1)}%`
+    : `${((totalDelivered / (totalDelivered + totalCancelled || 1)) * 100).toFixed(1)}%`;
+
+  // Stageshow Autoplay Choreography Loop
+  const [isWalkthroughPlaying, setIsWalkthroughPlaying] = useState(false);
+  const [walkthroughCursor, setWalkthroughCursor] = useState<{ x: number; y: number; clicking: boolean; label?: string } | null>(null);
+
+  useEffect(() => {
+    if (!isWalkthroughPlaying) {
+      setWalkthroughCursor(null);
+      return;
+    }
+
+    const steps = [
+      { idx: 1, delay: 1100 },
+      { idx: 3, delay: 1200 },
+      { idx: 6, delay: 1300 },
+      { idx: Math.min(8, pointsFulfilled.length - 1), delay: 1800, click: true },
+      { idx: Math.min(11, pointsFulfilled.length - 1), delay: 1300 },
+    ];
+
+    let currentStep = 0;
+    let timerId: number | null = null;
+
+    const playNext = () => {
+      if (!isWalkthroughPlaying) return;
+      const step = steps[currentStep % steps.length];
+      const targetIndex = Math.min(step.idx, pointsFulfilled.length - 1);
+      const pt = pointsFulfilled[targetIndex];
+      if (pt) {
+        setHoveredIndex(targetIndex);
+        setWalkthroughCursor({
+          x: pt.x,
+          y: pt.y,
+          clicking: !!step.click,
+          label: `${pt.label}: ${pt.dealsBlue} ${language === 'zh' ? '单' : 'orders'}`
+        });
+        if (step.click) {
+          setTimeout(() => {
+            setWalkthroughCursor((c) => c ? { ...c, clicking: false } : null);
+          }, 400);
+        }
+      }
+      currentStep++;
+      timerId = window.setTimeout(playNext, step.delay);
+    };
+
+    playNext();
+
+    return () => {
+      if (timerId) clearTimeout(timerId);
+    };
+  }, [isWalkthroughPlaying, pointsFulfilled, language]);
 
   return (
     <>
@@ -728,13 +800,13 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                       </div>
                     </div>
 
-                    <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-semibold tracking-wide shrink-0 ${
-                      currentShipment.statusColor === 'text-emerald-600'
-                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80'
-                        : 'bg-orange-50 text-[#E35D3B] border border-orange-200/80'
-                    }`}>
+                    <Badge 
+                      tone={currentShipment.statusColor === 'text-emerald-600' ? 'success' : 'accent'} 
+                      dot
+                      className="text-[9.5px] py-0.5 px-2 font-mono shrink-0 shadow-2xs"
+                    >
                       {currentShipment.status}
-                    </span>
+                    </Badge>
                   </div>
 
                   {/* Quick Specs Grid */}
@@ -908,6 +980,64 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   {t.bar}
                 </button>
               </div>
+
+              {/* Stageshow Autoplay Walkthrough Button */}
+              <button
+                type="button"
+                onClick={() => {
+                  const nextState = !isWalkthroughPlaying;
+                  setIsWalkthroughPlaying(nextState);
+                  if (nextState && onShowToast) {
+                    onShowToast(language === 'zh' ? '正在播放 Stageshow 演示' : 'Playing Stageshow Walkthrough');
+                  }
+                }}
+                className={`px-2.5 py-1 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border ${
+                  isWalkthroughPlaying
+                    ? 'bg-slate-950 text-white border-slate-950 shadow-xs'
+                    : 'bg-white hover:bg-slate-50 text-slate-700 border-slate-200/90'
+                }`}
+                title="Play Stageshow Product Walkthrough Demo"
+              >
+                <span className={isWalkthroughPlaying ? "animate-spin" : ""}>🎬</span>
+                <span className="hidden sm:inline font-mono">
+                  {isWalkthroughPlaying 
+                    ? (language === 'zh' ? '演示中 (点击暂停)' : 'Touring (Tap to Pause)') 
+                    : (language === 'zh' ? 'Stageshow 演示' : 'Stageshow Demo')}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Stageshow Dynamic Readout Strip (The headline is the readout per chart-scrub rule) */}
+          <div className="bg-slate-50/95 rounded-2xl px-3.5 py-2.5 border border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shadow-2xs">
+            <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+              <div className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider font-mono">
+                <Roll variant="fade">{readoutLabel}</Roll>
+              </div>
+              <div className="h-3 w-px bg-slate-200 hidden sm:block" />
+              <div className="flex items-center gap-3.5 text-xs font-medium">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0" />
+                  <span className="text-slate-500">{language === 'zh' ? '交付:' : 'Delivered:'}</span>
+                  <span className="font-bold text-slate-900 font-mono">
+                    <Roll stagger={20}>{readoutDelivered}</Roll>
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-red-500 shrink-0" />
+                  <span className="text-slate-500">{language === 'zh' ? '取消:' : 'Cancelled:'}</span>
+                  <span className="font-bold text-red-600 font-mono">
+                    <Roll stagger={20}>{readoutCancelled}</Roll>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-slate-400 font-medium text-[11px]">{language === 'zh' ? '交付成功率' : 'Success Rate'}:</span>
+              <span className="font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full text-xs">
+                <Roll variant="fade">{readoutRate}</Roll>
+              </span>
             </div>
           </div>
 
@@ -1086,17 +1216,60 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
 
                     {/* Active Vertical Crosshair */}
                     {safeHoveredIndex !== null && pointsFulfilled[safeHoveredIndex] && (
-                      <g>
+                      <g className="pointer-events-none">
                         <line
                           x1={pointsFulfilled[safeHoveredIndex].x}
                           y1={paddingTop}
                           x2={pointsFulfilled[safeHoveredIndex].x}
                           y2={chartBaselineY}
-                          stroke="#94A3B8"
+                          stroke="#64748B"
                           strokeWidth="1.5"
                           strokeDasharray="4 4"
-                          opacity="0.75"
+                          opacity="0.8"
                         />
+                        {/* Glowing Dot on Completed curve */}
+                        <circle
+                          cx={pointsFulfilled[safeHoveredIndex].x}
+                          cy={pointsFulfilled[safeHoveredIndex].y}
+                          r={6.5}
+                          fill="#2563EB"
+                          stroke="#FFFFFF"
+                          strokeWidth="2.5"
+                        />
+                        {/* Glowing Dot on Cancel curve */}
+                        {pointsCancel[safeHoveredIndex] && (
+                          <circle
+                            cx={pointsCancel[safeHoveredIndex].x}
+                            cy={pointsCancel[safeHoveredIndex].y}
+                            r={5.5}
+                            fill="#EF4444"
+                            stroke="#FFFFFF"
+                            strokeWidth="2"
+                          />
+                        )}
+                      </g>
+                    )}
+
+                    {/* Stageshow Virtual Animated Cursor during Walkthrough */}
+                    {walkthroughCursor && (
+                      <g
+                        className="pointer-events-none transition-transform duration-700 ease-out"
+                        style={{ transform: `translate(${walkthroughCursor.x}px, ${walkthroughCursor.y}px)` }}
+                      >
+                        {walkthroughCursor.clicking && (
+                          <circle cx="1" cy="1" r="18" fill="rgba(37, 99, 235, 0.3)" className="animate-ping" />
+                        )}
+                        <svg width="22" height="26" viewBox="0 0 18 22" fill="none" className="drop-shadow-md overflow-visible">
+                          <path d="M1 1L6.5 20.5L10 13.5L17 11.5L1 1Z" fill="#0F172A" stroke="#FFFFFF" strokeWidth="1.5" strokeLinejoin="round" />
+                        </svg>
+                        {walkthroughCursor.label && (
+                          <g transform="translate(18, 12)">
+                            <rect x="0" y="0" width="112" height="22" rx="6" fill="#0F172A" opacity="0.94" />
+                            <text x="8" y="15" fill="#FFFFFF" fontSize="10" fontWeight="600" fontFamily="system-ui">
+                              {walkthroughCursor.label}
+                            </text>
+                          </g>
+                        )}
                       </g>
                     )}
 
@@ -1287,14 +1460,16 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
             </div>
             </div>
 
-            {/* Bottom Strip: 4 Dead-Simple, Everyday Metrics that Anyone Understands */}
+            {/* Bottom Strip: 4 Dead-Simple, Everyday Metrics that Anyone Understands with Stageshow Roll */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-2.5 pt-2.5 sm:pt-3 border-t border-slate-100 mt-1 text-xs">
               <div className="bg-slate-50/90 rounded-2xl p-2.5 sm:p-3 border border-slate-100/90 flex flex-col justify-between">
                 <span className="text-[11px] text-slate-500 font-medium">
                   {language === 'zh' ? '成功交付订单' : 'Orders Delivered'}
                 </span>
                 <div className="mt-1">
-                  <div className="text-sm sm:text-base font-bold text-slate-950 font-mono">3,484</div>
+                  <div className="text-sm sm:text-base font-bold text-slate-950 font-mono">
+                    <Roll stagger={20}>{readoutDelivered.split(' ')[0]}</Roll>
+                  </div>
                   <div className="text-[10px] text-emerald-600 font-medium mt-0.5">
                     {language === 'zh' ? '● 顺利签收' : '● Successfully arrived'}
                   </div>
@@ -1306,7 +1481,9 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   {language === 'zh' ? '取消与退款' : 'Cancelled & Refunded'}
                 </span>
                 <div className="mt-1">
-                  <div className="text-sm sm:text-base font-bold text-red-600 font-mono">126</div>
+                  <div className="text-sm sm:text-base font-bold text-red-600 font-mono">
+                    <Roll stagger={20}>{readoutCancelled.split(' ')[0]}</Roll>
+                  </div>
                   <div className="text-[10px] text-slate-500 font-medium mt-0.5">
                     {language === 'zh' ? '100% 货款已退回' : '100% refunded to wallet'}
                   </div>
@@ -1318,7 +1495,9 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   {language === 'zh' ? '平均到货时间' : 'Average Delivery Time'}
                 </span>
                 <div className="mt-1">
-                  <div className="text-sm sm:text-base font-bold text-slate-900 font-mono">5 - 7 {language === 'zh' ? '天' : 'Days'}</div>
+                  <div className="text-sm sm:text-base font-bold text-slate-900 font-mono">
+                    <Roll variant="fade">{safeHoveredIndex !== null ? '4.8 Days' : '5 - 7 Days'}</Roll>
+                  </div>
                   <div className="text-[10px] text-slate-500 font-medium mt-0.5">
                     {language === 'zh' ? '工厂出货至签收' : 'From factory to your door'}
                   </div>
@@ -1330,7 +1509,9 @@ export const SourcingAnalyticsSection: React.FC<SourcingAnalyticsSectionProps> =
                   {language === 'zh' ? '整体成功率' : 'Success Rate'}
                 </span>
                 <div className="mt-1">
-                  <div className="text-sm sm:text-base font-bold text-emerald-600 font-mono">96.5%</div>
+                  <div className="text-sm sm:text-base font-bold text-emerald-600 font-mono">
+                    <Roll variant="fade">{readoutRate}</Roll>
+                  </div>
                   <div className="text-[10px] text-emerald-600 font-medium mt-0.5">
                     {language === 'zh' ? '无异常顺利履约' : 'Completed without issues'}
                   </div>

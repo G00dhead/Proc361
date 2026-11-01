@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, ArrowUpRight, CheckCircle2, Download, Filter } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { Roll } from '../stageshow';
 
 interface PerformanceChartProps {
   onShowToast?: (msg: string) => void;
@@ -90,16 +91,26 @@ export const PerformanceChart: React.FC<PerformanceChartProps> = ({ onShowToast 
         </div>
       </div>
 
-      {/* Main Metric Value: 68.4% Efficiency Index */}
+      {/* Main Metric Value: Readout rolls dynamically per Stageshow chart-scrub */}
       <div className="mt-4">
-        <div className="flex items-baseline gap-3 flex-wrap">
-          <span className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-950 tracking-tight">
-            68.4%
-          </span>
-          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white text-slate-900 border border-slate-200/80 shadow-2xs font-mono">
-            {metricMode} {language === 'zh' ? '均值' : 'Avg'}
-          </span>
-        </div>
+        {(() => {
+          const activeValue = hoveredIndex !== null && bars[hoveredIndex] 
+            ? bars[hoveredIndex].value 
+            : (metricMode === '7D' ? '72.1%' : metricMode === '14D' ? '68.4%' : '64.9%');
+          const activeLabel = hoveredIndex !== null && bars[hoveredIndex] 
+            ? `${bars[hoveredIndex].label} • ${bars[hoveredIndex].orders} ${language === 'zh' ? '单' : 'orders'}` 
+            : `${metricMode} ${language === 'zh' ? '均值' : 'Avg'}`;
+          return (
+            <div className="flex items-baseline gap-3 flex-wrap">
+              <span className="text-3xl sm:text-4xl font-extrabold font-mono text-slate-950 tracking-tight">
+                <Roll stagger={20}>{activeValue}</Roll>
+              </span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white text-slate-900 border border-slate-200/80 shadow-2xs font-mono">
+                <Roll variant="fade">{activeLabel}</Roll>
+              </span>
+            </div>
+          );
+        })()}
         <div className="flex items-center gap-2 mt-1 text-xs font-mono text-slate-600 flex-wrap">
           <span className="font-semibold text-slate-800">
             {language === 'zh' ? '中转仓平均入库质检耗时：3.8小时' : '3.8 hrs avg intake to QC photo'}

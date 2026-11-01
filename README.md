@@ -52,7 +52,13 @@ An operations dashboard for cross-border China sourcing, direct factory procurem
 - Instant bilingual localization between **English** and **Chinese (简体中文)**.
 - High-density search, tag filtering, and CSV export of all procurement and tracking data.
 
-### 7. Modern UI & Icon System
+### 7. Stageshow Micro-Interactions & Product Walkthrough
+- Integrated Benji Taylor's **Stageshow** design system kit (`benjitaylor/skills --skill stageshow`):
+  - **Dynamic Rolling Readouts (`<Roll>` / `<Count>`)**: Headlines act as the primary readout during chart scrub, eliminating awkward overlapping tooltips and delivering instant tactile feedback with tabular figure transitions.
+  - **Interactive Stageshow Product Walkthrough**: Autoplay cursor choreography mode that takes users through the end-to-end procurement and fulfillment journey with realistic OS-grade cursor motion and click interactions.
+  - **High-Craft Frame & Badge Geometry**: Native window styling, status badges (`<Badge>`), filter chips (`<Chip>`), and precision curve crosshairs.
+
+### 8. Modern UI & Icon System
 - Clean, high-density visual hierarchy designed for supply-chain operations.
 - **Hugeicons**: Comprehensive, crisp vector iconography across navigation, order status tags, action triage modals, and tracking pipelines.
 
